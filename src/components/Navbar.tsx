@@ -8,19 +8,32 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useUserStore } from "../stores/useUserStore";
+import { logOutUser } from "../services/AuthService";
+import { Link, useNavigate } from "react-router-dom";
 
 const navigation = [
-  { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
+  { name: "Dashboard", path: "/", current: true },
+  { name: "Team", path: "#", current: false },
+  { name: "Projects", path: "#", current: false },
+  { name: "Calendar", path: "#", current: false },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+export default function Navbar() {
+  const user = useUserStore((state) => state.user);
+  const navigate = useNavigate();
+  const handleLogOut = async () => {
+    console.log("clicked logout");
+    const res = await logOutUser();
+    console.log(res);
+    if (res === null) {
+      navigate("/", { replace: true });
+    }
+  };
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -44,16 +57,16 @@ export default function Example() {
             <div className="flex flex-shrink-0 items-center">
               <img
                 alt="Your Company"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
                 className="h-8 w-auto"
               />
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.path}
                     aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
@@ -63,8 +76,16 @@ export default function Example() {
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
+                {user && user.privileges === 3 && (
+                  <Link
+                    to={"/dashboard/nuevo"}
+                    className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                  >
+                    Agregar empleado
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -112,12 +133,12 @@ export default function Example() {
                   </a>
                 </MenuItem>
                 <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100"
+                  <button
+                    onClick={handleLogOut}
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100"
                   >
                     Sign out
-                  </a>
+                  </button>
                 </MenuItem>
               </MenuItems>
             </Menu>

@@ -6,20 +6,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
 
-  const handleLogOut = async () => {
-    console.log("clicked logout");
-    const res = await logOutUser();
-    console.log(res);
-    if (res === null) {
-      navigate("/", { replace: true });
-    }
-  };
-
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">Inicio</h1>
-      <h2>Bienvenido, {user?.full_name}</h2>
-
+    <div className="p-5 max-w-[1200px] bg-red-600 mx-auto">
+      <h1 className="text-primary text-4xl uppercase font-black">Dashboard</h1>
       {user?.privileges === 3 && <button>Nuevo empleado</button>}
 
       <button color="error" onClick={() => handleLogOut()}>
@@ -27,6 +16,6 @@ export default function Dashboard() {
       </button>
 
       <Outlet />
-    </>
+    </div>
   );
 }
