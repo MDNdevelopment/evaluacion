@@ -1,8 +1,5 @@
 import { useUserStore } from "../stores/useUserStore";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import Button from "@mui/material/Button";
-import { Box } from "@mui/material";
 import { logOutUser } from "../services/AuthService";
 
 export default function Dashboard() {
@@ -20,22 +17,15 @@ export default function Dashboard() {
 
   return (
     <>
-      <h1>Inicio</h1>
+      <h1 className="text-3xl font-bold underline">Inicio</h1>
       <h2>Bienvenido, {user?.full_name}</h2>
 
-      {user?.privileges === 3 && (
-        <Button variant="contained">Nuevo empleado</Button>
-      )}
+      {user?.privileges === 3 && <button>Nuevo empleado</button>}
 
-      <Box sx={{ mt: 5 }}>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => handleLogOut()}
-        >
-          Cerrar Sesión
-        </Button>
-      </Box>
+      <button color="error" onClick={() => handleLogOut()}>
+        Cerrar Sesión
+      </button>
+
       <Outlet />
     </>
   );

@@ -3,123 +3,22 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
-//-----
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
-import FormLabel from "@mui/material/FormLabel";
-import FormControl from "@mui/material/FormControl";
-import Link from "@mui/material/Link";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
-import {
-  GoogleIcon,
-  FacebookIcon,
-  SitemarkIcon,
-} from "../components/CustomIcons";
-import AppTheme from "../shared-theme/AppTheme";
-import ColorModeSelect from "../shared-theme/ColorModeSelect";
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
-  },
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const SignInContainer = styled(Stack)(({ theme }) => ({
-  padding: 20,
-  marginTop: "10vh",
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
-
-export default function Login(props: { disableCustomTheme?: boolean }) {
+export default function Login() {
   const [email, setEmail] = useState<string>("juanluislauretta@gmail.com");
   const [password, setPassword] = useState<string>("Juanluis007*");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
-  const [open, setOpen] = useState(false);
-
-  //------
-  const [emailError, setEmailError] = useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = useState("");
-  const [passwordError, setPasswordError] = useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const logged = await loginUser({ email, password, setError, setUser });
-    if (!logged) {
-      console.log({ logged });
+    const { ok } = await loginUser({ email, password, setError, setUser });
+    if (!ok) {
+      console.log("Error login");
+      return;
     }
     // Set cookie with session token
     navigate("/dashboard"); // Redirect to dashboard
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const validateInputs = () => {
-    const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage("");
-    }
-
-    return isValid;
   };
 
   //   Check if the user is already authenticated and has the auth-token cookie
@@ -133,136 +32,80 @@ export default function Login(props: { disableCustomTheme?: boolean }) {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p>{error}</p>}
-      </form>
-      <AppTheme {...props}>
-        <CssBaseline enableColorScheme />
-        <SignInContainer direction="column" justifyContent="space-between">
-          <ColorModeSelect
-            sx={{ position: "fixed", top: "1rem", right: "1rem" }}
+      <div className="flex min-h-full w-2/5 mx-auto mt-5 rounded-lg flex-col justify-center px-6 py-12 lg:px-4 shadow-lg 	">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <img
+            alt="Your Company"
+            src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
+            className="mx-auto h-24 w-auto"
           />
-          <Card variant="outlined">
-            <SitemarkIcon />
-            <Typography
-              component="h1"
-              variant="h4"
-              sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
-            >
-              Sign in
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                gap: 2,
-              }}
-            >
-              <FormControl>
-                <FormLabel htmlFor="email">Email</FormLabel>
-                <TextField
-                  error={emailError}
-                  helperText={emailErrorMessage}
+          <h2 className="mt-10 text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
+            Iniciar sesión
+          </h2>
+        </div>
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Email
+                </label>
+              </div>
+              <div className="mt-2">
+                <input
                   id="email"
-                  type="email"
                   name="email"
-                  placeholder="your@email.com"
+                  type="email"
+                  required
                   autoComplete="email"
-                  autoFocus
-                  required
-                  fullWidth
-                  variant="outlined"
-                  color={emailError ? "error" : "primary"}
-                  sx={{ ariaLabel: "email" }}
+                  className="pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-              </FormControl>
-              <FormControl>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <FormLabel htmlFor="password">Password</FormLabel>
-                </Box>
-                <TextField
-                  error={passwordError}
-                  helperText={passwordErrorMessage}
-                  name="password"
-                  placeholder="••••••"
-                  type="password"
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Contraseña
+                </label>
+                <div className="text-sm"></div>
+              </div>
+              <div className="mt-2">
+                <input
                   id="password"
-                  autoComplete="current-password"
-                  autoFocus
+                  name="password"
+                  type="password"
                   required
-                  fullWidth
-                  variant="outlined"
-                  color={passwordError ? "error" : "primary"}
+                  autoComplete="current-password"
+                  className="pl-3 block w-full rounded-lg border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-              </FormControl>
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
-              <Button
+              </div>
+            </div>
+
+            <div>
+              <button
                 type="submit"
-                fullWidth
-                variant="contained"
-                onClick={validateInputs}
+                className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Sign in
-              </Button>
-              <Typography sx={{ textAlign: "center" }}>
-                Don&apos;t have an account?{" "}
-                <span>
-                  <Link
-                    href="/material-ui/getting-started/templates/sign-in/"
-                    variant="body2"
-                    sx={{ alignSelf: "center" }}
-                  >
-                    Sign up
-                  </Link>
-                </span>
-              </Typography>
-            </Box>
-            <Divider>or</Divider>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Google")}
-                startIcon={<GoogleIcon />}
-              >
-                Sign in with Google
-              </Button>
-              <Button
-                type="submit"
-                fullWidth
-                variant="outlined"
-                onClick={() => alert("Sign in with Facebook")}
-                startIcon={<FacebookIcon />}
-              >
-                Sign in with Facebook
-              </Button>
-            </Box>
-          </Card>
-        </SignInContainer>
-      </AppTheme>
+                Entrar
+              </button>
+            </div>
+          </form>
+
+          {error && <p className="mt-5  text-red-600">{error}</p>}
+        </div>
+      </div>
     </>
   );
 }
