@@ -1,0 +1,32 @@
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+export interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  department: string;
+  avatar_url?: string;
+  role: string;
+  privileges: number;
+}
+
+interface UserState {
+  user: User | null;
+  setUser: (user: User) => void;
+  clearUser: () => void;
+}
+
+export const useUserStore = create<UserState>()(
+  persist(
+    (set) => ({
+      user: null,
+      setUser: (user: User) => set({ user }),
+      clearUser: () => set({ user: null }),
+    }),
+    {
+      name: "user-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
