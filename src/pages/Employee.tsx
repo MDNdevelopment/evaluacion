@@ -16,7 +16,6 @@ import formatDateToSpanishMonthYear from "../utils/formatDateToSpanishPeriod";
 
 export default function Employee() {
   const colors = [
-    "#111111",
     "#F4B000", // Vibrant Yellow
     "#8884d8", // Soft Indigo
     "#82ca9d", // Soft Green
@@ -24,6 +23,7 @@ export default function Employee() {
     "#4682B4", // Steel Blue
     "#FF69B4", // Hot Pink
     "#ff0048", // Orange
+    "#222222",
   ];
 
   const categories = {
@@ -34,7 +34,8 @@ export default function Employee() {
     customer_service: "Atención al cliente",
     process_tracking: "Seguimiento de procesos",
     responsibility: "Responsabilidad",
-    total_rate: "Total",
+    total_rate: "Promedio total",
+    total_evaluations: "Evaluaciones",
   };
 
   // Helper function to convert 'month year' string to a valid Date object
@@ -109,6 +110,7 @@ export default function Employee() {
           customer_service: [],
           process_tracking: [],
           responsibility: [],
+          total_evaluations: 0,
         };
       }
 
@@ -120,6 +122,7 @@ export default function Employee() {
       acc[periodKey].process_tracking.push(evaluation.process_tracking);
       acc[periodKey].responsibility.push(evaluation.responsibility);
       acc[periodKey].total_rate.push(evaluation.total_rate);
+      acc[periodKey].total_evaluations++;
       return acc;
     }, {});
 
@@ -138,9 +141,12 @@ export default function Employee() {
           process_tracking: average(periodData.process_tracking).toFixed(2),
           responsibility: average(periodData.responsibility).toFixed(2),
           total_rate: average(periodData.total_rate).toFixed(2),
+          total_evaluations: periodData.total_evaluations,
         };
       }
     );
+
+    console.log({ aggregatedEvaluations });
 
     const parsePeriod = (period) => {
       const [month, year] = period.split(" ");
@@ -154,7 +160,7 @@ export default function Employee() {
       return dateA - dateB;
     });
 
-    setEvaluationsData(aggregatedEvaluations);
+    setEvaluationsData(sortedData);
   };
 
   useEffect(() => {
@@ -174,7 +180,7 @@ export default function Employee() {
       evaluationsData.length > 0 ? Object.keys(evaluationsData[0]) : [];
 
     // Filter out keys that you don't want to include as lines
-    const metricKeys = dataKeys.filter((key) => key !== "Período");
+    const metricKeys = dataKeys.filter((key) => key !== "period");
 
     return (
       <ResponsiveContainer width="95%" height={300}>

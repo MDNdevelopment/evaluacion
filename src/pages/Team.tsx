@@ -26,6 +26,7 @@ interface Employee {
   role: string;
   avg_evaluations: Evaluations;
   recent_evaluation_date: string;
+  privileges: number;
 }
 
 export default function Team() {
@@ -38,7 +39,7 @@ export default function Team() {
     const { data: employeeData, error: employeeError } = await supabase
       .from("users")
       .select(
-        `user_id,first_name,last_name,department_id,role,departments(name),avg_evaluations:evaluations!target_employee(total_rate.avg())`
+        `user_id,first_name,last_name,department_id,role,privileges,departments(name),avg_evaluations:evaluations!target_employee(total_rate.avg())`
       );
 
     if (employeeError) {
@@ -175,20 +176,16 @@ export default function Team() {
                     <td className="px-6 py-4">
                       <EvaluatedBadge
                         badge={determineBadge(
-                          user.department_id,
                           user.privileges,
-                          employee.department_id,
-                          employee.recent_evaluation_date
+                          employee.privileges,
+                          employee.recent_evaluation_date,
+                          employee.last_name
                         )}
                       />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-row  ">
-                        {canEvaluate(
-                          user.department_id,
-                          user.privileges,
-                          employee.department_id
-                        ) ? (
+                        {canEvaluate(user.privileges, employee.privileges) ? (
                           <>
                             <EvaluateModal
                               userData={user.id}
