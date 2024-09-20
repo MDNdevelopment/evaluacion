@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", path: "/", current: true },
-  { name: "Team", path: "#", current: false },
+  { name: "Empleados", path: "/empleados", current: false },
   { name: "Projects", path: "#", current: false },
   { name: "Calendar", path: "#", current: false },
 ];

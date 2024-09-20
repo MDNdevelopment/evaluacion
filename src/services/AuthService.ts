@@ -48,6 +48,7 @@ export const loginUser = async ({
         id: userId,
         full_name: `${employeeData.first_name} ${employeeData.last_name}`,
         email: employeeData.email,
+        department_id: employeeData.department_id,
         department: employeeData.departments.name,
         role: employeeData.role,
         privileges: employeeData.privileges,

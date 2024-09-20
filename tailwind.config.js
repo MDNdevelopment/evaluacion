@@ -12,12 +12,17 @@ module.exports = {
       },
     },
     extend: {
+      maxWidth: {
+        "modal-evaluation": "55rem",
+      },
       colors: {
         primary: {
           DEFAULT: "#F4B000",
           dark: "#eba900",
         },
-
+        darkText: {
+          DEFAULT: "#2a2a2a",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

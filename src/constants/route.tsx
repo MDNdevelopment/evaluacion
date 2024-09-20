@@ -4,6 +4,8 @@ import { Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
+import Team from "../pages/Team";
+import Employee from "../pages/Employee";
 
 export const Routes = [
   {
@@ -35,6 +37,22 @@ export const Routes = [
     element: (
       <PrivateRoute>
         <NewEmployee />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/empleados",
+    element: (
+      <PrivateRoute>
+        <Team />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/empleado/:id",
+    element: (
+      <PrivateRoute>
+        <Employee />
       </PrivateRoute>
     ),
   },

@@ -1,6 +1,7 @@
 import { useUserStore } from "../stores/useUserStore";
 import { Outlet, useNavigate } from "react-router-dom";
 import { logOutUser } from "../services/AuthService";
+import EvaluateModal from "../components/EvaluateModal";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -14,8 +15,6 @@ export default function Dashboard() {
       <button color="error" onClick={() => handleLogOut()}>
         Cerrar Sesión
       </button>
-
-      <Outlet />
     </div>
   );
 }

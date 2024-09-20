@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../stores/useUserStore";
-import { loginUser } from "../services/AuthService";
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import ShowPasswordButton from "../components/ShowPasswordButton";
 import { supabase } from "../services/supabaseClient";
+import { toast } from "react-toastify";
 
 type Inputs = {
   firstName: string;
@@ -17,62 +15,75 @@ type Inputs = {
 };
 
 export default function NewEmployee() {
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [createError, setCreateError] = useState<string | null>(null);
   const [isLoading, setIsloading] = useState<boolean>(false);
-  const setUser = useUserStore((state) => state.setUser);
   const [showPassword1, setShowPassword1] = useState(false);
 
-  const toggleShowPassword1 = (e) => {
+  const toggleShowPassword1 = () => {
     setShowPassword1((prev) => !prev);
   };
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log("submitting");
-    setIsloading(true);
+    // setCreateError(null);
+    // console.log("submitting");
+    // setIsloading(true);
 
-    //First create the user in the supabase authentication service
-    const { data: signUp, error } = await supabase.auth.signUp({
-      email: watch("email"),
-      password: watch("password"),
+    // //First create the user in the supabase authentication service
+    // const { data: signUp, error } = await supabase.auth.signUp({
+    //   email: watch("email"),
+    //   password: watch("password"),
+    // });
+
+    // if (error) {
+    //   console.log("error creating authentication user");
+    //   setCreateError(error.message);
+    //   setIsloading(false);
+    //   return;
+    // }
+
+    // console.log("new user created successfully");
+    // if (signUp) {
+    //   //Create a new employee in the users table
+    //   const { error: errorEmployee } = await supabase.from("users").insert({
+    //     user_id: signUp.user.id,
+    //     first_name: watch("firstName"),
+    //     last_name: watch("lastName"),
+    //     email: watch("email"),
+    //     role: watch("role"),
+    //     department_id: watch("department"),
+    //     privileges: watch("privileges"),
+    //   });
+
+    //   if (errorEmployee) {
+    //     setIsloading(false);
+    //     setCreateError(
+    //       `Error al crear perfil del empleado.
+    //       Código de error: ${errorEmployee.code}`
+    //     );
+
+    //     console.log({ errorEmployee });
+    //     return;
+    //   }
+    // }
+
+    console.log(data);
+    toast.success("¡Empleado creado con éxito!", {
+      position: "bottom-right",
     });
-
-    if (error) {
-      console.log("error creating authentication user");
-      setIsloading(false);
-      return;
-    }
-
-    if (signUp) {
-      //Create a new employee in the users table
-      const { error: errorEmployee } = await supabase.from("users").insert({
-        user_id: signUp.user.id,
-        first_name: watch("firstName"),
-        last_name: watch("lastName"),
-        email: watch("email"),
-        role: watch("role"),
-        department_id: watch("department"),
-        privileges: watch("privileges"),
-      });
-
-      if (errorEmployee) {
-        setIsloading(false);
-
-        console.log(errorEmployee);
-      }
-
-      setIsloading(false);
-    }
+    setIsloading(false);
+    setCreateError(null);
+    // reset();
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto pt-5">
-      <h1 className="text-primary text-4xl uppercase font-black">
+    <div className="max-w-[1200px] mx-auto p-10 bg-gray-200 mt-10 shadow-md rounded-lg">
+      <h1 className="text-slate-900 text-4xl uppercase font-black">
         Crear nuevo empleado
       </h1>
 
@@ -84,10 +95,10 @@ export default function NewEmployee() {
                 <h2 className="font-black text-gray-800 text-2xl">
                   Datos personales
                 </h2>
-                <div className="">
+                <div className="mt-5">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="email"
+                      htmlFor="firstName"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Nombre
@@ -95,10 +106,8 @@ export default function NewEmployee() {
                   </div>
                   <input
                     id="firstName"
-                    name="firstName"
                     type="text"
                     autoComplete="given-name"
-                    required
                     className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6 ${
                       errors.firstName && "ring-red-500 focus:outline-red-500"
                     }`}
@@ -117,17 +126,21 @@ export default function NewEmployee() {
                         message: "El nombre es requerido",
                       },
                       pattern: {
-                        value: /^[A-Za-z]+$/,
+                        value: /^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s-]+$/,
                         message: "El nombre no es válido",
                       },
                     })}
                   />
-                  <div className=""></div>
+                  {errors && errors.firstName && (
+                    <p className="text-sm text-red-500  text-right">
+                      {errors.firstName.message}
+                    </p>
+                  )}
                 </div>
                 <div className="">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="email"
+                      htmlFor="lastName"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Apellido
@@ -135,10 +148,8 @@ export default function NewEmployee() {
                   </div>
                   <input
                     id="lastName"
-                    name="lastName"
                     type="text"
                     autoComplete="given-name"
-                    required
                     className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6 ${
                       errors.lastName && "ring-red-500 focus:outline-red-500"
                     }`}
@@ -157,12 +168,16 @@ export default function NewEmployee() {
                         message: "El apellido es requerido",
                       },
                       pattern: {
-                        value: /^[A-Za-z]+$/,
+                        value: /^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s-]+$/,
                         message: "El apellido no es válido",
                       },
                     })}
                   />
-                  <div className=""></div>
+                  {errors && errors.lastName && (
+                    <p className="text-sm text-red-500  text-right">
+                      {errors.lastName.message}
+                    </p>
+                  )}
                 </div>
                 <div className="">
                   <div className="flex items-center justify-between">
@@ -175,10 +190,8 @@ export default function NewEmployee() {
                   </div>
                   <input
                     id="email"
-                    name="email"
                     type="email"
                     autoComplete="email"
-                    required
                     className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6  ${
                       errors.email && "ring-red-500 focus:outline-red-500"
                     }`}
@@ -186,23 +199,27 @@ export default function NewEmployee() {
                     {...register("email", {
                       required: {
                         value: true,
-                        message: "The email is required",
+                        message: "El email es requerido",
                       },
                       minLength: {
                         value: 1,
-                        message: "The email cannot be blank",
+                        message: "El email no puede estar en blanco",
                       },
                       maxLength: {
-                        value: 30,
-                        message: "The email is too long",
+                        value: 40,
+                        message: "El email es muy largo",
                       },
                       pattern: {
                         value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                        message: "The email is not valid",
+                        message: "El email no es válido",
                       },
                     })}
                   />
-                  <div className=""></div>
+                  {errors && errors.email && (
+                    <p className="text-sm text-red-500  text-right">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -218,35 +235,39 @@ export default function NewEmployee() {
                   <div className="relative">
                     <input
                       id="password"
-                      name="password"
                       type={showPassword1 ? "text" : "password"}
                       autoComplete="current-password"
-                      required
                       className={`block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6  ${
                         errors.password && "ring-red-500 focus:outline-red-500"
                       }`}
                       {...register("password", {
                         required: {
                           value: true,
-                          message: "The password is required",
+                          message: "La contraseña es requerida",
                         },
                         minLength: {
                           value: 8,
                           message:
-                            "The password must be at least 8 characters long",
+                            "La contraseña debe tener mínimo 8 caracteres",
                         },
                         maxLength: {
                           value: 25,
                           message:
-                            "the password must be a maximum of 25 characters",
+                            "La contraseña debe tener máximo 25 caracteres",
                         },
                       })}
                     />
+
                     <ShowPasswordButton
                       toggleShowPassword={toggleShowPassword1}
                       showPassword={showPassword1}
                     />
                   </div>
+                  {errors && errors.password && (
+                    <p className="text-sm text-red-500  text-right">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -254,10 +275,10 @@ export default function NewEmployee() {
                 <h2 className="font-black text-gray-800 text-2xl">
                   Datos laborales
                 </h2>
-                <div className="">
+                <div className="mt-5">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="email"
+                      htmlFor="role"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Rol
@@ -265,6 +286,7 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
+                      id="role"
                       {...register("role")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
@@ -288,7 +310,7 @@ export default function NewEmployee() {
                 <div className="">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="email"
+                      htmlFor="department"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Departamento
@@ -296,6 +318,7 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
+                      id="department"
                       {...register("department")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
@@ -309,7 +332,7 @@ export default function NewEmployee() {
                 <div className="">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="email"
+                      htmlFor="privileges"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Privilegios
@@ -317,7 +340,8 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
-                      {...register("department")}
+                      id="privileges"
+                      {...register("privileges")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
                       <option value={1}>1 (No puede calificar)</option>
@@ -333,14 +357,20 @@ export default function NewEmployee() {
               <button
                 disabled={isLoading}
                 type="submit"
-                className={`flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer ${
-                  isLoading &&
-                  "bg-gray-400 hover:bg-gray-400 cursor-not-allowed"
-                }`}
+                className={`${
+                  isLoading
+                    ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed"
+                    : "bg-primary hover:bg-primary-dark "
+                }flex w-full justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-dark cursor-pointer`}
               >
                 Agregar
               </button>
             </div>
+            {createError && (
+              <p className="text-center text-red-500 font-bold">
+                {createError}
+              </p>
+            )}
           </form>
         </div>
       </div>
