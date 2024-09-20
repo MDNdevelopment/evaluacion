@@ -7,7 +7,7 @@ export const determineBadge = (
   employee_lastName: string
 ) => {
   if (userPrivileges < 2) {
-    return { type: "Danger", text: "No disponible" };
+    return { type: "danger", text: "No disponible" };
   }
 
   if (userPrivileges === 2 && employeePrivileges === 3) {

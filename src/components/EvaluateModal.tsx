@@ -113,6 +113,7 @@ export default function EvaluateModal({ userData, employeeData }: Props) {
                           evaluationData={evaluationData}
                           employeeData={employeeData}
                           userData={userData}
+                          setOpen={setOpen}
                         />
                       )}
                     </div>

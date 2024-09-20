@@ -12,13 +12,6 @@ import { useUserStore } from "../stores/useUserStore";
 import { logOutUser } from "../services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 
-const navigation = [
-  { name: "Dashboard", path: "/", current: true },
-  { name: "Empleados", path: "/empleados", current: false },
-  { name: "Mi perfil", path: "", current: false },
-  { name: "Calendar", path: "#", current: false },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -63,21 +56,26 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    aria-current={item.current ? "page" : undefined}
-                    className={classNames(
-                      item.current
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                      "rounded-md px-3 py-2 text-sm font-medium"
-                    )}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                {user && user.privileges >= 2 && (
+                  <>
+                    <Link
+                      className={
+                        "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                      }
+                      to={"/dashboard"}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      className={
+                        "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                      }
+                      to={"/empleados"}
+                    >
+                      Empleados
+                    </Link>
+                  </>
+                )}
                 {user && user.privileges === 3 && (
                   <Link
                     to={"/dashboard/nuevo"}
@@ -148,7 +146,7 @@ export default function Navbar() {
 
       <DisclosurePanel className="sm:hidden">
         <div className="space-y-1 px-2 pb-3 pt-2">
-          {navigation.map((item) => (
+          {/* {navigation.map((item) => (
             <DisclosureButton
               key={item.name}
               as="a"
@@ -163,7 +161,7 @@ export default function Navbar() {
             >
               {item.name}
             </DisclosureButton>
-          ))}
+          ))} */}
         </div>
       </DisclosurePanel>
     </Disclosure>

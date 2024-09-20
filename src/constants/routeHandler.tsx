@@ -18,6 +18,11 @@ const isAuthenticated = () => {
   return !!getAccessToken();
 };
 
+const checkPermissions = (privileges) => {
+  if (privileges === 1) return false;
+  return true;
+};
+
 export const AuthRoute = ({ children }: Props) => {
   return isAuthenticated() ? <Navigate to="/dashboard" replace /> : children;
 };
@@ -32,6 +37,17 @@ export const PrivateRoute = ({ children }: Props) => {
     return <Navigate to="/login" replace />;
   }
 
+  const userData = JSON.parse(localStorage.getItem("user-storage")).state.user;
+  if (!checkPermissions(userData.privileges)) {
+    return (
+      <>
+        <Navbar />
+        <Navigate to={`/empleado/${userData.id}`} />
+        <Outlet />
+        {children}
+      </>
+    );
+  }
   // If authenticated, render the Navbar and the protected content
   return (
     <>

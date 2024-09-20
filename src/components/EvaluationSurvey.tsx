@@ -3,6 +3,7 @@ import SurveyQuestion from "./SurveyQuestion";
 import { CATEGORIES } from "../constants/evaluationCategories";
 import { supabase } from "../services/supabaseClient";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface Props {
   evaluationData: Evaluation | {};
@@ -31,6 +32,7 @@ interface Evaluation {
   quality: number;
   responsibility: number;
   total_rate: number;
+  setOpen: any;
 }
 
 interface Inputs {}
@@ -41,6 +43,7 @@ export default function EvaluationSurvey({
   userData,
   periodStart,
   periodEnd,
+  setOpen,
 }: Props) {
   const methods = useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -79,6 +82,10 @@ export default function EvaluationSurvey({
     }
 
     console.log("data uploaded successfully");
+    toast.success("¡Evaluación cargada con éxito!", {
+      position: "bottom-right",
+    });
+    setOpen(false);
     // setIsLoading(false);
   };
 
