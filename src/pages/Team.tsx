@@ -105,16 +105,9 @@ export default function Team() {
     setLoadingData(false);
   };
 
-  const handleEvaluate = () => {
-    const { firstDay, lastDay } = getPastMonthRange();
-
-    console.log(formatDateForDisplay(firstDay));
-  };
   useEffect(() => {
     //Get all the employees from the database
     if (!!user) {
-      console.log("im here!");
-      console.log(!!user);
       retrieveEmployees();
     }
   }, [user]);
@@ -179,13 +172,20 @@ export default function Team() {
                           user.privileges,
                           employee.privileges,
                           employee.recent_evaluation_date,
-                          employee.last_name
+                          employee.last_name,
+                          user.id,
+                          employee.user_id
                         )}
                       />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-row  ">
-                        {canEvaluate(user.privileges, employee.privileges) ? (
+                        {canEvaluate(
+                          user.privileges,
+                          employee.privileges,
+                          user.id,
+                          employee.user_id
+                        ) ? (
                           <>
                             <EvaluateModal
                               userData={user.id}
@@ -193,6 +193,7 @@ export default function Team() {
                                 id: employee.user_id,
                                 name: `${employee.first_name} ${employee.last_name}`,
                               }}
+                              retrieveEmployees={retrieveEmployees}
                             />
                           </>
                         ) : (

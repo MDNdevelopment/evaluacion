@@ -57,25 +57,8 @@ export default function Employee() {
   const { id } = useParams();
   const [employeeData, setEmployeeData] = useState<any>();
   const [evaluationsData, setEvaluationsData] = useState<any>();
+  const [totalAverage, setTotalAverage] = useState<number | null>();
   const [averages, setAverages] = useState<any>(null);
-
-  // const processEvaluations = (evaluations: any) => {
-  //   const processedEvaluations = [];
-  //   evaluations.map((evaluation) => {
-  //     processedEvaluations.push({
-  //       Período: formatDateToSpanishMonthYear(evaluation.period_end),
-  //       Total: evaluation.total_rate,
-  //       Calidad: evaluation.quality,
-  //       Responsabilidad: evaluation.responsibility,
-  //       "Compromiso institucional": evaluation.commitment,
-  //       Iniciativa: evaluation.initiative,
-  //       "Atención al cliente": evaluation.customer_service,
-  //       "Seguimiento de procesos": evaluation.process_tracking,
-  //     });
-  //   });
-  //   setEvaluationsData(processedEvaluations);
-  //   console.log({ processedEvaluations });
-  // };
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
@@ -94,7 +77,6 @@ export default function Employee() {
     setEmployeeData({ ...data });
     setEvaluationsData(data.evaluations);
     setAverages(data.averages[0]);
-    // processEvaluations(data.evaluations);
 
     const evaluationsByPeriod = data.evaluations.reduce((acc, evaluation) => {
       const periodKey = `${evaluation.period_start}-${evaluation.period_end}`;
@@ -146,7 +128,22 @@ export default function Employee() {
       }
     );
 
-    console.log({ aggregatedEvaluations });
+    //TODO: CALCULAR EL PROMEDIO TOTAL HISTORICO DEL EMPLEADO
+    const calculateTotalAverage = (aggregatedEvaluations) => {
+      let total = 0.0;
+      let finalIndex = 0;
+      aggregatedEvaluations.map((evaluation, index) => {
+        const currentRate = parseFloat(evaluation.total_rate);
+        console.log({ currentRate });
+        total = total + currentRate;
+        finalIndex = index + 1;
+      });
+
+      const totalAverage = total / finalIndex;
+      setTotalAverage(totalAverage);
+    };
+
+    calculateTotalAverage(aggregatedEvaluations);
 
     const parsePeriod = (period) => {
       const [month, year] = period.split(" ");
@@ -208,19 +205,28 @@ export default function Employee() {
 
   return (
     <div className="max-w-[1200px] mx-auto p-10 bg-gray-100 mt-10 shadow-md rounded-lg">
-      <h1 className="text-primary text-5xl uppercase font-black">
-        {employeeData.first_name} {employeeData.last_name}
-      </h1>
-      <h4 className="text-gray-800 mb-10">
-        {employeeData.departments.name} - {employeeData.role}
-      </h4>
+      <div className="flex flex-row justify-between items-center">
+        <div>
+          <h1 className="text-primary text-5xl uppercase font-black">
+            {employeeData.first_name} {employeeData.last_name}
+          </h1>
+          <h4 className="text-gray-800 mb-10">
+            {employeeData.departments.name} - {employeeData.role}
+          </h4>
+        </div>
 
-      {/* <p>{JSON.stringify(employeeData)}</p> */}
+        <div>
+          <h3 className="text-gray-800 font-black text-2xl">
+            Promedio Total: {totalAverage ? totalAverage.toFixed(2) : 0}
+          </h3>
+        </div>
+      </div>
+
       {evaluationsData && <MyChart evaluationsData={evaluationsData} />}
 
       <div className="mt-10">
         <h2 className="text-slate-800 text-3xl uppercase font-black mb-5">
-          Categorias:
+          Histórico:
         </h2>
         <div className="grid grid-cols-3 grid-rows-2 gap-5 content-center">
           <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">

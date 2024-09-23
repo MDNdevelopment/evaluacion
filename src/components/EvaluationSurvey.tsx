@@ -11,6 +11,7 @@ interface Props {
   employeeData: EmployeeData;
   periodStart: Date;
   periodEnd: Date;
+  retrieveEmployees: Function;
 }
 
 interface EmployeeData {
@@ -44,6 +45,7 @@ export default function EvaluationSurvey({
   periodStart,
   periodEnd,
   setOpen,
+  retrieveEmployees,
 }: Props) {
   const methods = useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -86,6 +88,7 @@ export default function EvaluationSurvey({
       position: "bottom-right",
     });
     setOpen(false);
+    retrieveEmployees();
     // setIsLoading(false);
   };
 

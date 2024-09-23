@@ -15,6 +15,7 @@ import EvaluationSurvey from "./EvaluationSurvey";
 interface Props {
   userData: string;
   employeeData: Employee;
+  retrieveEmployees: Function;
 }
 
 interface Employee {
@@ -22,7 +23,11 @@ interface Employee {
   name: string;
 }
 
-export default function EvaluateModal({ userData, employeeData }: Props) {
+export default function EvaluateModal({
+  userData,
+  employeeData,
+  retrieveEmployees,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [checkingEvaluation, setCheckingEvaluation] = useState<boolean>(true);
   const [evaluationData, setEvaluationData] = useState<any>(null);
@@ -114,6 +119,7 @@ export default function EvaluateModal({ userData, employeeData }: Props) {
                           employeeData={employeeData}
                           userData={userData}
                           setOpen={setOpen}
+                          retrieveEmployees={retrieveEmployees}
                         />
                       )}
                     </div>

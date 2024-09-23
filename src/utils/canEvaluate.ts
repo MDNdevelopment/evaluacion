@@ -1,8 +1,12 @@
 export const canEvaluate = (
   userPrivileges: number,
-  employeePrivileges: number
+  employeePrivileges: number,
+  userId: string,
+  employeeId: string
 ): boolean => {
   // Privilege 3 (highest) can evaluate anyone
+  if (userId === employeeId) return false;
+
   if (userPrivileges === 3) return true;
 
   // Privilege 1 (lowest) cannot evaluate anyone
@@ -11,7 +15,7 @@ export const canEvaluate = (
   if (userPrivileges === 2 && employeePrivileges === 3) return false;
   if (userPrivileges === 2 && employeePrivileges <= 2) return true;
 
-  // Privilege 2 can evaluate based on department restrictions
+  // Privilege 2 can evaluate based on department restrictions ---- THIS WONT BE USED BY CESAR'S ORDER
   // const evaluationPermissions: Record<number, number[]> = {
   //   1: [1, 2, 3], // Department 1 (Redes) can evaluate departments 1, 2, and 3
   //   2: [1, 2], // Department 2 (Audiovisual) can evaluate departments 1 and 2

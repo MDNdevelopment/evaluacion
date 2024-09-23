@@ -4,7 +4,9 @@ export const determineBadge = (
   userPrivileges: number,
   employeePrivileges: number,
   recent_evaluation_date: string,
-  employee_lastName: string
+  employee_lastName: string,
+  userId: string,
+  employeeId: string
 ) => {
   if (userPrivileges < 2) {
     return { type: "danger", text: "No disponible" };
@@ -14,7 +16,7 @@ export const determineBadge = (
     return { type: "danger", text: "No disponible" };
   }
 
-  if (canEvaluate(userPrivileges, employeePrivileges)) {
+  if (canEvaluate(userPrivileges, employeePrivileges, userId, employeeId)) {
     console.log({ employee_lastName, employeePrivileges, userPrivileges });
 
     if (!!recent_evaluation_date) {
