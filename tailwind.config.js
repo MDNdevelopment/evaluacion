@@ -14,6 +14,7 @@ module.exports = {
     extend: {
       maxWidth: {
         "modal-evaluation": "55rem",
+        "modal-password": "30rem",
       },
       colors: {
         primary: {

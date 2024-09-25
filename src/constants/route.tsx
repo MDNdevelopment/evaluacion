@@ -1,11 +1,10 @@
-import { Component } from "react";
 import { Login, Dashboard } from "../pages/index";
-import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
 import Team from "../pages/Team";
 import Employee from "../pages/Employee";
+import Profile from "../pages/Profile";
+import PasswordReset from "../pages/PasswordReset";
 
 export const Routes = [
   {
@@ -54,6 +53,22 @@ export const Routes = [
       <PrivateRoute>
         <Employee />
       </PrivateRoute>
+    ),
+  },
+  {
+    path: "/perfil",
+    element: (
+      <PrivateRoute>
+        <Profile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/recuperacion",
+    element: (
+      // <AuthRoute>
+      <PasswordReset />
+      // </AuthRoute>
     ),
   },
   {

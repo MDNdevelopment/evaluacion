@@ -24,12 +24,20 @@ const checkPermissions = (privileges) => {
 };
 
 export const AuthRoute = ({ children }: Props) => {
+  const location = window.location;
+
+  // If we're on the password reset page, allow access even if not authenticated
+  const isPasswordResetRoute =
+    location.pathname === "/recuperacion" && location.search.includes("token");
+
+  // Allow access if it's a password reset route with a token
+  if (isPasswordResetRoute) {
+    return children;
+  }
+
+  // Otherwise, if authenticated, redirect to dashboard
   return isAuthenticated() ? <Navigate to="/dashboard" replace /> : children;
 };
-
-// export const PrivateRoute = ({ children }: Props) => {
-//   return isAuthenticated() ? children : <Navigate to="/login" replace />;
-// };
 
 export const PrivateRoute = ({ children }: Props) => {
   // If the user is not authenticated, redirect to login

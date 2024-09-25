@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
@@ -102,6 +102,15 @@ export default function Login() {
               </button>
             </div>
           </form>
+
+          <div className="flex justify-center items-center mt-3">
+            <Link
+              to={"/recuperacion"}
+              className="text-gray-700 text-center text-sm hover:text-gray-900"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
 
           {error && <p className="mt-5  text-red-600">{error}</p>}
         </div>

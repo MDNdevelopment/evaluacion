@@ -30,47 +30,47 @@ export default function NewEmployee() {
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    // setCreateError(null);
-    // console.log("submitting");
-    // setIsloading(true);
+    setCreateError(null);
+    console.log("submitting");
+    setIsloading(true);
 
-    // //First create the user in the supabase authentication service
-    // const { data: signUp, error } = await supabase.auth.signUp({
-    //   email: watch("email"),
-    //   password: watch("password"),
-    // });
+    //First create the user in the supabase authentication service
+    const { data: signUp, error } = await supabase.auth.signUp({
+      email: watch("email"),
+      password: watch("password"),
+    });
 
-    // if (error) {
-    //   console.log("error creating authentication user");
-    //   setCreateError(error.message);
-    //   setIsloading(false);
-    //   return;
-    // }
+    if (error) {
+      console.log("error creating authentication user");
+      setCreateError(error.message);
+      setIsloading(false);
+      return;
+    }
 
-    // console.log("new user created successfully");
-    // if (signUp) {
-    //   //Create a new employee in the users table
-    //   const { error: errorEmployee } = await supabase.from("users").insert({
-    //     user_id: signUp.user.id,
-    //     first_name: watch("firstName"),
-    //     last_name: watch("lastName"),
-    //     email: watch("email"),
-    //     role: watch("role"),
-    //     department_id: watch("department"),
-    //     privileges: watch("privileges"),
-    //   });
+    console.log("new user created successfully");
+    if (signUp) {
+      //Create a new employee in the users table
+      const { error: errorEmployee } = await supabase.from("users").insert({
+        user_id: signUp.user.id,
+        first_name: watch("firstName"),
+        last_name: watch("lastName"),
+        email: watch("email"),
+        role: watch("role"),
+        department_id: watch("department"),
+        privileges: watch("privileges"),
+      });
 
-    //   if (errorEmployee) {
-    //     setIsloading(false);
-    //     setCreateError(
-    //       `Error al crear perfil del empleado.
-    //       Código de error: ${errorEmployee.code}`
-    //     );
+      if (errorEmployee) {
+        setIsloading(false);
+        setCreateError(
+          `Error al crear perfil del empleado.
+          Código de error: ${errorEmployee.code}`
+        );
 
-    //     console.log({ errorEmployee });
-    //     return;
-    //   }
-    // }
+        console.log({ errorEmployee });
+        return;
+      }
+    }
 
     console.log(data);
     toast.success("¡Empleado creado con éxito!", {
@@ -78,7 +78,7 @@ export default function NewEmployee() {
     });
     setIsloading(false);
     setCreateError(null);
-    // reset();
+    reset();
   };
 
   return (
