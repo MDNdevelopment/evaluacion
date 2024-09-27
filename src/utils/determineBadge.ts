@@ -17,8 +17,6 @@ export const determineBadge = (
   }
 
   if (canEvaluate(userPrivileges, employeePrivileges, userId, employeeId)) {
-    console.log({ employee_lastName, employeePrivileges, userPrivileges });
-
     if (!!recent_evaluation_date) {
       return {
         type: "success",

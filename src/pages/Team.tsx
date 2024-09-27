@@ -40,7 +40,8 @@ export default function Team() {
       .from("users")
       .select(
         `user_id,first_name,last_name,department_id,role,privileges,departments(name),avg_evaluations:evaluations!target_employee(total_rate.avg())`
-      );
+      )
+      .order("departments(name)", { ascending: false });
 
     if (employeeError) {
       console.log(employeeError.message);
@@ -98,8 +99,8 @@ export default function Team() {
       };
     });
 
+    console.log({ combinedData });
     setEmployees(combinedData);
-    console.log(combinedData);
     setLoadingData(false);
 
     setLoadingData(false);
