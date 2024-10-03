@@ -21,6 +21,7 @@ interface Props {
 interface Employee {
   id: string;
   name: string;
+  department: number;
 }
 
 export default function EvaluateModal({

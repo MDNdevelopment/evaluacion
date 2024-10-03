@@ -137,9 +137,7 @@ export default function Team() {
                 <th scope="col" className="px-6 py-3">
                   Rol
                 </th>
-                <th scope="col" className="px-6 py-3">
-                  Promedio (<small>Histórico</small>)
-                </th>
+
                 <th scope="col" className="px-6 py-3">
                   Evaluación (<small>Este mes</small>)
                 </th>
@@ -164,9 +162,7 @@ export default function Team() {
                     <td className="px-6 py-4">{employee.departments.name}</td>
 
                     <td className="px-6 py-4">{employee.role}</td>
-                    <td className="px-6 py-4">
-                      {parseFloat(employee.avg_evaluations[0].avg).toFixed(2)}
-                    </td>
+
                     <td className="px-6 py-4">
                       <EvaluatedBadge
                         badge={determineBadge(
@@ -193,6 +189,7 @@ export default function Team() {
                               employeeData={{
                                 id: employee.user_id,
                                 name: `${employee.first_name} ${employee.last_name}`,
+                                department: employee.department_id,
                               }}
                               retrieveEmployees={retrieveEmployees}
                             />

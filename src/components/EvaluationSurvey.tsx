@@ -1,4 +1,4 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import SurveyQuestion from "./SurveyQuestion";
 import { CATEGORIES } from "../constants/evaluationCategories";
 import { supabase } from "../services/supabaseClient";
@@ -17,6 +17,7 @@ interface Props {
 interface EmployeeData {
   id: string;
   name: string;
+  department: number;
 }
 
 interface Evaluation {
@@ -36,7 +37,9 @@ interface Evaluation {
   setOpen: any;
 }
 
-interface Inputs {}
+interface Inputs {
+  note: string;
+}
 
 export default function EvaluationSurvey({
   evaluationData,
@@ -76,6 +79,8 @@ export default function EvaluationSurvey({
       total_rate: total_rate,
       period_start: periodStart,
       period_end: periodEnd,
+      department_id: employeeData.department,
+      note: data.note,
     });
 
     if (error) {
@@ -89,7 +94,7 @@ export default function EvaluationSurvey({
     });
     setOpen(false);
     retrieveEmployees();
-    // setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (
@@ -106,6 +111,21 @@ export default function EvaluationSurvey({
               />
             );
           })}
+          <div className="flex flex-row justify-around items-center border-t py-5 border-gray-300">
+            <div className=" w-1/5">
+              <label htmlFor="" className="  mr-5 font-black text-gray-900">
+                Comentario adicional:
+              </label>
+            </div>
+            <div className="w-4/5">
+              <textarea
+                disabled={!!evaluationData ? true : false}
+                value={!!evaluationData ? evaluationData.note : null}
+                {...methods.register("note")}
+                className="resize-none border border-gray-300 shadow-sm rounded-md w-full min-h-[3rem] p-2"
+              />
+            </div>
+          </div>
           {evaluationData === null && (
             <div className="flex flex-row justify-center items-center py-5">
               <button

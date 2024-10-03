@@ -293,16 +293,58 @@ export default function NewEmployee() {
                       <option value="Social Media Manager">
                         Social Media Manager
                       </option>
-                      <option value="Community Manager">
-                        Community Manager
-                      </option>
+                      <option value="Social Media Manager">Gestión</option>
                       <option value="Redactor/a">Redactor/a</option>
+                      <option value="Programador">Programador</option>
+                      <option value="Jefe de diseño">Jefe de diseño</option>
+                      <option value="Jefe de cuentas">Jefe de cuentas</option>
+                      <option value="Jefe de Audiovisual">
+                        Jefe de Audiovisual
+                      </option>
+                      <option value="Jefe de Administración">
+                        Jefe de Administración
+                      </option>
                       <option value="Fotógrafo/a">Fotógrafo/a</option>
-                      <option value="Tiktoker">Tiktoker</option>
-                      <option value="Diseñador/a">Diseñador/a</option>
+                      <option value="Estratega de Marketing">
+                        Estratega de Marketing
+                      </option>
+                      <option value="Especialista en ADS">
+                        Especialista en ADS
+                      </option>
                       <option value="Editor/a de video">
                         Editor/a de video
                       </option>
+                      <option value="Diseñador/a">Diseñador/a</option>
+                      <option value="Creador Cont. Audiov.">
+                        Creador Cont. Audiov.
+                      </option>
+                      <option value="Coordinador de Tecnología">
+                        Coordinador de Tecnología
+                      </option>
+                      <option value="Coordinador de Innovación">
+                        Coordinador de Innovación
+                      </option>
+                      <option value="Coordinador de Diseño">
+                        Coordinador de Diseño
+                      </option>
+                      <option value="Coordinador de Cuentas">
+                        Coordinador de Cuentas
+                      </option>
+                      <option value="Coordinador de Audiovisual">
+                        Coordinador de Audiovisual
+                      </option>
+                      <option value="Community Manager">
+                        Community Manager
+                      </option>
+                      <option value="Asistente de Marketing">
+                        Asistente de Marketing
+                      </option>
+                      <option value="Asistente Administrativo">
+                        Asistente Administrativo
+                      </option>
+                      <option value={"Sub-Director"}>Sub-Director</option>
+                      <option value={"Director"}>Director</option>
+                      <option value="CEO">CEO</option>
                     </select>
                   </div>
                 </div>
@@ -325,6 +367,10 @@ export default function NewEmployee() {
                       <option value={1}>Redes</option>
                       <option value={2}>Audiovisual</option>
                       <option value={3}>Diseño</option>
+                      <option value={0}>IT</option>
+                      <option value={4}>Operaciones</option>
+                      <option value={5}>Administración</option>
+                      <option value={6}>Dirección</option>
                     </select>
                   </div>
                 </div>

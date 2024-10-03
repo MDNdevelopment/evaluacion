@@ -13,7 +13,6 @@ import {
   Legend,
 } from "recharts";
 import formatDateToSpanishMonthYear from "../utils/formatDateToSpanishPeriod";
-import { useUserStore } from "../stores/useUserStore";
 import RecentEvaluations from "../components/RecentEvaluations";
 
 export default function Employee() {
@@ -50,7 +49,7 @@ export default function Employee() {
     jun: 5,
     jul: 6,
     ago: 7,
-    sep: 8,
+    sept: 8,
     oct: 9,
     nov: 10,
     dic: 11,
@@ -61,14 +60,13 @@ export default function Employee() {
   const [evaluationsData, setEvaluationsData] = useState<any>();
   const [totalAverage, setTotalAverage] = useState<number | null>();
   const [averages, setAverages] = useState<any>(null);
-  const user = useUserStore((state) => state.user);
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
       .from("users")
       .select(
         `
-        *,departments(name),evaluations:evaluations!target_employee(quality, commitment, initiative, responsibility, process_tracking, customer_service, period_start, period_end, evaluated_at, total_rate, made_by),averages:evaluations!target_employee(quality_avg:quality.avg(), commitment_avg:commitment.avg(), initiative_avg:initiative.avg(), responsibility_avg:responsibility.avg(),process_tracking_avg:process_tracking.avg(),customer_service_avg:customer_service.avg(), total_rate_avg:total_rate.avg())`
+        *,departments(name),evaluations:evaluations!target_employee(quality, commitment, initiative, responsibility, process_tracking, customer_service, period_start, period_end, evaluated_at, total_rate, made_by, note),averages:evaluations!target_employee(quality_avg:quality.avg(), commitment_avg:commitment.avg(), initiative_avg:initiative.avg(), responsibility_avg:responsibility.avg(),process_tracking_avg:process_tracking.avg(),customer_service_avg:customer_service.avg(), total_rate_avg:total_rate.avg())`
       )
       .eq("user_id", id)
       .single();
@@ -77,6 +75,7 @@ export default function Employee() {
       console.log(error.message);
       return;
     }
+    console.log({ dataBusqueda: data });
     setEmployeeData({ ...data });
     setEvaluationsData(data.evaluations);
     setAverages(data.averages[0]);
@@ -112,7 +111,11 @@ export default function Employee() {
 
       //Group each evaluation's date with the user who made it
       acc[periodKey].made_by.push([
-        { date: evaluation.evaluated_at, user: evaluation.made_by },
+        {
+          date: evaluation.evaluated_at,
+          user: evaluation.made_by,
+          note: evaluation.note,
+        },
       ]);
       return acc;
     }, {});
@@ -166,6 +169,7 @@ export default function Employee() {
     });
 
     setEvaluationsData(sortedData);
+    console.log({ sortedData });
   };
 
   useEffect(() => {
@@ -205,7 +209,7 @@ export default function Employee() {
           })}
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="period" />
-          <YAxis type="number" interval="preserveStart" />
+          <YAxis type="number" tickCount={6} />
           <Tooltip />
           <Legend />
         </LineChart>
@@ -296,11 +300,9 @@ export default function Employee() {
         </div>
       </div>
 
-      {user && user.privileges === 3 && (
-        <RecentEvaluations
-          evaluationsData={evaluationsData[evaluationsData.length - 1]}
-        />
-      )}
+      <RecentEvaluations
+        evaluationsData={evaluationsData[evaluationsData.length - 1]}
+      />
     </div>
   );
 }

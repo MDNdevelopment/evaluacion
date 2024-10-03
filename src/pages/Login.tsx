@@ -5,8 +5,8 @@ import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
 
 export default function Login() {
-  const [email, setEmail] = useState<string>("juanluislauretta@gmail.com");
-  const [password, setPassword] = useState<string>("Juanluis007*");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
