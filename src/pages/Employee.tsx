@@ -48,7 +48,7 @@ export default function Employee() {
     commitment: "Compromiso",
     initiative: "Iniciativa",
     customer_service: "Comunicación efectiva",
-    process_tracking: "Seguimiento de procesos",
+    process_tracking: "Cumplimiento de procesos",
     responsibility: "Responsabilidad",
     total_rate: "Promedio total",
     total_evaluations: "Evaluaciones",
@@ -322,7 +322,7 @@ export default function Employee() {
           </div>
           <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark leading-none text-center mb-5">
-              Atención al <br /> cliente
+              Comunicación <br /> efectiva
             </h4>
             <p className="text-5xl text-darkText font-black">
               {averages.customer_service_avg
@@ -332,7 +332,7 @@ export default function Employee() {
           </div>
           <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark leading-none text-center mb-5">
-              Seguimiento de <br /> procesos
+              Cumplimiento de <br /> procesos
             </h4>
             <p className="text-5xl text-darkText font-black">
               {averages.process_tracking_avg
