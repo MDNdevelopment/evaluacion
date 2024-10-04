@@ -6,6 +6,7 @@ interface Props {
   name: string;
   value: number | null;
   isLoading: boolean;
+  desc: string;
 }
 
 export default function SurveyQuestion({
@@ -13,6 +14,7 @@ export default function SurveyQuestion({
   name,
   value,
   isLoading,
+  desc,
 }: Props) {
   const { setValue } = useFormContext();
   const [answer, setAnswer] = useState<number>(1);
@@ -31,11 +33,12 @@ export default function SurveyQuestion({
     setAnswer(value);
   }, [value]);
   return (
-    <div className="flex flex-row justify-around items-center border-t py-5 border-gray-300">
+    <div className="flex flex-row justify-around items-center border-t py-3 border-gray-300 ">
       <div className=" w-1/5">
-        <label htmlFor="" className="  mr-5 font-black text-gray-900">
+        <p className="  mr-5 font-black text-gray-900 leading-5 mb-1">
           {question}
-        </label>
+        </p>
+        <p className="text-gray-500 text-xs">{desc}</p>
       </div>
 
       <div className="flex flex-row">
@@ -55,7 +58,7 @@ export default function SurveyQuestion({
                   : value !== null
                   ? "bg-[#a7a7a7] text-white border-[#a7a7a7] opacity-30"
                   : "bg-white text-black hover:bg-gray-200"
-              }  mx-2 w-[40px] h-[40px] rounded-full flex justify-center items-center border-2 border-primary ${
+              }  mx-2 w-[40px] h-[40px] rounded-full flex justify-center items-center border-2 border-primary text-md ${
                 value !== null ? "cursor-not-allowed" : "cursor-pointer"
               } `}
             >

@@ -103,6 +103,7 @@ export default function EvaluationSurvey({
             return (
               <SurveyQuestion
                 isLoading={isLoading}
+                desc={category.desc}
                 question={category.question}
                 name={category.name}
                 value={
@@ -113,11 +114,11 @@ export default function EvaluationSurvey({
               />
             );
           })}
-          <div className="flex flex-row justify-around items-center border-t py-5 border-gray-300">
+          <div className="flex flex-row px-5 justify-around items-center border-t py-5 border-gray-300 ">
             <div className=" w-1/5">
-              <label htmlFor="" className="  mr-5 font-black text-gray-900">
-                Comentario adicional:
-              </label>
+              <p className="  mr-5 font-black text-gray-900 leading-5">
+                Comentario adicional
+              </p>
             </div>
             <div className="w-4/5">
               <textarea
