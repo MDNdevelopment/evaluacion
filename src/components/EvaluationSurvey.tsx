@@ -122,7 +122,7 @@ export default function EvaluationSurvey({
             <div className="w-4/5">
               <textarea
                 disabled={!!evaluationData ? true : false}
-                value={!!evaluationData ? evaluationData.note : ""}
+                value={!!evaluationData ? evaluationData.note : undefined}
                 {...methods.register("note")}
                 className="resize-none border border-gray-300 shadow-sm rounded-md w-full min-h-[3rem] p-2"
               />
