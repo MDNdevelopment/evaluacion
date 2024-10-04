@@ -145,7 +145,6 @@ export default function TopRated() {
             console.log(department);
             if (
               department.id === 0 ||
-              department.id === 4 ||
               department.id === 5 ||
               department.id === 6
             )
