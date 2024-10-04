@@ -80,6 +80,7 @@ export default function TopRated() {
   };
 
   const getBestEmployee = (department: any) => {
+    let finishedSearching = false;
     let best: Evaluation | null = setBest(null);
     let topWeight = 0;
     evaluations.map((evaluation: Evaluation) => {
@@ -97,6 +98,17 @@ export default function TopRated() {
         }
       }
     });
+    finishedSearching = true;
+
+    if (best === null && finishedSearching) {
+      return (
+        <div className="flex justify-center  flex-1 items-center pt-5 flex-col">
+          <h2 className="text-gray-400 font-bold text-3xl text-center">
+            Aún no hay evaluaciones...
+          </h2>
+        </div>
+      );
+    }
 
     return (
       <div className="flex-1 ">
