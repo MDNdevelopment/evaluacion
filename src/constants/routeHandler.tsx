@@ -55,7 +55,6 @@ export const PrivateRoute = ({ children }: Props) => {
   }
   const userData = JSON.parse(userItem).state.user;
   if (isSettingsPage) {
-    console.log("is hereeeeeee");
     return (
       <>
         <Navbar />
