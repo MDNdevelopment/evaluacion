@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { supabase } from "../services/supabaseClient";
 import Cookies from "js-cookie";
 import { User } from "../stores/useUserStore";
@@ -29,7 +28,7 @@ export const loginUser = async ({
   } else if (data && data.session) {
     const userId = data.user.id;
     //Get the employee data from database
-    const { data: employeeData, error } = await supabase
+    const { data: employeeData } = await supabase
       .from("users")
       .select(
         `
@@ -60,6 +59,9 @@ export const loginUser = async ({
       };
     }
   }
+  return {
+    ok: true,
+  };
 };
 
 export const logOutUser = async () => {

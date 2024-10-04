@@ -5,7 +5,7 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { useForm, SubmitHandler, register } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
 import { toast } from "react-toastify";
 
@@ -14,8 +14,14 @@ type Inputs = {
   password2: string;
 };
 
-const errorMessages = {
-  same_password: "La nueva contraseña debe ser distinta a la anterior.",
+const parseErrorMessage = (errorCode: string | undefined) => {
+  switch (errorCode) {
+    case "same_password":
+      return "La nueva contraseña debe ser distinta a la anterior.";
+      break;
+    default:
+      "Ocurrió un error al cambiar la contraseña";
+  }
 };
 export default function ResetPasswordModal() {
   const [open, setOpen] = useState<boolean>(false);
@@ -27,12 +33,13 @@ export default function ResetPasswordModal() {
     reset,
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password: formData.password1,
     });
 
     if (error) {
-      toast.error(errorMessages[error.code], { position: "bottom-right" });
+      console.log({ error });
+      toast.error(parseErrorMessage(error.code), { position: "bottom-right" });
       return;
     }
 

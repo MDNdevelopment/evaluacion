@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 import { useForm } from "react-hook-form";
 import PasswordResetForm from "../components/PasswordResetForm";
@@ -11,20 +11,13 @@ type Inputs = {
 };
 
 export default function PasswordReset() {
-  const navigate = useNavigate();
-  const [error, setError] = useState<string>();
   const [recovery, setRecovery] = useState<boolean>(false);
   const [submittedForm, setSubmittedForm] = useState<boolean>(false);
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<Inputs>();
+  const { register, handleSubmit, watch } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+  const onSubmit = handleSubmit(async (formData) => {
     console.log(watch("email"));
-    const { data, error } = await supabase.auth.resetPasswordForEmail(
+    const { error } = await supabase.auth.resetPasswordForEmail(
       formData.email,
       { redirectTo: "http://localhost:5173/recuperacion" }
     );
@@ -36,12 +29,12 @@ export default function PasswordReset() {
 
     setSubmittedForm(true);
     toast.success("¡Correo enviado con éxito!", { position: "bottom-right" });
-  };
+  });
 
   //   Check if the user is already authenticated and has the auth-token cookie
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event, session) => {
+    supabase.auth.onAuthStateChange(async (event) => {
       if (event == "PASSWORD_RECOVERY") {
         setRecovery(true);
       }
@@ -85,7 +78,7 @@ export default function PasswordReset() {
 
         {!submittedForm && (
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={onSubmit} className="space-y-6">
               <div>
                 <div className="flex items-center justify-between">
                   <label
@@ -140,8 +133,6 @@ export default function PasswordReset() {
                 Iniciar sesión con mi cuenta
               </Link>
             </div>
-
-            {error && <p className="mt-5  text-red-600">{error}</p>}
           </div>
         )}
       </div>

@@ -14,9 +14,8 @@ export default function SurveyQuestion({
   value,
   isLoading,
 }: Props) {
-  const { register, setValue, watch } = useFormContext();
+  const { setValue } = useFormContext();
   const [answer, setAnswer] = useState<number>(1);
-  const currentValue = watch(name);
 
   const setSelectedValue = (value: number) => {
     setAnswer(value);

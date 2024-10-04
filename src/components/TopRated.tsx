@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabaseClient";
-import getPastMonthRange from "../utils/getPastMonthRange";
 import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 
@@ -31,13 +30,6 @@ export default function TopRated() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
-  let { firstDay, lastDay } = getPastMonthRange();
-
-  const getDepartmentById = (id: number) => {
-    return departments.map((department) =>
-      department.id == id ? department.name : null
-    );
-  };
 
   const getDepartments = async () => {
     let fetchedDepartments: Department[] = [];
@@ -57,10 +49,6 @@ export default function TopRated() {
     console.log(data);
   };
 
-  const determineBestByDepartment = (groupedByDepartment) => {
-    let accEvaluations = [];
-  };
-
   const getCurrentPeriodEvaluations = async () => {
     const { data, error } = await supabase
       .from("employee_evaluation_summary_last_month")
@@ -68,77 +56,33 @@ export default function TopRated() {
 
     if (error) {
       console.log(error);
+      return;
     }
 
-    console.log({ data });
     setEvaluations(data);
     setIsLoading(false);
   };
-  //Filter the data by department
-
-  // async function calculateBestEmployeeByDepartment() {
-  //   // Group evaluations by department_id
-  //   const groupedEvaluations = evaluations.reduce((acc, evaluation) => {
-  //     // Initialize the department if not present
-  //     if (!acc[evaluation.department_id]) {
-  //       acc[evaluation.department_id] = {}; // Initialize the department group
-  //     }
-
-  //     // Initialize the employee if not present in the department
-  //     if (!acc[evaluation.department_id][evaluation.target_employee]) {
-  //       acc[evaluation.department_id][evaluation.target_employee] = {
-  //         totalEvaluations: 0,
-  //         totalQuality: 0,
-  //         totalResponsibility: 0,
-  //         totalCommitment: 0,
-  //         totalInitiative: 0,
-  //         totalCustomerService: 0,
-  //         totalProcessTracking: 0,
-  //       } as EmployeeEvaluationSummary;
-  //     }
-
-  //     // Get the employee object
-  //     const employeeEval =
-  //       acc[evaluation.department_id][evaluation.target_employee];
-
-  //     // Check if the employeeEval object exists before modifying it
-  //     if (!employeeEval) {
-  //       console.error(
-  //         `Employee evaluation object not initialized for department ${evaluation.department_id}`
-  //       );
-  //       return acc;
-  //     }
-
-  //     // Increment total evaluations
-  //     employeeEval.totalEvaluations++;
-
-  //     // Sum the individual fields
-  //     employeeEval.totalQuality += evaluation.quality;
-  //     employeeEval.totalResponsibility += evaluation.responsibility;
-  //     employeeEval.totalCommitment += evaluation.commitment;
-  //     employeeEval.totalInitiative += evaluation.initiative;
-  //     employeeEval.totalCustomerService += evaluation.customer_service;
-  //     employeeEval.totalProcessTracking += evaluation.process_tracking;
-
-  //     return acc;
-  //   }, {} as Record<number, Record<string, EmployeeEvaluationSummary>>);
-
-  //   console.log({ groupedEvaluations });
-  // }
 
   useEffect(() => {
     getDepartments();
     getCurrentPeriodEvaluations();
   }, []);
 
-  const calculateEvaluationWeight = (averageScore, evaluationCount) => {
+  const calculateEvaluationWeight = (
+    averageScore: number,
+    evaluationCount: number
+  ) => {
     return (averageScore * evaluationCount) / (evaluationCount + 5);
   };
 
+  const setBest = (evaluation: Evaluation | null) => {
+    return evaluation;
+  };
+
   const getBestEmployee = (department: any) => {
-    let best: Evaluation | null = null;
+    let best: Evaluation | null = setBest(null);
     let topWeight = 0;
-    evaluations.map((evaluation) => {
+    evaluations.map((evaluation: Evaluation) => {
       if (evaluation.department_id === department.id) {
         const currentResult = calculateEvaluationWeight(
           evaluation.average_total_rate,
@@ -148,18 +92,15 @@ export default function TopRated() {
         if (currentResult > topWeight) {
           console.log({ here: evaluation });
           topWeight = currentResult;
-          best = evaluation;
+          best = setBest(evaluation);
           console.log({ best });
         }
-      } else {
-        console.log("no coincideee");
       }
-      return <></>;
     });
 
     return (
       <div className="flex-1 ">
-        {!best ? (
+        {best === null ? (
           <div className="flex justify-center items-center pt-14">
             <Spinner />
           </div>

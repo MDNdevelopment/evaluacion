@@ -7,22 +7,16 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useUserStore } from "../stores/useUserStore";
 import { logOutUser } from "../services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export default function Navbar() {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const handleLogOut = async () => {
-    console.log("clicked logout");
     const res = await logOutUser();
-    console.log(res);
     if (res === null) {
       navigate("/", { replace: true });
     }

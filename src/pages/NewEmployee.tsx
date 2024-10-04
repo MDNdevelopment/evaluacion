@@ -48,7 +48,7 @@ export default function NewEmployee() {
     }
 
     console.log("new user created successfully");
-    if (signUp) {
+    if (signUp.user) {
       //Create a new employee in the users table
       const { error: errorEmployee } = await supabase.from("users").insert({
         user_id: signUp.user.id,

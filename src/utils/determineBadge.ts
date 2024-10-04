@@ -4,7 +4,7 @@ export const determineBadge = (
   userPrivileges: number,
   employeePrivileges: number,
   recent_evaluation_date: string,
-  employee_lastName: string,
+
   userId: string,
   employeeId: string
 ) => {

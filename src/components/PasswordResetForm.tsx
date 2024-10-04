@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
 import { toast } from "react-toastify";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type Inputs = {
   password1: string;
@@ -18,9 +18,9 @@ export default function PasswordResetForm() {
 
   const navigate = useNavigate();
 
-  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
-    const { data, error } = await supabase.auth.updateUser({
-      password: formData.password1,
+  const onSubmit = handleSubmit(async (data) => {
+    const { error } = await supabase.auth.updateUser({
+      password: data.password1,
     });
     if (error) {
       console.log(error);
@@ -30,7 +30,7 @@ export default function PasswordResetForm() {
       position: "bottom-right",
     });
     navigate("/login", { replace: true });
-  };
+  });
   return (
     <>
       <div className="flex min-h-full max-w-[500px] mx-auto mt-20 rounded-lg bg-gray-50 flex-col justify-center px-6 py-12 lg:px-4 shadow-lg 	">
@@ -50,7 +50,7 @@ export default function PasswordResetForm() {
         </p>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={onSubmit} className="space-y-6">
             <div>
               <div>
                 <div className="flex items-center justify-between">
@@ -84,9 +84,9 @@ export default function PasswordResetForm() {
                     })}
                   />
                 </div>
-                {errors && errors.password && (
+                {errors && errors.password1 && (
                   <p className="text-sm text-red-500  text-right">
-                    {errors.password.message}
+                    {errors.password1.message}
                   </p>
                 )}
               </div>

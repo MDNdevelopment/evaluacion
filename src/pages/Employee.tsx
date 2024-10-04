@@ -15,6 +15,21 @@ import {
 import formatDateToSpanishMonthYear from "../utils/formatDateToSpanishPeriod";
 import RecentEvaluations from "../components/RecentEvaluations";
 
+interface Evaluation {
+  commitment: number;
+  customer_service: number;
+  initiative: number;
+  process_tracking: number;
+  quality: number;
+  responsibility: number;
+  total_rate: number;
+  evaluated_at: string;
+  made_by: string;
+  period_end: string;
+  period_start: string;
+  note: string;
+}
+
 export default function Employee() {
   const colors = [
     "#F4B000", // Vibrant Yellow
@@ -39,20 +54,42 @@ export default function Employee() {
     total_evaluations: "Evaluaciones",
   };
 
-  // Helper function to convert 'month year' string to a valid Date object
-  const monthNames = {
-    ene: 0,
-    feb: 1,
-    mar: 2,
-    abr: 3,
-    may: 4,
-    jun: 5,
-    jul: 6,
-    ago: 7,
-    sept: 8,
-    oct: 9,
-    nov: 10,
-    dic: 11,
+  const getMonth = (monthName: string) => {
+    switch (monthName) {
+      case "ene":
+        return 0;
+
+      case "feb":
+        return 1;
+
+      case "mar":
+        return 2;
+
+      case "abr":
+        return 3;
+
+      case "may":
+        return 4;
+
+      case "jun":
+        return 5;
+
+      case "jul":
+        return 6;
+
+      case "ago":
+        return 7;
+      case "sept":
+        return 8;
+      case "oct":
+        return 9;
+      case "nov":
+        return 10;
+      case "dic":
+        return 11;
+      default:
+        return 0;
+    }
   };
 
   const { id } = useParams();
@@ -80,50 +117,54 @@ export default function Employee() {
     setEvaluationsData(data.evaluations);
     setAverages(data.averages[0]);
 
-    const evaluationsByPeriod = data.evaluations.reduce((acc, evaluation) => {
-      const periodKey = `${evaluation.period_start}-${evaluation.period_end}`;
+    const evaluationsByPeriod = data.evaluations.reduce(
+      (acc: any, evaluation: Evaluation) => {
+        const periodKey = `${evaluation.period_start}-${evaluation.period_end}`;
 
-      if (!acc[periodKey]) {
-        acc[periodKey] = {
-          period_start: evaluation.period_start,
-          period_end: evaluation.period_end,
-          quality: [],
-          commitment: [],
-          initiative: [],
-          total_rate: [],
-          customer_service: [],
-          process_tracking: [],
-          responsibility: [],
-          total_evaluations: 0,
-          made_by: [],
-        };
-      }
+        if (!acc[periodKey]) {
+          acc[periodKey] = {
+            period_start: evaluation.period_start,
+            period_end: evaluation.period_end,
+            quality: [],
+            commitment: [],
+            initiative: [],
+            total_rate: [],
+            customer_service: [],
+            process_tracking: [],
+            responsibility: [],
+            total_evaluations: 0,
+            made_by: [],
+          };
+        }
 
-      //Push each evaluation's metrics into arrays for that period
-      acc[periodKey].quality.push(evaluation.quality);
-      acc[periodKey].commitment.push(evaluation.commitment);
-      acc[periodKey].initiative.push(evaluation.initiative);
-      acc[periodKey].customer_service.push(evaluation.customer_service);
-      acc[periodKey].process_tracking.push(evaluation.process_tracking);
-      acc[periodKey].responsibility.push(evaluation.responsibility);
-      acc[periodKey].total_rate.push(evaluation.total_rate);
-      acc[periodKey].total_evaluations++;
+        //Push each evaluation's metrics into arrays for that period
+        acc[periodKey].quality.push(evaluation.quality);
+        acc[periodKey].commitment.push(evaluation.commitment);
+        acc[periodKey].initiative.push(evaluation.initiative);
+        acc[periodKey].customer_service.push(evaluation.customer_service);
+        acc[periodKey].process_tracking.push(evaluation.process_tracking);
+        acc[periodKey].responsibility.push(evaluation.responsibility);
+        acc[periodKey].total_rate.push(evaluation.total_rate);
+        acc[periodKey].total_evaluations++;
 
-      //Group each evaluation's date with the user who made it
-      acc[periodKey].made_by.push([
-        {
-          date: evaluation.evaluated_at,
-          user: evaluation.made_by,
-          note: evaluation.note,
-        },
-      ]);
-      return acc;
-    }, {});
+        //Group each evaluation's date with the user who made it
+        acc[periodKey].made_by.push([
+          {
+            date: evaluation.evaluated_at,
+            user: evaluation.made_by,
+            note: evaluation.note,
+          },
+        ]);
+        return acc;
+      },
+      {}
+    );
 
     // Step 2: Calculate averages for each period
     const aggregatedEvaluations = Object.values(evaluationsByPeriod).map(
-      (periodData) => {
-        const average = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+      (periodData: any) => {
+        const average = (arr: any) =>
+          arr.reduce((a: any, b: any) => a + b, 0) / arr.length;
 
         return {
           period: formatDateToSpanishMonthYear(periodData.period_end),
@@ -141,11 +182,11 @@ export default function Employee() {
     );
 
     //TODO: CALCULAR EL PROMEDIO TOTAL HISTORICO DEL EMPLEADO
-    const calculateTotalAverage = (aggregatedEvaluations) => {
+    const calculateTotalAverage = (aggregatedEvaluations: any) => {
       let total = 0.0;
       let finalIndex = 0;
-      aggregatedEvaluations.map((evaluation, index) => {
-        const currentRate = parseFloat(evaluation.total_rate);
+      aggregatedEvaluations.map((evaluation: Evaluation, index: number) => {
+        const currentRate = evaluation.total_rate;
         total = total + currentRate;
         finalIndex = index + 1;
       });
@@ -156,15 +197,15 @@ export default function Employee() {
 
     calculateTotalAverage(aggregatedEvaluations);
 
-    const parsePeriod = (period) => {
+    const parsePeriod = (period: string) => {
       const [month, year] = period.split(" ");
-      return new Date(year, monthNames[month.toLowerCase()]); // Creates a Date object with year and month
+      return new Date(parseInt(year), getMonth(month.toLowerCase())); // Creates a Date object with year and month
     };
 
     // Sorting the array
     const sortedData = aggregatedEvaluations.sort((a, b) => {
-      const dateA = parsePeriod(a.period);
-      const dateB = parsePeriod(b.period);
+      const dateA: any = parsePeriod(a.period);
+      const dateB: any = parsePeriod(b.period);
       return dateA - dateB;
     });
 
@@ -183,7 +224,7 @@ export default function Employee() {
     );
   }
 
-  const MyChart = ({ evaluationsData }) => {
+  const MyChart = ({ evaluationsData }: any) => {
     // Assuming evaluationsData is an array of objects
     const dataKeys =
       evaluationsData.length > 0 ? Object.keys(evaluationsData[0]) : [];
@@ -196,14 +237,16 @@ export default function Employee() {
     return (
       <ResponsiveContainer width="95%" height={300}>
         <LineChart data={evaluationsData}>
-          {metricKeys.map((key, index) => {
+          {metricKeys.map((key: string, index) => {
+            console.log({ metricKey: index });
+            console.log(Object.values(categories));
             return (
               <Line
                 key={key}
                 type="monotone"
                 dataKey={key}
                 stroke={colors[index]}
-                name={categories[key]}
+                name={Object.values(categories)[index + 1]}
               />
             );
           })}

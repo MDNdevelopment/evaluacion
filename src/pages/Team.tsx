@@ -7,7 +7,6 @@ import EvaluatedBadge from "../components/EvaluatedBadge";
 import { canEvaluate } from "../utils/canEvaluate";
 import { determineBadge } from "../utils/determineBadge";
 import getPastMonthRange from "../utils/getPastMonthRange";
-import formatDateForDisplay from "../utils/formatDateForDisplay";
 import EvaluateModal from "../components/EvaluateModal";
 import { useNavigate } from "react-router-dom";
 
@@ -87,7 +86,7 @@ export default function Team() {
     }
 
     // Step 3: Combine Employee Data with Recent Evaluation Date
-    const combinedData = employeeData.map((employee) => {
+    const combinedData: any = employeeData.map((employee) => {
       const recentEvaluation = evaluationData.find(
         (evaluation) => evaluation.target_employee === employee.user_id
       );
@@ -99,7 +98,6 @@ export default function Team() {
       };
     });
 
-    console.log({ combinedData });
     setEmployees(combinedData);
     setLoadingData(false);
 
@@ -151,7 +149,7 @@ export default function Team() {
                 return (
                   <tr
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                    key={employee.user_uid}
+                    key={employee.user_id}
                   >
                     <th
                       scope="row"
@@ -169,7 +167,6 @@ export default function Team() {
                           user.privileges,
                           employee.privileges,
                           employee.recent_evaluation_date,
-                          employee.last_name,
                           user.id,
                           employee.user_id
                         )}

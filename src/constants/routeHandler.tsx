@@ -18,8 +18,9 @@ const isAuthenticated = () => {
   return !!getAccessToken();
 };
 
-const checkPermissions = (privileges) => {
+const checkPermissions = (privileges: number | null) => {
   if (privileges === 1) return false;
+  if (privileges === null) return false;
   return true;
 };
 
@@ -45,7 +46,13 @@ export const PrivateRoute = ({ children }: Props) => {
     return <Navigate to="/login" replace />;
   }
 
-  const userData = JSON.parse(localStorage.getItem("user-storage")).state.user;
+  const userItem = localStorage.getItem("user-storage");
+  if (userItem === null) {
+    Cookies.remove("auth-token");
+    <Navigate to={`/login`} />;
+    return;
+  }
+  const userData = JSON.parse(userItem).state.user;
   if (!checkPermissions(userData.privileges)) {
     return (
       <>

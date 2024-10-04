@@ -1,4 +1,4 @@
-export default function formatDateForDisplay(date) {
+export default function formatDateForDisplay(date: string) {
   let dateFormatted = stringToDate(date);
 
   const day = String(dateFormatted.getDate()).padStart(2, "0");
@@ -7,7 +7,7 @@ export default function formatDateForDisplay(date) {
   return `${day}/${month}/${year}`;
 }
 
-function stringToDate(date) {
+function stringToDate(date: string) {
   const [year, month, day] = date.split("-").map(Number);
   return new Date(year, month - 1, day); // Month is 0-indexed
 }

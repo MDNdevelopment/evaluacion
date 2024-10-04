@@ -1,10 +1,13 @@
-"use client";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
+interface Props {
+  toggleShowPassword: () => void;
+  showPassword: boolean;
+}
 export default function ShowPasswordButton({
   toggleShowPassword,
-  showPassword = false,
-}) {
+  showPassword,
+}: Props) {
   return (
     <button
       onClick={toggleShowPassword}

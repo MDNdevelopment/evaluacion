@@ -1,4 +1,4 @@
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import SurveyQuestion from "./SurveyQuestion";
 import { CATEGORIES } from "../constants/evaluationCategories";
 import { supabase } from "../services/supabaseClient";
@@ -6,12 +6,13 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 interface Props {
-  evaluationData: Evaluation | {};
+  evaluationData: Evaluation | "";
   userData: string;
   employeeData: EmployeeData;
-  periodStart: Date;
-  periodEnd: Date;
+  periodStart: string;
+  periodEnd: string;
   retrieveEmployees: Function;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface EmployeeData {
@@ -34,10 +35,6 @@ interface Evaluation {
   quality: number;
   responsibility: number;
   total_rate: number;
-  setOpen: any;
-}
-
-interface Inputs {
   note: string;
 }
 
@@ -52,9 +49,9 @@ export default function EvaluationSurvey({
 }: Props) {
   const methods = useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const onSubmit = async (data) => {
+  const onSubmit = methods.handleSubmit(async (data) => {
     setIsLoading(true);
-    console.log(data);
+    console.log({ daaaataaa: data });
     let total_rate = (
       (data.commitment +
         data.initiative +
@@ -95,19 +92,24 @@ export default function EvaluationSurvey({
     setOpen(false);
     retrieveEmployees();
     setIsLoading(false);
-  };
+  });
 
   return (
     <div>
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
-          {CATEGORIES.map((category) => {
+        <form onSubmit={onSubmit}>
+          {CATEGORIES.map((category, index) => {
+            console.log({ category });
             return (
               <SurveyQuestion
                 isLoading={isLoading}
                 question={category.question}
                 name={category.name}
-                value={!!evaluationData ? evaluationData[category.name] : null}
+                value={
+                  !!evaluationData
+                    ? Object.values(evaluationData)[index + 1]
+                    : null
+                }
               />
             );
           })}
@@ -120,7 +122,7 @@ export default function EvaluationSurvey({
             <div className="w-4/5">
               <textarea
                 disabled={!!evaluationData ? true : false}
-                value={!!evaluationData ? evaluationData.note : null}
+                value={!!evaluationData ? evaluationData.note : ""}
                 {...methods.register("note")}
                 className="resize-none border border-gray-300 shadow-sm rounded-md w-full min-h-[3rem] p-2"
               />
