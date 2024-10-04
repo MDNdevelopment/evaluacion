@@ -45,8 +45,6 @@ export default function TopRated() {
     );
 
     setDepartments(fetchedDepartments);
-
-    console.log(data);
   };
 
   const getCurrentPeriodEvaluations = async () => {
@@ -91,10 +89,8 @@ export default function TopRated() {
         );
 
         if (currentResult > topWeight) {
-          console.log({ here: evaluation });
           topWeight = currentResult;
           best = setBest(evaluation);
-          console.log({ best });
         }
       }
     });
@@ -154,7 +150,6 @@ export default function TopRated() {
       <div className="grid grid-cols-3 gap-4 mt-2">
         {departments &&
           departments.map((department) => {
-            console.log(department);
             if (
               department.id === 0 ||
               department.id === 5 ||

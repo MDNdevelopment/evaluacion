@@ -41,7 +41,6 @@ export const loginUser = async ({
       )
       .eq("user_id", userId)
       .single();
-    console.log(employeeData);
     if (employeeData) {
       setUser({
         id: userId,
@@ -65,7 +64,6 @@ export const loginUser = async ({
 };
 
 export const logOutUser = async () => {
-  console.log("logging out");
   const { error } = await supabase.auth.signOut();
   localStorage.removeItem("user-storage");
   Cookies.remove("auth-token");

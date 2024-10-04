@@ -51,7 +51,6 @@ export default function EvaluationSurvey({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const onSubmit = methods.handleSubmit(async (data) => {
     setIsLoading(true);
-    console.log({ daaaataaa: data });
     let total_rate = (
       (data.commitment +
         data.initiative +
@@ -61,8 +60,6 @@ export default function EvaluationSurvey({
         data.quality) /
       6
     ).toFixed(2);
-    console.log(employeeData);
-    console.log(userData);
 
     const { error } = await supabase.from("evaluations").insert({
       quality: data.quality,
@@ -85,7 +82,6 @@ export default function EvaluationSurvey({
       console.log(error.message);
     }
 
-    console.log("data uploaded successfully");
     toast.success("¡Evaluación cargada con éxito!", {
       position: "bottom-right",
     });
@@ -99,7 +95,6 @@ export default function EvaluationSurvey({
       <FormProvider {...methods}>
         <form onSubmit={onSubmit}>
           {CATEGORIES.map((category, index) => {
-            console.log({ category });
             return (
               <SurveyQuestion
                 isLoading={isLoading}

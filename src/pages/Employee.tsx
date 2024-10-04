@@ -112,7 +112,6 @@ export default function Employee() {
       console.log(error.message);
       return;
     }
-    console.log({ dataBusqueda: data });
     setEmployeeData({ ...data });
     setEvaluationsData(data.evaluations);
     setAverages(data.averages[0]);
@@ -210,7 +209,6 @@ export default function Employee() {
     });
 
     setEvaluationsData(sortedData);
-    console.log({ sortedData });
   };
 
   useEffect(() => {
@@ -238,8 +236,6 @@ export default function Employee() {
       <ResponsiveContainer width="95%" height={300}>
         <LineChart data={evaluationsData}>
           {metricKeys.map((key: string, index) => {
-            console.log({ metricKey: index });
-            console.log(Object.values(categories));
             return (
               <Line
                 key={key}

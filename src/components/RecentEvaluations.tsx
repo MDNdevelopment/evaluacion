@@ -10,7 +10,6 @@ interface Director {
 }
 
 export default function RecentEvaluations({ evaluationsData }: any) {
-  console.log({ dataaaaa: evaluationsData });
   const user = useUserStore((state) => state.user);
   const [directors, setDirectors] = useState<Director[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,7 +18,6 @@ export default function RecentEvaluations({ evaluationsData }: any) {
     const fetchedDirectors: Director[] = [];
 
     for (const directorList of evaluationsData.made_by) {
-      console.log({ directorList });
       const director = directorList[0]; // Access the first element in the array
 
       const { data, error } = await supabase
@@ -43,7 +41,6 @@ export default function RecentEvaluations({ evaluationsData }: any) {
       fetchedDirectors.push(newDirector);
     }
 
-    console.log({ fetchedDirectors });
     setDirectors(fetchedDirectors);
     setLoading(false); // Stop loading
   };

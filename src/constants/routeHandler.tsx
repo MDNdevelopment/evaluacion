@@ -2,14 +2,12 @@ interface Props {
   children?: React.ReactNode;
 }
 
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
 
 //Function to get the access token from cookies
 const getAccessToken = () => {
-  console.log(Cookies.get("auth-token"));
-
   return Cookies.get("auth-token");
 };
 
@@ -41,6 +39,9 @@ export const AuthRoute = ({ children }: Props) => {
 };
 
 export const PrivateRoute = ({ children }: Props) => {
+  const location = useLocation();
+  const isSettingsPage = location.pathname === "/perfil";
+  console.log({ issss: isSettingsPage });
   // If the user is not authenticated, redirect to login
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
@@ -53,6 +54,16 @@ export const PrivateRoute = ({ children }: Props) => {
     return;
   }
   const userData = JSON.parse(userItem).state.user;
+  if (isSettingsPage) {
+    console.log("is hereeeeeee");
+    return (
+      <>
+        <Navbar />
+        <Outlet />
+        {children}
+      </>
+    );
+  }
   if (!checkPermissions(userData.privileges)) {
     return (
       <>

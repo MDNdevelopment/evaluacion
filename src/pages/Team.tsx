@@ -43,7 +43,6 @@ export default function Team() {
       .order("departments(name)", { ascending: false });
 
     if (employeeError) {
-      console.log(employeeError.message);
       setLoadingData(false);
       return;
     }
@@ -56,9 +55,7 @@ export default function Team() {
 
     const { firstDay, lastDay } = getPastMonthRange();
 
-    console.log({ startOfMonth });
     if (user === null) {
-      console.log("user doesnt exist!");
       return;
     }
 
@@ -76,8 +73,6 @@ export default function Team() {
       .gte("evaluated_at", startOfMonth)
       .gte("period_start", firstDay)
       .lte("period_end", lastDay);
-
-    console.log({ evaluationData });
 
     if (evaluationError) {
       console.log(evaluationError);

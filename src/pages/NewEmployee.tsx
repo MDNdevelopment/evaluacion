@@ -29,9 +29,8 @@ export default function NewEmployee() {
     reset,
     formState: { errors },
   } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async () => {
     setCreateError(null);
-    console.log("submitting");
     setIsloading(true);
 
     //First create the user in the supabase authentication service
@@ -47,7 +46,6 @@ export default function NewEmployee() {
       return;
     }
 
-    console.log("new user created successfully");
     if (signUp.user) {
       //Create a new employee in the users table
       const { error: errorEmployee } = await supabase.from("users").insert({
@@ -67,12 +65,10 @@ export default function NewEmployee() {
           Código de error: ${errorEmployee.code}`
         );
 
-        console.log({ errorEmployee });
         return;
       }
     }
 
-    console.log(data);
     toast.success("¡Empleado creado con éxito!", {
       position: "bottom-right",
     });

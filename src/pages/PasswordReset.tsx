@@ -13,10 +13,9 @@ type Inputs = {
 export default function PasswordReset() {
   const [recovery, setRecovery] = useState<boolean>(false);
   const [submittedForm, setSubmittedForm] = useState<boolean>(false);
-  const { register, handleSubmit, watch } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs>();
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log(watch("email"));
     const { error } = await supabase.auth.resetPasswordForEmail(
       formData.email,
       { redirectTo: "http://localhost:5173/recuperacion" }

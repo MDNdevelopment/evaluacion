@@ -49,13 +49,9 @@ export default function EvaluateModal({
       setCheckingEvaluation(false);
     } else if (data) {
       setCheckingEvaluation(false);
-      console.log("Evaluation exists for the last period:", data);
       setEvaluationData(data);
     } else {
       setCheckingEvaluation(false);
-      console.log(
-        "No evaluation found for the last period, you can proceed to evaluate."
-      );
     }
 
     setCheckingEvaluation(false);
