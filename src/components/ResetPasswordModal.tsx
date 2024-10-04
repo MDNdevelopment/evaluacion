@@ -151,6 +151,7 @@ export default function ResetPasswordModal() {
                         </div>
                         <div className="flex justify-center  mt-5">
                           <input
+                            value="Cambiar"
                             className="bg-primary text-white px-5 py-1 rounded-md hover:bg-primary-dark cursor-pointer"
                             type="submit"
                           />
