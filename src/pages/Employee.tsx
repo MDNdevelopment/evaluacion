@@ -47,7 +47,7 @@ export default function Employee() {
     quality: "Calidad",
     commitment: "Compromiso",
     initiative: "Iniciativa",
-    customer_service: "Atención al cliente",
+    customer_service: "Comunicación efectiva",
     process_tracking: "Seguimiento de procesos",
     responsibility: "Responsabilidad",
     total_rate: "Promedio total",

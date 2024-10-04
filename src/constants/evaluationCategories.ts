@@ -3,7 +3,10 @@ export const CATEGORIES = [
   { name: "responsibility", question: "Responsabilidad" },
   { name: "commitment", question: "Compromiso institucional" },
   { name: "initiative", question: "Iniciativa" },
-  { name: "customer_service", question: "Atención al cliente" },
+  {
+    name: "customer_service",
+    question: "Comunicación efectiva",
+  },
   { name: "process_tracking", question: "Seguimiento de procesos" },
 ];
 
