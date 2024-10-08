@@ -22,7 +22,7 @@ export const CATEGORIES = [
   },
   {
     name: "process_tracking",
-    question: "Seguimiento de procesos",
+    question: "Cumplimiento de procesos",
     desc: "Sigue y responde a los canales previamente establecidos.",
   },
 ];
