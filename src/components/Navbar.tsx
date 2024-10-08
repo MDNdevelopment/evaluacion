@@ -78,16 +78,14 @@ export default function Navbar() {
                     Agregar empleado
                   </Link>
                 )}
-                {user && user.privileges === 1 && (
-                  <Link
-                    className={
-                      "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    }
-                    to={`/empleado/${user.id}`}
-                  >
-                    Mi perfil
-                  </Link>
-                )}
+                <Link
+                  className={
+                    "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                  }
+                  to={`/empleado/${user?.id}`}
+                >
+                  Mi perfil
+                </Link>
               </div>
             </div>
           </div>
