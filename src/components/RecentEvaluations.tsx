@@ -9,7 +9,7 @@ interface Director {
   note: string;
 }
 
-export default function RecentEvaluations({ evaluationsData }: any) {
+export default function RecentEvaluations({ evaluationsData = null }: any) {
   const user = useUserStore((state) => state.user);
   const [directors, setDirectors] = useState<Director[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,12 +47,13 @@ export default function RecentEvaluations({ evaluationsData }: any) {
 
   //Get the name of every director that has evaluated this employee
   useEffect(() => {
+    console.log(JSON.stringify(evaluationsData));
     if (evaluationsData && evaluationsData.made_by) {
       getDirectorsNames();
     }
   }, [evaluationsData]);
 
-  if (directors.length === 0) {
+  if (directors.length === 0 || evaluationsData === null) {
     return <></>;
   }
   return (
