@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { CATEGORIES } from "../constants/evaluationCategories";
-
 interface Props {
   label: number;
   value: number;
@@ -24,15 +21,6 @@ const renameLabel = (label: number) => {
 };
 
 export default function RateCircle({ label, value }: Props) {
-  const [showLabel, setShowLabel] = useState<boolean>(false);
-
-  const handleMouseOut = () => {
-    setShowLabel(false);
-  };
-
-  const handleMouseOver = () => {
-    setShowLabel(true);
-  };
   return (
     <div className="flex flex-col items-center mx-2  overflow-clip h-full">
       <div className="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-primary-dark ">

@@ -51,7 +51,6 @@ export default function EvaluationSurvey({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mandatoryComment, setMandatoryComment] = useState<boolean>(false);
   const onSubmit = methods.handleSubmit(async (data) => {
-    const answersArray = Object.values(data);
     const hasLowScore = CATEGORIES.some((category) => data[category.name] <= 4);
 
     if (hasLowScore && !data.note) {
