@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "../services/supabaseClient";
 import formatDateForDisplay from "../utils/formatDateForDisplay";
 import { useUserStore } from "../stores/useUserStore";
+import RateCircle from "./RateCircle";
+import Spinner from "./Spinner";
 
 interface Director {
   name: string;
   evaluationDate: string;
   note: string;
+  categories: number[];
 }
 
 export default function RecentEvaluations({ evaluationsData = null }: any) {
@@ -31,10 +34,12 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
         continue; // Skip this iteration on error
       }
 
+      console.log({ director });
       const newDirector: Director = {
         name: `${data.first_name} ${data.last_name}`,
         evaluationDate: director.date,
         note: director.note,
+        categories: director.categories,
       };
 
       // Add new director to the list
@@ -47,11 +52,19 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
 
   //Get the name of every director that has evaluated this employee
   useEffect(() => {
-    console.log(JSON.stringify(evaluationsData));
+    console.log({ evaluationsData });
     if (evaluationsData && evaluationsData.made_by) {
       getDirectorsNames();
     }
   }, [evaluationsData]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center items-center mt-5">
+        <Spinner />
+      </div>
+    );
+  }
 
   if (directors.length === 0 || evaluationsData === null) {
     return <></>;
@@ -64,22 +77,40 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
         </h2>
 
         <div className="w-full rounded-lg  min-h-11">
-          <ul className="flex flex-col  flex-wrap">
+          <ul className="flex flex-row justify-center  flex-wrap ">
             {directors &&
               !loading &&
               directors.map((director, index) => (
                 <li
-                  className="flex flex-col w-2/5 py-2 px-5 rounded-md justify-between items-center  bg-[#f8f8f8] border border-[#f5f5f5] my-1 shadow-sm"
+                  className="flex flex-col w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-[#f8f8f8] border border-[#f5f5f5] shadow-sm"
                   key={index}
                 >
-                  <div className="flex w-full mt-3 justify-between items-center">
-                    {user && user.privileges > 2 ? (
-                      <h4>{director.name}</h4>
+                  <div className="flex w-full mt-3 justify-between items-center ">
+                    {user && user.privileges > 3 ? (
+                      <div>
+                        <h4>{director.name}</h4>
+                      </div>
                     ) : null}
                     <h5>{formatDateForDisplay(director.evaluationDate)}</h5>
                   </div>
+                  {user && user.privileges > 3 && (
+                    <div className="flex flex-row w-full justify-around min-h-[25px] mt-5">
+                      {director.categories.map((category, index) => (
+                        <div className="grow flex-1 ">
+                          <RateCircle label={index} value={category} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex w-full mt-3 justify-between items-center">
-                    <p className="text-[#5f5f5f]">{director.note}</p>
+                    {director.note && (
+                      <p className="text-[#5f5f5f]">
+                        <span className="font-bold text-gray-900">
+                          Comentario:
+                        </span>{" "}
+                        {director.note}
+                      </p>
+                    )}
                   </div>
                 </li>
               ))}

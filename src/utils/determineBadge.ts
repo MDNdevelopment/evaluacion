@@ -12,7 +12,10 @@ export const determineBadge = (
     return { type: "danger", text: "No disponible" };
   }
 
-  if (userPrivileges === 2 && employeePrivileges === 3) {
+  if (
+    (userPrivileges === 2 && employeePrivileges === 3) ||
+    (userPrivileges === 2 && employeePrivileges === 4)
+  ) {
     return { type: "danger", text: "No disponible" };
   }
 

@@ -152,6 +152,20 @@ export default function Employee() {
             date: evaluation.evaluated_at,
             user: evaluation.made_by,
             note: evaluation.note,
+            quality: evaluation.quality,
+            responsibility: evaluation.responsibility,
+            commitment: evaluation.commitment,
+            initiative: evaluation.initiative,
+            customer_service: evaluation.customer_service,
+            process_tracking: evaluation.process_tracking,
+            categories: [
+              evaluation.quality,
+              evaluation.responsibility,
+              evaluation.commitment,
+              evaluation.initiative,
+              evaluation.customer_service,
+              evaluation.process_tracking,
+            ],
           },
         ]);
         return acc;

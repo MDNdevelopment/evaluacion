@@ -49,7 +49,16 @@ export default function EvaluationSurvey({
 }: Props) {
   const methods = useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [mandatoryComment, setMandatoryComment] = useState<boolean>(false);
   const onSubmit = methods.handleSubmit(async (data) => {
+    const answersArray = Object.values(data);
+    const hasLowScore = CATEGORIES.some((category) => data[category.name] <= 4);
+
+    if (hasLowScore && !data.note) {
+      setMandatoryComment(true);
+      return;
+    }
+
     setIsLoading(true);
     let total_rate = (
       (data.commitment +
@@ -109,7 +118,7 @@ export default function EvaluationSurvey({
               />
             );
           })}
-          <div className="flex flex-row px-5 justify-around items-center border-t py-5 border-gray-300 ">
+          <div className="flex flex-row px-5 justify-around items-start border-t py-5 border-gray-300 ">
             <div className=" w-1/5">
               <p className="  mr-5 font-black text-gray-900 leading-5">
                 Comentario adicional
@@ -122,6 +131,12 @@ export default function EvaluationSurvey({
                 {...methods.register("note")}
                 className="resize-none border border-gray-300 shadow-sm rounded-md w-full min-h-[3rem] p-2"
               />
+              {mandatoryComment && (
+                <p className="text-red-500 text-sm">
+                  Un comentario de retroalimentación es obligatorio si una de
+                  las categorias tiene un valor de 4 o menos.
+                </p>
+              )}
             </div>
           </div>
           {evaluationData === null && (
