@@ -70,7 +70,7 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
-                {user && user.privileges === 3 && (
+                {user && user.privileges === 4 && (
                   <Link
                     to={"/dashboard/nuevo"}
                     className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"

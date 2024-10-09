@@ -20,6 +20,7 @@ module.exports = {
         primary: {
           DEFAULT: "#F4B000",
           dark: "#eba900",
+          light: "#fccb4f",
         },
         darkText: {
           DEFAULT: "#2a2a2a",

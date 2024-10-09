@@ -41,7 +41,6 @@ export const AuthRoute = ({ children }: Props) => {
 export const PrivateRoute = ({ children }: Props) => {
   const location = useLocation();
   const isSettingsPage = location.pathname === "/perfil";
-  console.log({ issss: isSettingsPage });
   // If the user is not authenticated, redirect to login
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
