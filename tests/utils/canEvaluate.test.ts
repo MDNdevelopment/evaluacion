@@ -46,4 +46,28 @@ describe("canEvaluate function", () => {
     const result4 = canEvaluate(1, 4, "id", "id2");
     expect(result4).toBe(false);
   });
+
+  it("should allow every level 2,3 and 4 user evaluate Juan lauretta", () => {
+    const result = canEvaluate(
+      2,
+      4,
+      "user",
+      "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
+    );
+    expect(result).toBe(true);
+    const result2 = canEvaluate(
+      3,
+      4,
+      "user",
+      "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
+    );
+    expect(result2).toBe(true);
+    const result3 = canEvaluate(
+      4,
+      4,
+      "user",
+      "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
+    );
+    expect(result3).toBe(true);
+  });
 });
