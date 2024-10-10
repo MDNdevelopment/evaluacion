@@ -16,7 +16,7 @@ export default function PasswordReset() {
   const { register, handleSubmit } = useForm<Inputs>();
 
   const onSubmit = handleSubmit(async (formData) => {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(
+    const { error } = await supabase.auth.resetPasswordForEmail(
       formData.email,
       { redirectTo: "https://evaluacion.mdnpublicidad.com/recuperacion" }
     );
@@ -25,8 +25,6 @@ export default function PasswordReset() {
       console.log(error);
       return;
     }
-
-    console.log(data);
 
     setSubmittedForm(true);
     toast.success("¡Correo enviado con éxito!", { position: "bottom-right" });

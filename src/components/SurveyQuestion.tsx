@@ -7,6 +7,8 @@ interface Props {
   value: number | null;
   isLoading: boolean;
   desc: string;
+  autoFilledVal: number | null;
+  setAutoFilledVal: (val: number | null) => void;
 }
 
 export default function SurveyQuestion({
@@ -15,24 +17,32 @@ export default function SurveyQuestion({
   value,
   isLoading,
   desc,
+  autoFilledVal,
+  setAutoFilledVal,
 }: Props) {
   const { setValue } = useFormContext();
-  const [answer, setAnswer] = useState<number>(1);
+  const [answer, setAnswer] = useState<number>(5);
   const [abstention, setAbstention] = useState<boolean>(false);
 
   const setSelectedValue = (value: number) => {
     setAnswer(value);
     setValue(name, value);
+    setAutoFilledVal(null);
   };
 
   useEffect(() => {
-    if (value === null) {
-      setAnswer(1);
-      setValue(name, 1);
+    if (value === null && autoFilledVal === null && answer === null) {
+      setAnswer(5);
+      setValue(name, 5);
       return;
     }
-    setAnswer(value);
-  }, [value]);
+
+    if (autoFilledVal) {
+      setAnswer(autoFilledVal);
+      setValue(name, autoFilledVal);
+      setAbstention(false);
+    }
+  }, [value, autoFilledVal]);
   return (
     <div className="flex flex-row justify-around items-center border-t py-3 border-gray-300 ">
       <div className=" w-1/5">
@@ -55,15 +65,15 @@ export default function SurveyQuestion({
                   setSelectedValue(currentValue);
                 }}
                 className={`${
-                  currentValue === answer
-                    ? "bg-primary text-white"
+                  currentValue === answer || currentValue === autoFilledVal
+                    ? "bg-primary text-white border-primary"
                     : value !== null || abstention
                     ? "bg-[#a7a7a7] text-white border-[#a7a7a7] opacity-30"
                     : "bg-white text-black hover:bg-gray-200"
-                }  mx-2 w-[40px] h-[40px] rounded-full flex justify-center items-center border-2 border-primary text-md ${
+                }  mx-2 w-[40px] h-[40px] rounded-full flex justify-center items-center border-2  text-md ${
                   value !== null || abstention
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer"
+                    ? "cursor-not-allowed border-[#a7a7a7] "
+                    : "cursor-pointer border-primary"
                 } `}
               >
                 <p className=" font-bold">{currentValue}</p>

@@ -34,7 +34,6 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
         continue; // Skip this iteration on error
       }
 
-      console.log({ director });
       const newDirector: Director = {
         name: `${data.first_name} ${data.last_name}`,
         evaluationDate: director.date,
@@ -82,7 +81,7 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
               !loading &&
               directors.map((director, index) => (
                 <li
-                  className="flex flex-col w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-[#f8f8f8] border border-[#f5f5f5] shadow-sm"
+                  className="flex flex-col w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-white border border-[#f5f5f5] shadow-sm"
                   key={index}
                 >
                   <div className="flex w-full mt-3 justify-between items-center ">

@@ -6,9 +6,27 @@ describe("determineBadge function", () => {
     expect(result).toEqual({ type: "success", text: "Evaluado" });
   });
 
-  it("should return warning and pendiente if the employee hasnt been evaluadted", () => {
+  it("should return warning and pendiente if the employee hasnt been evaluated", () => {
     const result = determineBadge(2, 2, "", "lauretta", "employee");
     expect(result).toEqual({ type: "warning", text: "Por evaluar" });
+
+    const result2 = determineBadge(
+      2,
+      4,
+      "",
+      "id",
+      "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
+    );
+    expect(result2).toEqual({ type: "warning", text: "Por evaluar" });
+
+    const result3 = determineBadge(
+      3,
+      4,
+      "",
+      "id",
+      "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
+    );
+    expect(result3).toEqual({ type: "warning", text: "Por evaluar" });
   });
 
   it("should return no disponible if the user is not able to evaluate (privileges 1)", () => {

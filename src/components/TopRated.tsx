@@ -24,6 +24,7 @@ interface Evaluation {
   first_name: string;
   last_name: string;
   role: string;
+  privileges: number;
 }
 
 export default function TopRated() {
@@ -70,7 +71,7 @@ export default function TopRated() {
     averageScore: number,
     evaluationCount: number
   ) => {
-    return (averageScore * evaluationCount) / (evaluationCount + 5);
+    return (averageScore * evaluationCount) / evaluationCount;
   };
 
   const setBest = (evaluation: Evaluation | null) => {
@@ -82,7 +83,10 @@ export default function TopRated() {
     let best: Evaluation | null = setBest(null);
     let topWeight = 0;
     evaluations.map((evaluation: Evaluation) => {
-      if (evaluation.department_id === department.id) {
+      if (
+        evaluation.department_id === department.id &&
+        evaluation.privileges < 4
+      ) {
         const currentResult = calculateEvaluationWeight(
           evaluation.average_total_rate,
           evaluation.evaluation_count

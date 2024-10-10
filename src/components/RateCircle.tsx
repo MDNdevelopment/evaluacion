@@ -26,7 +26,7 @@ export default function RateCircle({ label, value }: Props) {
       <div className="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-primary-dark ">
         <p className="text-white font-bold">{value}</p>
       </div>
-      <div className="flex-1  flex justify-center items-center">
+      <div className="flex-1  flex justify-center items-start">
         <p className="text-[12px] mt-2 leading-4 text-gray-800 text-center">
           {renameLabel(label)}
         </p>
