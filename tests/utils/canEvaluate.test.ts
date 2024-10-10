@@ -47,7 +47,7 @@ describe("canEvaluate function", () => {
     expect(result4).toBe(false);
   });
 
-  it("should allow every level 2,3 and 4 user evaluate Juan lauretta", () => {
+  it("should allow every level 2,3 and 4 user to evaluate Juan lauretta", () => {
     const result = canEvaluate(
       2,
       4,

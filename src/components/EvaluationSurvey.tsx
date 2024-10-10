@@ -4,6 +4,7 @@ import { CATEGORIES } from "../constants/evaluationCategories";
 import { supabase } from "../services/supabaseClient";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useUserStore } from "../stores/useUserStore";
 
 interface Props {
   evaluationData: Evaluation | "";
@@ -47,9 +48,11 @@ export default function EvaluationSurvey({
   setOpen,
   retrieveEmployees,
 }: Props) {
+  const user = useUserStore((state) => state.user);
   const methods = useForm();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mandatoryComment, setMandatoryComment] = useState<boolean>(false);
+  const [autoFilledVal, setAutoFilledVal] = useState<number | null>(null);
   const onSubmit = methods.handleSubmit(async (data) => {
     const hasLowScore = CATEGORIES.some((category) => data[category.name] <= 4);
 
@@ -109,6 +112,8 @@ export default function EvaluationSurvey({
                 desc={category.desc}
                 question={category.question}
                 name={category.name}
+                autoFilledVal={autoFilledVal}
+                setAutoFilledVal={setAutoFilledVal}
                 value={
                   !!evaluationData
                     ? Object.values(evaluationData)[index + 1]
@@ -138,19 +143,36 @@ export default function EvaluationSurvey({
               )}
             </div>
           </div>
-          {evaluationData === null && (
-            <div className="flex flex-row justify-center items-center py-5">
-              <button
-                disabled={isLoading}
-                className={`${
-                  isLoading
-                    ? "bg-gray-300 cursor-progress"
-                    : "bg-primary hover:bg-primary-dark"
-                }  text-white font-bold px-3 py-1 rounded-md text-xl `}
-              >
-                Enviar
-              </button>
+          {user && user.privileges > 3 && evaluationData === null && (
+            <div className="flex flex-row justify-center items-center">
+              {[6, 7, 8, 9].map((val) => (
+                <div
+                  key={val}
+                  onClick={() => {
+                    setAutoFilledVal(val);
+                  }}
+                  className={`mx-2 bg-blue-600 w-[40px] h-[40px] rounded-full flex justify-center items-center text-white text-md cursor-pointer transition-all hover:bg-blue-800`}
+                >
+                  <p className=" font-bold">{val}</p>
+                </div>
+              ))}
             </div>
+          )}
+          {evaluationData === null && (
+            <>
+              <div className="flex flex-row justify-center items-center py-5">
+                <button
+                  disabled={isLoading}
+                  className={`${
+                    isLoading
+                      ? "bg-gray-300 cursor-progress"
+                      : "bg-primary hover:bg-primary-dark"
+                  }  text-white font-bold px-3 py-1 rounded-md text-xl `}
+                >
+                  Enviar
+                </button>
+              </div>
+            </>
           )}
         </form>
       </FormProvider>
