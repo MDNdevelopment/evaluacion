@@ -14,20 +14,26 @@ export default function PasswordReset() {
   const [recovery, setRecovery] = useState<boolean>(false);
   const [submittedForm, setSubmittedForm] = useState<boolean>(false);
   const { register, handleSubmit } = useForm<Inputs>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = handleSubmit(async (formData) => {
+    setIsLoading(true);
+    console.log("im hereee");
     const { error } = await supabase.auth.resetPasswordForEmail(
       formData.email,
-      { redirectTo: "https://evaluacion.mdnpublicidad.com/recuperacion" }
+      { redirectTo: "https://evaluacion.mdnpublicidad/recuperacion" }
     );
 
     if (error) {
-      console.log(error);
+      console.log(error.message);
+      toast.error("No se pudo enviar el correo", { position: "bottom-right" });
+      setIsLoading(false);
       return;
     }
 
     setSubmittedForm(true);
     toast.success("¡Correo enviado con éxito!", { position: "bottom-right" });
+    setIsLoading(false);
   });
 
   //   Check if the user is already authenticated and has the auth-token cookie
@@ -117,7 +123,12 @@ export default function PasswordReset() {
               <div>
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className={`${
+                    isLoading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-primary cursor-pointer hover:bg-primary-dark"
+                  } flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                  disabled={isLoading}
                 >
                   Restablecer
                 </button>
