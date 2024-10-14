@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 interface Props {
   children?: React.ReactNode;
 }
@@ -5,10 +7,16 @@ interface Props {
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
+import { useUserStore } from "../stores/useUserStore";
+import axios from "axios";
 
 //Function to get the access token from cookies
 const getAccessToken = () => {
-  return Cookies.get("auth-token");
+  const token = Cookies.get("auth-token");
+  console.log(token);
+  //get the user privileges from the token
+
+  return token;
 };
 
 //Function to check if the user is authenticated
@@ -16,9 +24,33 @@ const isAuthenticated = () => {
   return !!getAccessToken();
 };
 
-const checkPermissions = (privileges: number | null) => {
-  if (privileges === 1) return false;
-  if (privileges === null) return false;
+const checkPermissions = async () => {
+  const token = Cookies.get("auth-token");
+  const user = useUserStore((state) => state.user);
+  console.log(JSON.stringify(user));
+
+  if (user) {
+    try {
+      const fetchedPrivileges = await axios({
+        method: "get",
+        url: "http://localhost:5500/api/privileges",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          uuid: user.id,
+        },
+      }).then((res) => {
+        console.log(res.data);
+        return res.data.privileges;
+      });
+
+      if (fetchedPrivileges === 1) return false;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return true;
 };
 
@@ -62,7 +94,7 @@ export const PrivateRoute = ({ children }: Props) => {
       </>
     );
   }
-  if (!checkPermissions(userData.privileges)) {
+  if (!checkPermissions()) {
     return (
       <>
         <Navbar />

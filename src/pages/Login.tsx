@@ -3,22 +3,53 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("jlauretta@mdnpublicidad.com");
+  const [password, setPassword] = useState<string>("juandev12");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { ok } = await loginUser({ email, password, setError, setUser });
-    if (!ok) {
-      console.log("Error login");
-      return;
-    }
-    // Set cookie with session token
-    navigate("/dashboard"); // Redirect to dashboard
+
+    axios
+      .post("http://localhost:5500/auth/login", {
+        email: email,
+        password: password,
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.ok) {
+          setUser({
+            id: res.data.userData.user_id,
+            full_name: `${res.data.userData.first_name} ${res.data.userData.last_name}`,
+            email: res.data.userData.email,
+            department: res.data.userData.departments.name,
+            department_id: res.data.userData.departments.id,
+
+            role: res.data.userData.role,
+            privileges: res.data.userData.privileges,
+          });
+
+          // const dec = jwtDecode(res.data.token);
+          console.log(res.data.token.length);
+
+          Cookies.set("auth-token", res.data.token, {
+            expires: 7,
+          });
+
+          navigate("/dashboard");
+        } else {
+          console.log("Error al iniciar sesión: " + res.data.error);
+          setError(res.data.error);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   //   Check if the user is already authenticated and has the auth-token cookie

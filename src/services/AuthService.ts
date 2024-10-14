@@ -52,6 +52,7 @@ export const loginUser = async ({
         privileges: employeeData.privileges,
       });
 
+      console.log("setting cookie", data.session.access_token);
       Cookies.set("auth-token", data.session.access_token, { expires: 7 }); // 7-day expiration
       return {
         ok: true,
