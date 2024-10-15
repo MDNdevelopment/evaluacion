@@ -31,10 +31,14 @@ export default function SurveyQuestion({
   };
 
   useEffect(() => {
-    if (value === null && autoFilledVal === null && answer === null) {
+    if (value === null && autoFilledVal === null) {
       setAnswer(5);
       setValue(name, 5);
       return;
+    }
+
+    if (value !== null) {
+      setAnswer(value);
     }
 
     if (autoFilledVal) {

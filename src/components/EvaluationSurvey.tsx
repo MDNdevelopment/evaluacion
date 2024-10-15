@@ -54,6 +54,7 @@ export default function EvaluationSurvey({
   const [mandatoryComment, setMandatoryComment] = useState<boolean>(false);
   const [autoFilledVal, setAutoFilledVal] = useState<number | null>(null);
   const onSubmit = methods.handleSubmit(async (data) => {
+    console.log(data);
     const hasLowScore = CATEGORIES.some((category) => data[category.name] <= 4);
 
     if (hasLowScore && !data.note) {
@@ -91,6 +92,10 @@ export default function EvaluationSurvey({
     if (error) {
       setIsLoading(false);
       console.log(error.message);
+      toast.error("¡Hubo un error al cargar la evaluación!", {
+        position: "bottom-right",
+      });
+      return;
     }
 
     toast.success("¡Evaluación cargada con éxito!", {
