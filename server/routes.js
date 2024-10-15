@@ -64,7 +64,7 @@ router.get("/api/privileges", authenticateJWT, async (req, res) => {
     return res.status(200).json({ error: error.message });
   }
 
-  res.json({ privileges: data.privileges });
+  res.json(data.privileges);
 });
 
 module.exports = router;

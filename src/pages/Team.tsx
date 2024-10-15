@@ -9,6 +9,7 @@ import { determineBadge } from "../utils/determineBadge";
 import getPastMonthRange from "../utils/getPastMonthRange";
 import EvaluateModal from "../components/EvaluateModal";
 import { useNavigate } from "react-router-dom";
+import { checkPrivileges } from "../utils/checkPrivileges";
 
 interface Evaluations {
   avg: number;
@@ -30,6 +31,7 @@ interface Employee {
 export default function Team() {
   const [loadingData, setLoadingData] = useState<boolean>(true);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [userPrivileges, setUserPrivileges] = useState<number>(0);
   const user = useUserStore((state) => state.user);
   const [evaluationsDirection, setEvaluationsDirection] =
     useState<boolean>(false);
@@ -108,6 +110,14 @@ export default function Team() {
     if (!!user) {
       retrieveEmployees();
     }
+
+    const fetchPrivileges = async () => {
+      const privileges = await checkPrivileges();
+      console.log({ privileges });
+      setUserPrivileges(privileges);
+    };
+
+    fetchPrivileges();
   }, [user]);
 
   const sortEvaluations = () => {
@@ -295,7 +305,7 @@ export default function Team() {
               {employees.map((employee) => {
                 return (
                   <tr
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    className="bg-white border-b   dark:bg-gray-800 dark:border-gray-700"
                     key={employee.user_id}
                   >
                     <th
@@ -315,20 +325,27 @@ export default function Team() {
                     </td>
 
                     <td className="px-6 py-4">
-                      <EvaluatedBadge
-                        badge={determineBadge(
-                          user.privileges,
-                          employee.privileges,
-                          employee.recent_evaluation_date,
-                          user.id,
-                          employee.user_id
-                        )}
-                      />
+                      {userPrivileges > 0 ? (
+                        <EvaluatedBadge
+                          badge={determineBadge(
+                            userPrivileges,
+                            employee.privileges,
+                            employee.recent_evaluation_date,
+                            user.id,
+                            employee.user_id
+                          )}
+                        />
+                      ) : (
+                        <div className="flex justify-center items-center">
+                          <Spinner />
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-row  ">
-                        {canEvaluate(
-                          user.privileges,
+                        {userPrivileges &&
+                        canEvaluate(
+                          userPrivileges,
                           employee.privileges,
                           user.id,
                           employee.user_id

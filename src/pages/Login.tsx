@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
-import { loginUser } from "../services/AuthService";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("jlauretta@mdnpublicidad.com");

@@ -1,15 +1,17 @@
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
+import Navbar from "../components/Navbar";
+import { checkPrivileges } from "../utils/checkPrivileges";
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
 interface Props {
   children?: React.ReactNode;
 }
 
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
-import Navbar from "../components/Navbar";
-import { useUserStore } from "../stores/useUserStore";
-import axios from "axios";
-
+interface Token {
+  id: string | null;
+}
 //Function to get the access token from cookies
 const getAccessToken = () => {
   const token = Cookies.get("auth-token");
@@ -19,39 +21,15 @@ const getAccessToken = () => {
   return token;
 };
 
+const decodeJWT = () => {
+  const token = getAccessToken();
+  const decodedToken = token ? jwtDecode(token) : null;
+  return decodedToken;
+};
+
 //Function to check if the user is authenticated
 const isAuthenticated = () => {
   return !!getAccessToken();
-};
-
-const checkPermissions = async () => {
-  const token = Cookies.get("auth-token");
-  const user = useUserStore((state) => state.user);
-  console.log(JSON.stringify(user));
-
-  if (user) {
-    try {
-      const fetchedPrivileges = await axios({
-        method: "get",
-        url: "http://localhost:5500/api/privileges",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          uuid: user.id,
-        },
-      }).then((res) => {
-        console.log(res.data);
-        return res.data.privileges;
-      });
-
-      if (fetchedPrivileges === 1) return false;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  return true;
 };
 
 export const AuthRoute = ({ children }: Props) => {
@@ -71,20 +49,31 @@ export const AuthRoute = ({ children }: Props) => {
 };
 
 export const PrivateRoute = ({ children }: Props) => {
+  const token = decodeJWT();
+  const userId: Token = token?.id;
+  let userPrivileges = null;
+
   const location = useLocation();
   const isSettingsPage = location.pathname === "/perfil";
+
+  useEffect(() => {
+    const fetchPrivileges = async () => {
+      userPrivileges = await checkPrivileges();
+    };
+    fetchPrivileges();
+  }, []);
+
   // If the user is not authenticated, redirect to login
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  const userItem = localStorage.getItem("user-storage");
+  const userItem = Cookies.get("auth-token");
   if (userItem === null) {
     Cookies.remove("auth-token");
     <Navigate to={`/login`} />;
     return;
   }
-  const userData = JSON.parse(userItem).state.user;
   if (isSettingsPage) {
     return (
       <>
@@ -94,7 +83,8 @@ export const PrivateRoute = ({ children }: Props) => {
       </>
     );
   }
-  if (!checkPermissions()) {
+  console.log({ userPrivileges });
+  if (userPrivileges === 1) {
     return (
       <>
         <Navbar />

@@ -42,11 +42,9 @@ const loginUser = async (email, password) => {
     const tokenPayload = {
       id: authData.user.id,
       email: authData.user.email,
-      role: userData.role,
-      department: userData.departments.name,
     };
     const token = jwt.sign(tokenPayload, SECRET_KEY, {
-      expiresIn: "7d",
+      expiresIn: "900",
     });
     console.log({ serverToken: token });
     return {

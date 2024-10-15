@@ -11,8 +11,11 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useUserStore } from "../stores/useUserStore";
 import { logOutUser } from "../services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { checkPrivileges } from "../utils/checkPrivileges";
 
 export default function Navbar() {
+  const [userPrivileges, setUserPrivileges] = useState<number | null>(null);
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const handleLogOut = async () => {
@@ -21,6 +24,18 @@ export default function Navbar() {
       navigate("/", { replace: true });
     }
   };
+
+  useEffect(() => {
+    const fetchPrivileges = async () => {
+      const privileges = await checkPrivileges();
+      console.log({ privileges });
+      setUserPrivileges(privileges);
+    };
+
+    fetchPrivileges();
+    console.log("hola");
+  }, []);
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -50,7 +65,7 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {user && user.privileges >= 2 && (
+                {userPrivileges && userPrivileges >= 2 && (
                   <>
                     <Link
                       className={
@@ -70,7 +85,7 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
-                {user && user.privileges === 4 && (
+                {userPrivileges && userPrivileges === 4 && (
                   <Link
                     to={"/dashboard/nuevo"}
                     className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"

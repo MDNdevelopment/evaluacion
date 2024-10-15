@@ -2,9 +2,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import SurveyQuestion from "./SurveyQuestion";
 import { CATEGORIES } from "../constants/evaluationCategories";
 import { supabase } from "../services/supabaseClient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useUserStore } from "../stores/useUserStore";
+import { checkPrivileges } from "../utils/checkPrivileges";
 
 interface Props {
   evaluationData: Evaluation | "";
@@ -53,6 +54,8 @@ export default function EvaluationSurvey({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mandatoryComment, setMandatoryComment] = useState<boolean>(false);
   const [autoFilledVal, setAutoFilledVal] = useState<number | null>(null);
+  const [userPrivileges, setUserPrivileges] = useState<number>(0);
+
   const onSubmit = methods.handleSubmit(async (data) => {
     const hasLowScore = CATEGORIES.some((category) => data[category.name] <= 4);
 
@@ -101,6 +104,14 @@ export default function EvaluationSurvey({
     setIsLoading(false);
   });
 
+  useEffect(() => {
+    const fetchPrivileges = async () => {
+      const privileges = await checkPrivileges();
+      setUserPrivileges(privileges);
+    };
+
+    fetchPrivileges();
+  }, []);
   return (
     <div>
       <FormProvider {...methods}>
@@ -143,7 +154,7 @@ export default function EvaluationSurvey({
               )}
             </div>
           </div>
-          {user && user.privileges > 3 && evaluationData === null && (
+          {user && userPrivileges > 3 && evaluationData === null && (
             <div className="flex flex-row justify-center items-center">
               {[6, 7, 8, 9].map((val) => (
                 <div
