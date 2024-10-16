@@ -11,12 +11,10 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useUserStore } from "../stores/useUserStore";
 import { logOutUser } from "../services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { checkPrivileges } from "../utils/checkPrivileges";
 
 export default function Navbar() {
-  const [userPrivileges, setUserPrivileges] = useState<number | null>(null);
   const user = useUserStore((state) => state.user);
+
   const navigate = useNavigate();
   const handleLogOut = async () => {
     const res = await logOutUser();
@@ -24,17 +22,6 @@ export default function Navbar() {
       navigate("/", { replace: true });
     }
   };
-
-  useEffect(() => {
-    const fetchPrivileges = async () => {
-      const privileges = await checkPrivileges();
-      console.log({ privileges });
-      setUserPrivileges(privileges);
-    };
-
-    fetchPrivileges();
-    console.log("hola");
-  }, []);
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -57,15 +44,17 @@ export default function Navbar() {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
-              <img
-                alt="Your Company"
-                src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
-                className="h-8 w-auto"
-              />
+              <Link to={"/dashboard"}>
+                <img
+                  alt="Your Company"
+                  src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
+                  className="h-8 w-auto"
+                />
+              </Link>
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
-                {userPrivileges && userPrivileges >= 2 && (
+                {user && user.privileges >= 2 && (
                   <>
                     <Link
                       className={
@@ -85,7 +74,7 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
-                {userPrivileges && userPrivileges === 4 && (
+                {user && user.privileges === 4 && (
                   <Link
                     to={"/dashboard/nuevo"}
                     className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"

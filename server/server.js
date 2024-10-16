@@ -8,7 +8,12 @@ const routes = require("./routes");
 const PORT = process.env.PORT || 5500; // Choose the port you want to use
 
 // Middlewares
-app.use(cors()); // Enable CORS
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+); // Enable CORS
 app.use(express.json()); // Parse JSON bodies
 app.use(cookieParser()); // Parse cookies
 app.use(bodyParser.json()); // Parse JSON bodies

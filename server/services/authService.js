@@ -37,16 +37,18 @@ const loginUser = async (email, password) => {
       };
     }
 
-    console.log(authData);
-
     const tokenPayload = {
-      id: authData.user.id,
+      userId: authData.user.id,
       email: authData.user.email,
     };
-    const token = jwt.sign(tokenPayload, SECRET_KEY, {
-      expiresIn: "900",
+    const accessToken = jwt.sign(tokenPayload, SECRET_KEY, {
+      expiresIn: "15m",
     });
-    console.log({ serverToken: token });
+
+    const refreshToken = jwt.sign(tokenPayload, SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
     return {
       ok: true,
       token,

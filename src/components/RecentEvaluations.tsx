@@ -51,7 +51,6 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
 
   //Get the name of every director that has evaluated this employee
   useEffect(() => {
-    console.log({ evaluationsData });
     if (evaluationsData && evaluationsData.made_by) {
       getDirectorsNames();
     }
@@ -82,7 +81,7 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
               directors.map((director, index) => (
                 <li
                   className="flex flex-col w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-white border border-[#f5f5f5] shadow-sm"
-                  key={index}
+                  key={director.name + index}
                 >
                   <div className="flex w-full mt-3 justify-between items-center ">
                     {user && user.privileges > 3 ? (

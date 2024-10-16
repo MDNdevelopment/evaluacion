@@ -1,6 +1,8 @@
 import { supabase } from "../services/supabaseClient";
 import Cookies from "js-cookie";
-import { User } from "../stores/useUserStore";
+import { User, useUserStore } from "../stores/useUserStore";
+import { useTokenStore } from "../stores/useTokenStore";
+import axios from "axios";
 
 interface Props {
   email: string;
@@ -52,7 +54,6 @@ export const loginUser = async ({
         privileges: employeeData.privileges,
       });
 
-      console.log("setting cookie", data.session.access_token);
       Cookies.set("auth-token", data.session.access_token, { expires: 7 }); // 7-day expiration
       return {
         ok: true,
@@ -65,8 +66,22 @@ export const loginUser = async ({
 };
 
 export const logOutUser = async () => {
-  const { error } = await supabase.auth.signOut();
-  localStorage.removeItem("user-storage");
-  Cookies.remove("auth-token");
-  return error;
+  const token = useTokenStore.getState().token;
+  try {
+    axios
+      .post(
+        "http://localhost:5500/auth/logout",
+        {},
+        { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(() => {
+        useTokenStore.getState().clearToken();
+        useUserStore.getState().clearUser();
+      })
+      .catch((e) => {
+        console.log({ errorLogout: e });
+      });
+  } catch (e) {
+    console.log(e);
+  }
 };

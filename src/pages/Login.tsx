@@ -1,59 +1,46 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
-import axios from "axios";
+import { axiosInstance } from "../api/axiosInstance";
+import { useTokenStore } from "../stores/useTokenStore";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("jlauretta@mdnpublicidad.com");
   const [password, setPassword] = useState<string>("juandev12");
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
+  const setToken = useTokenStore((state) => state.setToken);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    axios
-      .post("http://localhost:5500/auth/login", {
-        email: email,
-        password: password,
-      })
-      .then((res) => {
-        console.log(res.data);
-        if (res.data.ok) {
-          setUser({
-            id: res.data.userData.user_id,
-            full_name: `${res.data.userData.first_name} ${res.data.userData.last_name}`,
-            email: res.data.userData.email,
-            department: res.data.userData.departments.name,
-            department_id: res.data.userData.departments.id,
-
-            role: res.data.userData.role,
-            privileges: res.data.userData.privileges,
-          });
-
-          // const dec = jwtDecode(res.data.token);
-          console.log(res.data.token.length);
-
-          Cookies.set("auth-token", res.data.token, {
-            expires: 7,
-          });
-
+    try {
+      axiosInstance
+        .post(
+          "/auth/login",
+          {
+            email,
+            password,
+          },
+          { withCredentials: true }
+        )
+        .then((response) => {
+          const { accessToken, userData } = response.data;
+          setToken(accessToken);
+          setUser(userData);
           navigate("/dashboard");
-        } else {
-          console.log("Error al iniciar sesión: " + res.data.error);
-          setError(res.data.error);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        })
+        .catch((error) => {
+          console.error(error);
+          // setError("Credenciales incorrectas");
+        });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   //   Check if the user is already authenticated and has the auth-token cookie
   useEffect(() => {
-    const authToken = Cookies.get("auth-token");
-    if (authToken) {
+    const accessToken = useTokenStore.getState().token;
+    if (accessToken) {
       // Redirect to dashboard if token exists
       navigate("/dashboard");
     }
@@ -140,8 +127,6 @@ export default function Login() {
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
-
-          {error && <p className="mt-5  text-red-600">{error}</p>}
         </div>
       </div>
     </>

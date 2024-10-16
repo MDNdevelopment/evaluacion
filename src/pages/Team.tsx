@@ -9,7 +9,6 @@ import { determineBadge } from "../utils/determineBadge";
 import getPastMonthRange from "../utils/getPastMonthRange";
 import EvaluateModal from "../components/EvaluateModal";
 import { useNavigate } from "react-router-dom";
-import { checkPrivileges } from "../utils/checkPrivileges";
 
 interface Evaluations {
   avg: number;
@@ -31,7 +30,6 @@ interface Employee {
 export default function Team() {
   const [loadingData, setLoadingData] = useState<boolean>(true);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [userPrivileges, setUserPrivileges] = useState<number>(0);
   const user = useUserStore((state) => state.user);
   const [evaluationsDirection, setEvaluationsDirection] =
     useState<boolean>(false);
@@ -107,17 +105,9 @@ export default function Team() {
 
   useEffect(() => {
     //Get all the employees from the database
-    if (!!user) {
+    if (user) {
       retrieveEmployees();
     }
-
-    const fetchPrivileges = async () => {
-      const privileges = await checkPrivileges();
-      console.log({ privileges });
-      setUserPrivileges(privileges);
-    };
-
-    fetchPrivileges();
   }, [user]);
 
   const sortEvaluations = () => {
@@ -325,10 +315,10 @@ export default function Team() {
                     </td>
 
                     <td className="px-6 py-4">
-                      {userPrivileges > 0 ? (
+                      {user && user.privileges > 1 ? (
                         <EvaluatedBadge
                           badge={determineBadge(
-                            userPrivileges,
+                            user.privileges,
                             employee.privileges,
                             employee.recent_evaluation_date,
                             user.id,
@@ -343,9 +333,10 @@ export default function Team() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-row  ">
-                        {userPrivileges &&
+                        {user &&
+                        user.privileges &&
                         canEvaluate(
-                          userPrivileges,
+                          user.privileges,
                           employee.privileges,
                           user.id,
                           employee.user_id
