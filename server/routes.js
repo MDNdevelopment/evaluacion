@@ -32,9 +32,14 @@ const authenticateJWT = (req, res, next) => {
 
 //Refresh token route
 router.post("/refresh-token", (req, res) => {
+  console.log("generating new token");
   const refreshToken = req.cookies.refreshToken; // Refresh token from HTTPOnly cookie
   if (!refreshToken) {
-    return res.status(401).json({ message: "No refresh token found" });
+    return (
+      res.clearCookie("accessToken"),
+      res.clearCookie("refreshToken"),
+      res.status(403).json({ message: "No refresh token found" })
+    );
   }
 
   // Verify the refresh token
@@ -60,7 +65,7 @@ router.post("/refresh-token", (req, res) => {
     const newAccessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email },
       SECRET_KEY,
-      { expiresIn: "15m" }
+      { expiresIn: "3s" }
     );
 
     res.cookie("accessToken", newAccessToken, {
@@ -119,7 +124,7 @@ router.post("/auth/login", async (req, res) => {
       email: authData.user.email,
     };
     const accessToken = jwt.sign(tokenPayload, SECRET_KEY, {
-      expiresIn: "15m",
+      expiresIn: "3s",
     });
 
     const refreshToken = jwt.sign(tokenPayload, SECRET_KEY, {

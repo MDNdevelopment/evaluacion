@@ -70,7 +70,7 @@ export const logOutUser = async () => {
   try {
     axios
       .post(
-        "http://localhost:5500/auth/logout",
+        "https://mdn-evaluacion.onrender.com/auth/logout",
         {},
         { withCredentials: true, headers: { Authorization: `Bearer ${token}` } }
       )

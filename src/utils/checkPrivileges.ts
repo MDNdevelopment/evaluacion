@@ -7,7 +7,7 @@ export const checkPrivileges = async () => {
     const data = await axios({
       // withCredentials: true,
       method: "get",
-      url: "http://localhost:5500/api/privileges",
+      url: "https://mdn-evaluacion.onrender.com/api/privileges",
       headers: {
         Authorization: `Bearer ${token}`,
       },

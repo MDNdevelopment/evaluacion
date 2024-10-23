@@ -17,7 +17,7 @@ function App() {
     // Make an explicit call to refresh the access token
     axios
       .post(
-        "http://localhost:5500/refresh-token",
+        "https://mdn-evaluacion.onrender.com/refresh-token",
         {},
         { withCredentials: true }
       )
