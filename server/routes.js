@@ -124,7 +124,7 @@ router.post("/auth/login", async (req, res) => {
       email: authData.user.email,
     };
     const accessToken = jwt.sign(tokenPayload, SECRET_KEY, {
-      expiresIn: "3s",
+      expiresIn: "15m",
     });
 
     const refreshToken = jwt.sign(tokenPayload, SECRET_KEY, {
