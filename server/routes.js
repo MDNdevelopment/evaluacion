@@ -134,11 +134,17 @@ router.post("/auth/login", async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       expires: dayjs().add(7, "day").toDate(),
+      sameSite: "None", // Use 'None' when your front-end and back-end are on different domains
+      domain: "https://mdnevaluacionexpress.com", // Set this to your production domain
+      path: "/", // This is optional, depends on your use case
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       expires: dayjs().add(15, "minute").toDate(),
+      sameSite: "None", // Use 'None' when your front-end and back-end are on different domains
+      domain: "https://mdnevaluacionexpress.com", // Set this to your production domain
+      path: "/", // This is optional, depends on your use case
     });
 
     res.status(200).json({

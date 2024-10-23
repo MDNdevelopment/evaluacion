@@ -10,7 +10,10 @@ const PORT = process.env.PORT || 5500; // Choose the port you want to use
 // Middlewares
 app.use(
   cors({
-    origin: "https://mdnevaluacionexpress.netlify.app",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://mdnevaluacionexpress.netlify.app"
+        : "http://localhost:5173",
     credentials: true,
   })
 ); // Enable CORS
@@ -27,7 +30,5 @@ app.get("/", (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(
-    `Server is running on https://mdn-evaluacion.onrender.com:${PORT}`
-  );
+  console.log(`Server is running on port: ${PORT}`);
 });

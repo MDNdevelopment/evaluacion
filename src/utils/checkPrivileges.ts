@@ -7,7 +7,10 @@ export const checkPrivileges = async () => {
     const data = await axios({
       // withCredentials: true,
       method: "get",
-      url: "https://mdn-evaluacion.onrender.com/api/privileges",
+      url:
+        process.env.NODE_ENV === "production"
+          ? "https://mdn-evaluacion.onrender.com/api/privileges"
+          : "http://localhost:5500/api/privileges",
       headers: {
         Authorization: `Bearer ${token}`,
       },
