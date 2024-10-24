@@ -134,11 +134,13 @@ router.post("/auth/login", async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       expires: dayjs().add(7, "day").toDate(),
+      sameSite: "none",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       expires: dayjs().add(15, "minute").toDate(),
+      sameSite: "none",
     });
 
     res.status(200).json({

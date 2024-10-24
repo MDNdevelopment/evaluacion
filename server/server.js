@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors"); // Optional: for enabling CORS
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 const app = express();
 const routes = require("./routes");
 const PORT = process.env.PORT || 5500; // Choose the port you want to use
