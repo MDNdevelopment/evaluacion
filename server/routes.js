@@ -71,6 +71,8 @@ router.post("/refresh-token", (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       expires: dayjs().add(15, "minute").toDate(),
+      secure: true,
+      sameSite: "none",
     });
 
     // Send the new accessToken and user data to the frontend
@@ -134,12 +136,14 @@ router.post("/auth/login", async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       expires: dayjs().add(7, "day").toDate(),
+      secure: true,
       sameSite: "none",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       expires: dayjs().add(15, "minute").toDate(),
+      secure: true,
       sameSite: "none",
     });
 
