@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5500; // Choose the port you want to use
 app.use(
   cors({
     origin:
-      process.env.NODE_ENV === "production"
+      process.env.NODE_PROD === true
         ? "https://mdnevaluacionexpress.netlify.app"
         : "http://localhost:5173",
     credentials: true,

@@ -8,7 +8,7 @@ export const checkPrivileges = async () => {
       // withCredentials: true,
       method: "get",
       url:
-        process.env.NODE_ENV === "production"
+        import.meta.env.VITE_PROD === true
           ? "https://mdn-evaluacion.onrender.com/api/privileges"
           : "http://localhost:5500/api/privileges",
       headers: {

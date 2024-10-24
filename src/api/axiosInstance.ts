@@ -4,7 +4,7 @@ import { useUserStore } from "../stores/useUserStore";
 
 export const axiosInstance = axios.create({
   baseURL:
-    import.meta.env.VITE_ENVIRONMENT === "development"
+    import.meta.env.VITE_PROD === true
       ? "http://localhost:5500"
       : "https://mdn-evaluacion.onrender.com",
   timeout: 15000,

@@ -14,17 +14,17 @@ function App() {
   const setUser = useUserStore((state) => state.setUser);
   useEffect(() => {
     console.log("refreshing token");
+    console.log(import.meta.env.PROD);
     // Make an explicit call to refresh the access token
     axios
       .post(
-        process.env.NODE_ENV === "production"
+        import.meta.env.PROD === true
           ? "https://mdn-evaluacion.onrender.com/refresh-token"
           : "http://localhost:5500/refresh-token",
         {},
         { withCredentials: true }
       )
       .then((response) => {
-        console.log("im here");
         setToken(response.data.accessToken); // Update the access token in Zustand store
         setUser(response.data.userData); // Update the user data in Zustand store
         setLoading(false); // Stop loading spinner

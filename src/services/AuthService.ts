@@ -70,7 +70,7 @@ export const logOutUser = async () => {
   try {
     axios
       .post(
-        process.env.NODE_ENV === "production"
+        import.meta.env.VITE_PROD === true
           ? "https://mdn-evaluacion.onrender.com/auth/logout"
           : "http://localhost:5500/auth/logout",
         {},
