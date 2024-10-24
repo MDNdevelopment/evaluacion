@@ -65,7 +65,7 @@ router.post("/refresh-token", (req, res) => {
     const newAccessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email },
       SECRET_KEY,
-      { expiresIn: "3s" }
+      { expiresIn: "15m" }
     );
 
     res.cookie("accessToken", newAccessToken, {

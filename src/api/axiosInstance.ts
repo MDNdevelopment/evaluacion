@@ -7,7 +7,7 @@ export const axiosInstance = axios.create({
     import.meta.env.VITE_PROD === true
       ? "http://localhost:5500"
       : "https://mdn-evaluacion.onrender.com",
-  timeout: 15000,
+  timeout: 65000,
   headers: { "Content-Type": "application/json" },
 }); //Create the axios instance
 
