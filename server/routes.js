@@ -70,7 +70,7 @@ router.post("/refresh-token", (req, res) => {
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      expires: dayjs().add(15, "minute").toDate(),
+      maxAge: 15 * 60 * 1000, // 15 minutes in milliseconds
       secure: true,
       sameSite: "none",
     });
@@ -135,14 +135,14 @@ router.post("/auth/login", async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      expires: dayjs().add(7, "day").toDate(),
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       secure: true,
       sameSite: "none",
     });
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      expires: dayjs().add(15, "minute").toDate(),
+      maxAge: 15 * 60 * 1000, // 15 minutes in milliseconds
       secure: true,
       sameSite: "none",
     });
