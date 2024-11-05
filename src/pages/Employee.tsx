@@ -196,15 +196,13 @@ export default function Employee() {
 
     //TODO: CALCULAR EL PROMEDIO TOTAL HISTORICO DEL EMPLEADO
     const calculateTotalAverage = (aggregatedEvaluations: any) => {
-      let total = 0.0;
-      let finalIndex = 0;
-      aggregatedEvaluations.map((evaluation: Evaluation, index: number) => {
-        const currentRate = evaluation.total_rate;
-        total = total + currentRate;
-        finalIndex = index + 1;
-      });
+      const total = aggregatedEvaluations.reduce(
+        (acc: any, evaluation: any) => acc + parseFloat(evaluation.total_rate),
+        0
+      );
 
-      const totalAverage = total / finalIndex;
+      const totalEvaluations = aggregatedEvaluations.length;
+      const totalAverage = total / totalEvaluations;
       setTotalAverage(totalAverage);
     };
 

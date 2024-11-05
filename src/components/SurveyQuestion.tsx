@@ -21,7 +21,7 @@ export default function SurveyQuestion({
   setAutoFilledVal,
 }: Props) {
   const { setValue } = useFormContext();
-  const [answer, setAnswer] = useState<number>(5);
+  const [answer, setAnswer] = useState<number | null>(null);
   const [abstention, setAbstention] = useState<boolean>(false);
 
   const setSelectedValue = (value: number) => {
@@ -31,7 +31,7 @@ export default function SurveyQuestion({
   };
 
   useEffect(() => {
-    if (value === null && autoFilledVal === null) {
+    if (value === null && autoFilledVal === null && answer === null) {
       setAnswer(5);
       setValue(name, 5);
       return;
@@ -45,6 +45,10 @@ export default function SurveyQuestion({
       setAnswer(autoFilledVal);
       setValue(name, autoFilledVal);
       setAbstention(false);
+    }
+
+    if (autoFilledVal === null && answer !== null) {
+      setValue(name, answer);
     }
   }, [value, autoFilledVal]);
   return (

@@ -51,7 +51,6 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
 
   //Get the name of every director that has evaluated this employee
   useEffect(() => {
-    console.log({ evaluationsData });
     if (evaluationsData && evaluationsData.made_by) {
       getDirectorsNames();
     }
