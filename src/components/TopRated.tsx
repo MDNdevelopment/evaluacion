@@ -150,7 +150,9 @@ export default function TopRated() {
   }
   return (
     <div className="mt-5">
-      <h2 className="text-gray-800 font-black text-2xl">Mejores promedios</h2>
+      <h2 className="text-gray-800 font-black text-2xl">
+        Mejores promedios del período actual
+      </h2>
       <div className="grid grid-cols-3 gap-4 mt-2">
         {departments &&
           departments.map((department) => {
