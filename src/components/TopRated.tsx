@@ -85,7 +85,7 @@ export default function TopRated() {
     evaluations.map((evaluation: Evaluation) => {
       if (
         evaluation.department_id === department.id &&
-        evaluation.privileges < 4
+        evaluation.privileges < 3
       ) {
         const currentResult = calculateEvaluationWeight(
           evaluation.average_total_rate,
