@@ -153,7 +153,7 @@ export default function TopRated() {
       <h2 className="text-gray-800 font-black text-2xl">
         Mejores promedios del período actual
       </h2>
-      <div className="lg-grid lg-grid-cols-3 lg-gap-4 mt-2 flex flex-col  mx-auto">
+      <div className="lg:grid lg:grid-cols-3 lg:gap-4 mt-2 flex flex-col mx-auto">
         {departments &&
           departments.map((department) => {
             if (
@@ -163,7 +163,7 @@ export default function TopRated() {
             )
               return;
             return (
-              <div className="my-2 lg-my-0 shadow-md flex flex-col items-center justify-between rounded-md flex-1 bg-white min-h-[17rem]">
+              <div className="my-2 lg:my-0 shadow-md flex flex-col items-center justify-between rounded-md flex-1 bg-white min-h-[17rem]">
                 <h3 className="   text-center pt-3 uppercase font-semibold text-primary-dark">
                   {department.name}
                 </h3>
