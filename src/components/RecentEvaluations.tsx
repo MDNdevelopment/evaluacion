@@ -80,7 +80,7 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
               !loading &&
               directors.map((director, index) => (
                 <li
-                  className="flex flex-col w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-white border border-[#f5f5f5] shadow-sm"
+                  className="flex flex-col w-[100%] lg:w-[80%] mx-2 my-2 py-2 px-5 rounded-md justify-center items-center  bg-white border border-[#f5f5f5] shadow-sm"
                   key={index}
                 >
                   <div className="flex w-full mt-3 justify-between items-center ">
@@ -92,7 +92,7 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
                     <h5>{formatDateForDisplay(director.evaluationDate)}</h5>
                   </div>
                   {user && user.privileges > 3 && (
-                    <div className="flex flex-row w-full justify-around min-h-[25px] mt-5">
+                    <div className="flex flex-row flex-wrap lg:flex-nowrap  w-full justify-around min-h-[25px] mt-5">
                       {director.categories.map((category, index) => (
                         <div className="grow flex-1 ">
                           <RateCircle label={index} value={category} />

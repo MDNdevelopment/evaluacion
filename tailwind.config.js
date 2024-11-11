@@ -15,6 +15,7 @@ module.exports = {
       maxWidth: {
         "modal-evaluation": "55rem",
         "modal-password": "30rem",
+        "modal-delete-evaluation": "30rem",
       },
       colors: {
         primary: {

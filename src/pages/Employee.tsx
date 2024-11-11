@@ -14,6 +14,8 @@ import {
 } from "recharts";
 import formatDateToSpanishMonthYear from "../utils/formatDateToSpanishPeriod";
 import RecentEvaluations from "../components/RecentEvaluations";
+// import { useUserStore } from "../stores/useUserStore";
+// import { toast } from "react-toastify";
 
 interface Evaluation {
   commitment: number;
@@ -93,10 +95,13 @@ export default function Employee() {
   };
 
   const { id } = useParams();
+  // const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState<any>();
   const [evaluationsData, setEvaluationsData] = useState<any>();
   const [totalAverage, setTotalAverage] = useState<number | null>();
   const [averages, setAverages] = useState<any>(null);
+
+  // const user = useUserStore((state) => state.user);
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
@@ -268,21 +273,63 @@ export default function Employee() {
     );
   };
 
+  // const handleDelete = async () => {
+  //   if (id) {
+  //     const { error } = await supabase.from("users").delete().eq("user_id", id);
+
+  //     if (error) {
+  //       console.log(error.message);
+  //       toast.error("Error al eliminar al empleado", {
+  //         position: "bottom-right",
+  //       });
+  //       return;
+  //     }
+
+  //     // const { error: userError } = await supabase.auth.admin.deleteUser(id);
+
+  //     // if (userError) {
+  //     //   console.log(userError.message);
+  //     //   toast.error("Error al eliminar al empleado", {
+  //     //     position: "bottom-right",
+  //     //   });
+  //     //   return;
+  //     // }
+  //     toast.success("Empleado eliminado con éxito", {
+  //       position: "bottom-right",
+  //     });
+  //     navigate("/empleados");
+  //   }
+  // };
+
   return (
     <div className="max-w-[1200px] mx-auto p-10 bg-gray-100 mt-10 shadow-md rounded-lg">
-      <div className="flex flex-row justify-between items-center">
-        <div>
+      <div className="flex lg:flex-row flex-col items-center lg:justify-between items-lg-center">
+        <div className="mb-10">
           <h1 className="text-primary text-5xl uppercase font-black">
             {employeeData.first_name} {employeeData.last_name}
           </h1>
-          <h4 className="text-gray-800 mb-10">
+          <h4 className="text-gray-800">
             {employeeData.departments.name} - {employeeData.role}
           </h4>
+          {/* {user && user.privileges === 4 && (
+            <button
+              onClick={() => {
+                handleDelete();
+              }}
+              className="mt-2 bg-red-500 text-white rounded-md px-3 hover:bg-red-600 cursor-pointer"
+            >
+              Eliminar empleado
+            </button>
+          )} */}
         </div>
 
         <div>
-          <h3 className="text-gray-800 font-black text-2xl">
+          <h3 className="text-gray-800 font-black text-2xl text-center">
             Promedio Total: {totalAverage ? totalAverage.toFixed(2) : 0}
+          </h3>
+          <h3 className="text-gray-800 mb-5 text-2xl text-center">
+            Promedio actual:{" "}
+            {evaluationsData[evaluationsData.length - 1].total_rate}
           </h3>
         </div>
       </div>
@@ -293,8 +340,8 @@ export default function Employee() {
         <h2 className="text-slate-800 text-3xl uppercase font-black mb-5">
           Histórico:
         </h2>
-        <div className="grid grid-cols-3 grid-rows-2 gap-5 content-center">
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+        <div className="lg:grid lg:grid-cols-3 lg:grid-rows-2 lg:gap-5 lg:content-center">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark mb-5">
               Calidad
             </h4>
@@ -302,7 +349,7 @@ export default function Employee() {
               {averages.quality_avg ? averages.quality_avg.toFixed(2) : 0}
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark mb-5">
               Responsabilidad
             </h4>
@@ -312,7 +359,7 @@ export default function Employee() {
                 : 0}
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark leading-none text-center mb-5">
               Compromiso <br /> institucional
             </h4>
@@ -320,7 +367,7 @@ export default function Employee() {
               {averages.commitment_avg ? averages.commitment_avg.toFixed(2) : 0}
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark mb-5">
               Iniciativa
             </h4>
@@ -328,7 +375,7 @@ export default function Employee() {
               {averages.initiative_avg ? averages.initiative_avg.toFixed(2) : 0}
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark leading-none text-center mb-5">
               Comunicación <br /> efectiva
             </h4>
@@ -338,7 +385,7 @@ export default function Employee() {
                 : 0}
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center bg-white rounded-lg py-5">
+          <div className="my-3 flex flex-col justify-center items-center bg-white rounded-lg py-5">
             <h4 className="text-2xl font-bold text-primary-dark leading-none text-center mb-5">
               Cumplimiento de <br /> procesos
             </h4>
