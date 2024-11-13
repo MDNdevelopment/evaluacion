@@ -94,7 +94,7 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
                   {user && user.privileges > 3 && (
                     <div className="flex flex-row flex-wrap lg:flex-nowrap  w-full justify-around min-h-[25px] mt-5">
                       {director.categories.map((category, index) => (
-                        <div className="grow flex-1 ">
+                        <div className=" flex-1  px-1">
                           <RateCircle label={index} value={category} />
                         </div>
                       ))}

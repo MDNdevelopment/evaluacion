@@ -22,12 +22,12 @@ const renameLabel = (label: number) => {
 
 export default function RateCircle({ label, value }: Props) {
   return (
-    <div className="mb-4 lg:mb-0 flex flex-col items-center mx-2  overflow-clip h-full">
+    <div className="mb-4 lg:mb-0 flex flex-col items-center  overflow-clip h-full">
       <div className="w-[38px] h-[38px] flex justify-center items-center rounded-full bg-primary-dark ">
         <p className="text-white font-bold">{value}</p>
       </div>
       <div className="flex-1  flex justify-center items-start">
-        <p className="text-[12px] mt-2 leading-4 text-gray-800 text-center">
+        <p className=" text-[10px] lg:text-[12px] mt-2 leading-4 text-gray-800 text-center">
           {renameLabel(label)}
         </p>
       </div>
