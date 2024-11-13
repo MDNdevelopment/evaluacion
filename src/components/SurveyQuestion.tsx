@@ -54,7 +54,7 @@ export default function SurveyQuestion({
   return (
     <div className="flex flex-col lg:flex-row justify-around items-center border-t py-3 border-gray-300 ">
       <div className=" lg:w-1/5 w-full">
-        <p className="  mr-5 font-black text-gray-900 leading-5 lg:mb-1">
+        <p className="  lg:mr-5 font-black text-gray-900 leading-5 lg:mb-1">
           {question}
         </p>
         <p className="text-gray-500 lg:text-xs lg:mb-0 mb-3">{desc}</p>

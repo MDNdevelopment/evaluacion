@@ -121,7 +121,7 @@ export default function EvaluateModal({
 
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left  w-full">
-                    <div className="flex lg:flex-row flex-col justify-between items-center pr-5">
+                    <div className="flex lg:flex-row flex-col justify-between items-center lg:pr-5">
                       <div>
                         <DialogTitle
                           as="h3"
