@@ -215,7 +215,7 @@ export default function EvaluateModal({
                             onClick={() => {
                               setDeleteOpen(false);
                             }}
-                            className="bg-gray-400 hover:bg-gray-500 text-white rounded-md py-1 px-2"
+                            className="bg-gray-400 hover:bg-gray-500 text-white rounded-md py-1 px-2 mx-1"
                           >
                             Cancelar
                           </button>
@@ -223,7 +223,7 @@ export default function EvaluateModal({
                             onClick={() => {
                               handleDelete();
                             }}
-                            className="bg-red-500 hover:bg-red-600 text-white rounded-md py-1 px-2"
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-md py-1 px-2 mx-1"
                           >
                             Eliminar
                           </button>
