@@ -106,7 +106,7 @@ export default function EvaluationSurvey({
   });
 
   return (
-    <div>
+    <div className=" w-full">
       <FormProvider {...methods}>
         <form onSubmit={onSubmit}>
           {CATEGORIES.map((category, index) => {
@@ -126,13 +126,13 @@ export default function EvaluationSurvey({
               />
             );
           })}
-          <div className="flex flex-row px-5 justify-around items-start border-t py-5 border-gray-300 ">
-            <div className=" w-1/5">
+          <div className="flex  flex-col lg:flex-row px-5 justify-around items-start border-t py-5 border-gray-300 ">
+            <div className="w-full lg:w-1/5">
               <p className="  mr-5 font-black text-gray-900 leading-5">
                 Comentario adicional
               </p>
             </div>
-            <div className="w-4/5">
+            <div className="w-full lg:w-4/5 lg:mt-0 mt-2">
               <textarea
                 disabled={!!evaluationData ? true : false}
                 value={!!evaluationData ? evaluationData.note : undefined}

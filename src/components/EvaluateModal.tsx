@@ -4,8 +4,10 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
+  CloseButton,
 } from "@headlessui/react";
 import { FaClipboardCheck, FaTrashAlt } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 import getPastMonthRange from "../utils/getPastMonthRange";
 import formatDateForDisplay from "../utils/formatDateForDisplay";
 import Spinner from "./Spinner";
@@ -105,20 +107,29 @@ export default function EvaluateModal({
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-red-600 text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-modal-evaluation data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+              className="relative transform overflow-hidden rounded-lg text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-modal-evaluation data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
             >
-              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 ">
+              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 relative">
+                <CloseButton
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer"
+                >
+                  <FaXmark size={25} color="#363636" />
+                </CloseButton>
+
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left  w-full">
-                    <div className="flex justify-between items-center pr-5">
+                    <div className="flex lg:flex-row flex-col justify-between items-center pr-5">
                       <div>
                         <DialogTitle
                           as="h3"
-                          className="text-base font-semibold leading-6 text-gray-900"
+                          className=" text-xl  lg:text-base font-semibold leading-6 text-gray-900"
                         >
                           {`Evaluación a ${employeeData.name}`}
                         </DialogTitle>
-                        <p className="text-sm text-gray-500">
+                        <p className=" text-md mb-5 lg:text-sm text-gray-500">
                           Período {formatDateForDisplay(firstDay)} -{" "}
                           {formatDateForDisplay(lastDay)}
                         </p>
@@ -129,7 +140,7 @@ export default function EvaluateModal({
                             onClick={() => {
                               setDeleteOpen(true);
                             }}
-                            className="bg-red-600 hover:bg-red-700 text-white flex items-center px-1 py-2 rounded-md"
+                            className="mb-3 lg:mb-0 bg-red-600 hover:bg-red-700 text-white flex items-center px-1 py-2 rounded-md"
                           >
                             <FaTrashAlt
                               size={17}

@@ -25,6 +25,7 @@ export default function Navbar() {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", current: false },
     { name: "Empleados", href: "/empleados", current: false },
+    { name: "Resumen", href: "/resumen", current: false },
     { name: "Mi perfil", href: `/empleado/${user?.id}`, current: false },
   ];
   return (
@@ -74,6 +75,15 @@ export default function Navbar() {
                         to={"/empleados"}
                       >
                         Empleados
+                      </Link>
+
+                      <Link
+                        className={
+                          "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                        }
+                        to={`/resumen`}
+                      >
+                        Resumen
                       </Link>
                     </>
                   )}

@@ -52,16 +52,16 @@ export default function SurveyQuestion({
     }
   }, [value, autoFilledVal]);
   return (
-    <div className="flex flex-row justify-around items-center border-t py-3 border-gray-300 ">
-      <div className=" w-1/5">
-        <p className="  mr-5 font-black text-gray-900 leading-5 mb-1">
+    <div className="flex flex-col lg:flex-row justify-around items-center border-t py-3 border-gray-300 ">
+      <div className=" lg:w-1/5 w-full">
+        <p className="  mr-5 font-black text-gray-900 leading-5 lg:mb-1">
           {question}
         </p>
-        <p className="text-gray-500 text-xs">{desc}</p>
+        <p className="text-gray-500 lg:text-xs lg:mb-0 mb-3">{desc}</p>
       </div>
 
-      <div className="flex flex-col items-center">
-        <div className="flex flex-row">
+      <div className="flex flex-col items-center lg:w-full w-4/5">
+        <div className="flex flex-row  flex-wrap  justify-center">
           {[...Array(10).keys()].map((option) => {
             const currentValue = option + 1;
             return (
@@ -78,7 +78,7 @@ export default function SurveyQuestion({
                     : value !== null || abstention
                     ? "bg-[#a7a7a7] text-white border-[#a7a7a7] opacity-30"
                     : "bg-white text-black hover:bg-gray-200"
-                }  mx-2 w-[40px] h-[40px] rounded-full flex justify-center items-center border-2  text-md ${
+                }  mx-2 lg:my-0 my-1 w-[35px] h-[35px] lg:w-[40px] lg:h-[40px] rounded-full flex justify-center items-center border-2  text-sm lg:text-md ${
                   value !== null || abstention
                     ? "cursor-not-allowed border-[#a7a7a7] "
                     : "cursor-pointer border-primary"

@@ -5,6 +5,7 @@ import Team from "../pages/Team";
 import Employee from "../pages/Employee";
 import Profile from "../pages/Profile";
 import PasswordReset from "../pages/PasswordReset";
+import Summary from "../pages/Summary";
 
 export const Routes = [
   {
@@ -69,6 +70,14 @@ export const Routes = [
       // <AuthRoute>
       <PasswordReset />
       // </AuthRoute>
+    ),
+  },
+  {
+    path: "/resumen",
+    element: (
+      <PrivateRoute>
+        <Summary />
+      </PrivateRoute>
     ),
   },
   {
