@@ -329,7 +329,9 @@ export default function Employee() {
           </h3>
           <h3 className="text-gray-800 mb-5 text-2xl text-center">
             Promedio actual:{" "}
-            {evaluationsData[evaluationsData.length - 1].total_rate}
+            {evaluationsData.length > 0
+              ? evaluationsData[evaluationsData.length - 1].total_rate
+              : 0}
           </h3>
         </div>
       </div>
