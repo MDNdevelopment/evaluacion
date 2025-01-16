@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { supabase } from "../services/supabaseClient";
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+
 import formatDateToSpanishMonthYear from "../utils/formatDateToSpanishPeriod";
 import RecentEvaluations from "../components/RecentEvaluations";
-// import { useUserStore } from "../stores/useUserStore";
+import { useUserStore } from "../stores/useUserStore";
 // import { toast } from "react-toastify";
+import { EvaluationsChart } from "../components/EvaluationsChart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
+import { EvaluationsMadeBy } from "@/components/EvaluationsMadeBy";
 
 interface Evaluation {
   commitment: number;
@@ -33,29 +34,6 @@ interface Evaluation {
 }
 
 export default function Employee() {
-  const colors = [
-    "#F4B000", // Vibrant Yellow
-    "#8884d8", // Soft Indigo
-    "#82ca9d", // Soft Green
-    "#FF6347", // Tomato Red
-    "#4682B4", // Steel Blue
-    "#FF69B4", // Hot Pink
-    "#ff0048", // Orange
-    "#222222",
-  ];
-
-  const categories = {
-    period: "Período",
-    quality: "Calidad",
-    commitment: "Compromiso",
-    initiative: "Iniciativa",
-    customer_service: "Comunicación efectiva",
-    process_tracking: "Cumplimiento de procesos",
-    responsibility: "Responsabilidad",
-    total_rate: "Promedio total",
-    total_evaluations: "Evaluaciones",
-  };
-
   const getMonth = (monthName: string) => {
     switch (monthName) {
       case "ene":
@@ -100,6 +78,7 @@ export default function Employee() {
   const [evaluationsData, setEvaluationsData] = useState<any>();
   const [totalAverage, setTotalAverage] = useState<number | null>();
   const [averages, setAverages] = useState<any>(null);
+  const user = useUserStore((state) => state.user);
 
   // const user = useUserStore((state) => state.user);
 
@@ -239,40 +218,6 @@ export default function Employee() {
     );
   }
 
-  const MyChart = ({ evaluationsData }: any) => {
-    // Assuming evaluationsData is an array of objects
-    const dataKeys =
-      evaluationsData.length > 0 ? Object.keys(evaluationsData[0]) : [];
-
-    // Filter out keys that you don't want to include as lines
-    const metricKeys = dataKeys.filter(
-      (key) => key !== "period" && key !== "made_by"
-    );
-
-    return (
-      <ResponsiveContainer width="95%" height={300}>
-        <LineChart data={evaluationsData}>
-          {metricKeys.map((key: string, index) => {
-            return (
-              <Line
-                key={key}
-                type="monotone"
-                dataKey={key}
-                stroke={colors[index]}
-                name={Object.values(categories)[index + 1]}
-              />
-            );
-          })}
-          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis dataKey="period" />
-          <YAxis type="number" tickCount={6} />
-          <Tooltip />
-          <Legend />
-        </LineChart>
-      </ResponsiveContainer>
-    );
-  };
-
   // const handleDelete = async () => {
   //   if (id) {
   //     const { error } = await supabase.from("users").delete().eq("user_id", id);
@@ -302,41 +247,82 @@ export default function Employee() {
   // };
 
   return (
-    <div className="max-w-[1200px] mx-auto p-10 bg-gray-100 mt-10 shadow-md rounded-lg">
-      <div className="flex lg:flex-row flex-col items-center lg:justify-between items-lg-center">
-        <div className="mb-10">
-          <h1 className="text-primary text-5xl uppercase font-black">
-            {employeeData.first_name} {employeeData.last_name}
-          </h1>
-          <h4 className="text-gray-800">
-            {employeeData.departments.name} - {employeeData.role}
-          </h4>
-          {/* {user && user.privileges === 4 && (
-            <button
-              onClick={() => {
-                handleDelete();
-              }}
-              className="mt-2 bg-red-500 text-white rounded-md px-3 hover:bg-red-600 cursor-pointer"
-            >
-              Eliminar empleado
-            </button>
-          )} */}
-        </div>
+    <div className="max-w-[1200px] mx-auto p-5 lg:p-10 bg-[#f7f7f7] lg:mt-10 shadow-md rounded-lg">
+      <div className="flex lg:flex-row flex-col">
+        <div className="w-full lg:w-2/5  lg:pr-5 flex flex-col justify-between items-center lg:items-start ">
+          <div className=" w-full">
+            <h1 className="text-darkText text-5xl uppercase font-black">
+              {employeeData.first_name} <br /> {employeeData.last_name}
+            </h1>
+            <h4 className="text-gray-800">
+              {employeeData.departments.name} - {employeeData.role}
+            </h4>
+            {/* {user && user.privileges === 4 && (
+              <button
+                onClick={() => {
+                  // handleDelete();
+                }}
+                className="mt-2 bg-red-500 text-white rounded-md px-3 hover:bg-red-600 cursor-pointer"
+              >
+                Eliminar empleado
+              </button>
+            )} */}
+          </div>
+          <div className=" pt-10 mx-auto pb-5 lg:pb-0">
+            <Card className=" flex-1 h-full flex flex-col justify-between">
+              <div className="flex flex-row items-center pl-3">
+                <CardContent className="py-1 px-2 bg-primary rounded-md text-white flex justify-center items-center text-2xl mx-auto w-fit font-bold">
+                  {totalAverage ? totalAverage.toFixed(2) : 0}
+                </CardContent>
+                <CardHeader className="py-4">
+                  <CardTitle>Promedio Total</CardTitle>
+                  <CardDescription>
+                    Promedio generado a lo largo de los meses
+                  </CardDescription>
+                </CardHeader>
+              </div>
 
-        <div>
-          <h3 className="text-gray-800 font-black text-2xl text-center">
-            Promedio Total: {totalAverage ? totalAverage.toFixed(2) : 0}
-          </h3>
-          <h3 className="text-gray-800 mb-5 text-2xl text-center">
-            Promedio actual:{" "}
-            {evaluationsData.length > 0
-              ? evaluationsData[evaluationsData.length - 1].total_rate
-              : 0}
-          </h3>
+              <div className="border-b w-60 mx-auto " />
+
+              <div className="flex flex-row items-center pl-3">
+                <CardContent className="py-1 px-2 bg-primary rounded-md text-white flex justify-center items-center text-2xl mx-auto w-fit font-bold">
+                  {evaluationsData.length > 0
+                    ? evaluationsData[evaluationsData.length - 1].total_rate
+                    : 0}
+                </CardContent>
+                <CardHeader className="py-4">
+                  <CardTitle className="flex flex-row">
+                    Promedio Actual{" "}
+                    {evaluationsData.length > 1 &&
+                    totalAverage &&
+                    evaluationsData[evaluationsData.length - 1].total_rate <
+                      totalAverage ? (
+                      <FaArrowTrendDown
+                        size={20}
+                        className="ml-2 text-red-500"
+                      />
+                    ) : (
+                      <FaArrowTrendUp
+                        size={20}
+                        className="ml-2 text-green-500"
+                      />
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    Promedio generado para el mes actual
+                  </CardDescription>
+                </CardHeader>
+              </div>
+            </Card>
+          </div>
+        </div>
+        <div className="lg:w-3/4 w-full">
+          {" "}
+          {evaluationsData && (
+            <EvaluationsChart evaluationsData={evaluationsData} />
+          )}
         </div>
       </div>
-
-      {evaluationsData && <MyChart evaluationsData={evaluationsData} />}
 
       <div className="mt-10">
         <h2 className="text-slate-800 text-3xl uppercase font-black mb-5">
@@ -399,6 +385,10 @@ export default function Employee() {
           </div>
         </div>
       </div>
+
+      {user && user.privileges === 4 && employeeData.privileges > 1 ? (
+        <EvaluationsMadeBy employeeData={employeeData} />
+      ) : null}
 
       <RecentEvaluations
         evaluationsData={evaluationsData[evaluationsData.length - 1]}
