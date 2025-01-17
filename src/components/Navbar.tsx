@@ -27,6 +27,7 @@ export default function Navbar() {
     { name: "Empleados", href: "/empleados", current: false },
     { name: "Resumen", href: "/resumen", current: false },
     { name: "Mi perfil", href: `/empleado/${user?.id}`, current: false },
+    { name: "Mi empresa", href: "/company", current: false },
   ];
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -58,7 +59,7 @@ export default function Navbar() {
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
-                  {user && user.privileges >= 2 && (
+                  {user && user.access_level >= 2 && (
                     <>
                       <Link
                         className={
@@ -87,7 +88,7 @@ export default function Navbar() {
                       </Link>
                     </>
                   )}
-                  {user && user.privileges === 4 && (
+                  {user && user.access_level === 4 && (
                     <Link
                       to={"/dashboard/nuevo"}
                       className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
@@ -102,6 +103,15 @@ export default function Navbar() {
                     to={`/empleado/${user?.id}`}
                   >
                     Mi perfil
+                  </Link>
+
+                  <Link
+                    className={
+                      "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                    }
+                    to={`/company`}
+                  >
+                    Mi empresa
                   </Link>
                 </div>
               </div>

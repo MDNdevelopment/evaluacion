@@ -84,14 +84,14 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
                   key={index}
                 >
                   <div className="flex w-full mt-3 justify-between items-center ">
-                    {user && user.privileges > 3 ? (
+                    {user && user.access_level > 3 ? (
                       <div>
                         <h4>{director.name}</h4>
                       </div>
                     ) : null}
                     <h5>{formatDateForDisplay(director.evaluationDate)}</h5>
                   </div>
-                  {user && user.privileges > 3 && (
+                  {user && user.access_level > 3 && (
                     <div className="flex flex-row flex-wrap lg:flex-nowrap  w-full justify-around min-h-[25px] mt-5">
                       {director.categories.map((category, index) => (
                         <div className=" flex-1  px-1">

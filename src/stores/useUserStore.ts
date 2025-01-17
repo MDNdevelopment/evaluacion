@@ -8,8 +8,9 @@ export interface User {
   department: string;
   department_id: number;
   avatar_url?: string;
-  role: string;
-  privileges: number;
+  position: string;
+  access_level: number;
+  company_id: string;
 }
 
 interface UserState {

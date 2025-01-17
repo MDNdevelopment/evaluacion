@@ -16,9 +16,9 @@ const isAuthenticated = () => {
   return !!getAccessToken();
 };
 
-const checkPermissions = (privileges: number | null) => {
-  if (privileges === 1) return false;
-  if (privileges === null) return false;
+const checkPermissions = (access_level: number | null) => {
+  if (access_level === 1) return false;
+  if (access_level === null) return false;
   return true;
 };
 
@@ -62,7 +62,7 @@ export const PrivateRoute = ({ children }: Props) => {
       </>
     );
   }
-  if (!checkPermissions(userData.privileges)) {
+  if (!checkPermissions(userData.access_level)) {
     return (
       <>
         <Navbar />

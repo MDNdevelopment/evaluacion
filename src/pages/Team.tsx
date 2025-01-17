@@ -19,10 +19,10 @@ interface Employee {
   last_name: string;
   department_id: number;
   department_name: string;
-  role: string;
+  position: string;
   avg_evaluations: Evaluations;
   recent_evaluation_date: string;
-  privileges: number;
+  access_level: number;
   average_total_rate: number;
   evaluation_count: number;
 }
@@ -206,9 +206,9 @@ export default function Team() {
     setBadgeDirection((state) => !state);
   };
   return (
-    <div className="max-w-[1200px] mx-auto p-10 bg-gray-200 mt-10 shadow-md rounded-lg">
+    <div className="max-w-[1200px] mx-auto p-10  mt-10 rounded-lg">
       {/* <p>{JSON.stringify(user)}</p> */}
-      <h1 className="text-slate-900 text-4xl uppercase font-black">
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Empleados
       </h1>
 
@@ -306,7 +306,7 @@ export default function Team() {
                     </th>
                     <td className="px-6 py-4">{employee.department_name}</td>
 
-                    <td className="px-6 py-4">{employee.role}</td>
+                    <td className="px-6 py-4">{employee.position}</td>
                     <td className="px-6 py-4 text-center">
                       {employee.evaluation_count}
                     </td>
@@ -317,8 +317,8 @@ export default function Team() {
                     <td className="px-6 py-4">
                       <EvaluatedBadge
                         badge={determineBadge(
-                          user.privileges,
-                          employee.privileges,
+                          user.access_level,
+                          employee.access_level,
                           employee.recent_evaluation_date,
                           user.id,
                           employee.user_id
@@ -328,8 +328,8 @@ export default function Team() {
                     <td className="px-6 py-4">
                       <div className="flex flex-row  ">
                         {canEvaluate(
-                          user.privileges,
-                          employee.privileges,
+                          user.access_level,
+                          employee.access_level,
                           user.id,
                           employee.user_id
                         ) ? (

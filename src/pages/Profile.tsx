@@ -16,7 +16,7 @@ export default function Profile() {
       <h1 className="text-primary text-5xl uppercase font-black">Ajustes</h1>
       <h4 className="text-gray-800 text-xl">{user.full_name}</h4>
       <h4 className="text-gray-800 ">
-        {user.department} - {user.role}
+        {user.department} - {user.position}
       </h4>
 
       <div className="mt-10 font-semibold bg-white shadow-md rounded-md w-2/6 flex flex-col justify-center items-center h-32">

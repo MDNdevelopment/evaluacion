@@ -23,8 +23,8 @@ interface Evaluation {
   target_employee: string;
   first_name: string;
   last_name: string;
-  role: string;
-  privileges: number;
+  position: string;
+  access_level: number;
 }
 
 export default function TopRated() {
@@ -58,6 +58,7 @@ export default function TopRated() {
       return;
     }
 
+    console.log(data);
     setEvaluations(data);
     setIsLoading(false);
   };
@@ -85,7 +86,7 @@ export default function TopRated() {
     evaluations.map((evaluation: Evaluation) => {
       if (
         evaluation.department_id === department.id &&
-        evaluation.privileges < 3
+        evaluation.access_level < 3
       ) {
         const currentResult = calculateEvaluationWeight(
           evaluation.average_total_rate,
@@ -94,7 +95,7 @@ export default function TopRated() {
 
         if (currentResult > topWeight) {
           topWeight = currentResult;
-          best = setBest(evaluation);
+          best = evaluation;
         }
       }
     });
@@ -124,7 +125,7 @@ export default function TopRated() {
             <h3 className="text-xl">
               {best.first_name} {best.last_name}
             </h3>
-            <h4 className="text-gray-500">{best.role}</h4>
+            <h4 className="text-gray-500">{best.position}</h4>
             <h4>
               Evaluaciones:{" "}
               <span className="font-black text-xl text-primary-dark">

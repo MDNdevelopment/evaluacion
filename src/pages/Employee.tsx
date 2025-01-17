@@ -255,7 +255,7 @@ export default function Employee() {
               {employeeData.first_name} <br /> {employeeData.last_name}
             </h1>
             <h4 className="text-gray-800">
-              {employeeData.departments.name} - {employeeData.role}
+              {employeeData.departments.name} - {employeeData.position}
             </h4>
             {/* {user && user.privileges === 4 && (
               <button
@@ -386,7 +386,7 @@ export default function Employee() {
         </div>
       </div>
 
-      {user && user.privileges === 4 && employeeData.privileges > 1 ? (
+      {user && user.access_level === 4 && employeeData.access_level > 1 ? (
         <EvaluationsMadeBy employeeData={employeeData} />
       ) : null}
 

@@ -9,9 +9,9 @@ type Inputs = {
   lastName: string;
   email: string;
   password: string;
-  role: string;
+  position: string;
   department: number;
-  privileges: number;
+  access_level: number;
 };
 
 export default function NewEmployee() {
@@ -53,9 +53,9 @@ export default function NewEmployee() {
         first_name: watch("firstName"),
         last_name: watch("lastName"),
         email: watch("email"),
-        role: watch("role"),
+        position: watch("position"),
         department_id: watch("department"),
-        privileges: watch("privileges"),
+        access_level: watch("access_level"),
       });
 
       if (errorEmployee) {
@@ -274,7 +274,7 @@ export default function NewEmployee() {
                 <div className="mt-5">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="role"
+                      htmlFor="position"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Rol
@@ -282,8 +282,8 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
-                      id="role"
-                      {...register("role")}
+                      id="position"
+                      {...register("position")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
                       <option value="Social Media Manager">
@@ -374,7 +374,7 @@ export default function NewEmployee() {
                 <div className="">
                   <div className="flex items-center justify-between">
                     <label
-                      htmlFor="privileges"
+                      htmlFor="access_level"
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Privilegios
@@ -382,8 +382,8 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
-                      id="privileges"
-                      {...register("privileges")}
+                      id="access_level"
+                      {...register("access_level")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
                       <option value={1}>1 (No puede calificar)</option>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
+import { useCompanyStore } from "@/stores/useCompanyStore";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -10,9 +11,16 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
+  const setCompany = useCompanyStore((state) => state.setCompany);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { ok } = await loginUser({ email, password, setError, setUser });
+    const { ok } = await loginUser({
+      email,
+      password,
+      setError,
+      setUser,
+      setCompany,
+    });
     if (!ok) {
       console.log("Error login");
       return;

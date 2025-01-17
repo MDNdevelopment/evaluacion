@@ -1,12 +1,14 @@
 import { supabase } from "../services/supabaseClient";
 import Cookies from "js-cookie";
 import { User } from "../stores/useUserStore";
+import { Company } from "@/stores/useCompanyStore";
 
 interface Props {
   email: string;
   password: string;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   setUser: (user: User) => void;
+  setCompany: (company: Company) => void;
 }
 
 export const loginUser = async ({
@@ -14,6 +16,7 @@ export const loginUser = async ({
   password,
   setError,
   setUser,
+  setCompany,
 }: Props) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -22,6 +25,8 @@ export const loginUser = async ({
 
   if (error) {
     setError(error.message);
+    console.log(error);
+    console.log(error.message);
     return {
       ok: false,
     };
@@ -33,23 +38,37 @@ export const loginUser = async ({
       .select(
         `
             *,
-            departments (
+            
+            departments:department_id (
             id, 
             name
-            )
+            ),
+            companies:company_id(
+            *)
+            
             `
       )
       .eq("user_id", userId)
       .single();
     if (employeeData) {
+      console.log(employeeData);
       setUser({
         id: userId,
         full_name: `${employeeData.first_name} ${employeeData.last_name}`,
         email: employeeData.email,
         department_id: employeeData.department_id,
         department: employeeData.departments.name,
-        role: employeeData.role,
-        privileges: employeeData.privileges,
+        position: employeeData.position,
+        access_level: employeeData.access_level,
+        company_id: employeeData.company_id,
+      });
+
+      setCompany({
+        id: employeeData.companies.id,
+        name: employeeData.companies.name,
+        created_at: employeeData.companies.created_at,
+        owner_user_id: employeeData.companies.owner_user_id,
+        logo_url: employeeData.companies.logo_url,
       });
 
       Cookies.set("auth-token", data.session.access_token, { expires: 7 }); // 7-day expiration

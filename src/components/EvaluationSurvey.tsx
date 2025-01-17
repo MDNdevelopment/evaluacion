@@ -147,7 +147,7 @@ export default function EvaluationSurvey({
               )}
             </div>
           </div>
-          {user && user.privileges > 3 && evaluationData === null && (
+          {user && user.access_level > 3 && evaluationData === null && (
             <div className="flex flex-row justify-center items-center">
               {[6, 7, 8, 9].map((val) => (
                 <div

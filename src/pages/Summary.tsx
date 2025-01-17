@@ -87,7 +87,6 @@ export default function Summary() {
 
   const onSubmit = handleSubmit(async (data: any) => {
     setIsLoading(true);
-    console.log(data);
     const periodDate = `${data.year}-${String(data.month).padStart(2, "0")}-01`;
     const { data: periodData, error } = await supabase.rpc(
       "employee_evaluation_summary_for_period",
@@ -103,8 +102,6 @@ export default function Summary() {
       setData(null);
       setIsLoading(false);
     }
-
-    console.log(periodData);
 
     periodData.sort(function (x: any, y: any) {
       if (x.department_name < y.department_name) {
@@ -125,6 +122,7 @@ export default function Summary() {
       return 0;
     });
     setData(periodData);
+    console.log(periodData);
     setIsLoading(false);
   });
 
@@ -229,6 +227,7 @@ export default function Summary() {
           {!isLoading && data && data.length > 0 && (
             <tbody className="relative">
               {data.map((employee: any) => {
+                console.log(employee);
                 return (
                   <tr
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
@@ -242,7 +241,7 @@ export default function Summary() {
                     </th>
                     <td className="px-6 py-4">{employee.department_name}</td>
 
-                    <td className="px-6 py-4">{employee.role}</td>
+                    <td className="px-6 py-4">{employee.position}</td>
                     <td className="px-6 py-4 text-center">
                       {employee.evaluation_count}
                     </td>
