@@ -11,6 +11,7 @@ export interface User {
   position: string;
   access_level: number;
   company_id: string;
+  role: string;
 }
 
 interface UserState {

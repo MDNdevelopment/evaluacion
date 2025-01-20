@@ -86,6 +86,7 @@ export default function Team() {
 
     // Step 3: Combine Employee Data with Recent Evaluation Date
     const combinedData: any = employeeData.map((employee) => {
+      console.log(employee);
       const recentEvaluation = evaluationData.find(
         (evaluation) => evaluation.target_employee === employee.user_id
       );
@@ -293,6 +294,7 @@ export default function Team() {
             </thead>
             <tbody className="relative">
               {employees.map((employee) => {
+                console.log(employee);
                 return (
                   <tr
                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"

@@ -61,6 +61,7 @@ export const loginUser = async ({
         position: employeeData.position,
         access_level: employeeData.access_level,
         company_id: employeeData.company_id,
+        role: employeeData.role,
       });
 
       setCompany({
