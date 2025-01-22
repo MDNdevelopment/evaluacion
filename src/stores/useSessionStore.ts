@@ -12,6 +12,6 @@ interface SessionState {
 
 export const useSessionStore = create<SessionState>()((set) => ({
   session: undefined,
-  setSession: (session: Session) => set({ session }),
+  setSession: (session: Session | null) => set({ session }),
   clearSession: () => set({ session: undefined }),
 }));

@@ -1,44 +1,44 @@
-import { supabase } from "@/services/supabaseClient";
-import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
-import SelectedDepartment from "./SelectedDepartment";
+// import { supabase } from "@/services/supabaseClient";
+// import { useEffect, useState } from "react";
+// import SelectedDepartment from "./SelectedDepartment";
 
-interface Department {
-  id: number;
-  name: string;
-}
+// interface Department {
+//   id: number;
+//   name: string;
+// }
 
 const CompanyDepartments = ({ company }: any) => {
-  const [departments, setDepartments] = useState(null);
+  console.log(company);
+  // const [departments, setDepartments] = useState(null);
 
-  const [selectedDepartment, setSelectedDepartment] =
-    useState<Department | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const getDepartments = async () => {
-    const { data, error } = await supabase
-      .from("departments")
-      .select("*")
-      .eq("company_id", company.id);
+  // const [selectedDepartment, setSelectedDepartment] =
+  //   useState<Department | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const getDepartments = async () => {
+  //   const { data, error } = await supabase
+  //     .from("departments")
+  //     .select("*")
+  //     .eq("company_id", company.id);
 
-    if (error) {
-      console.log(error.message);
-      setIsLoading(false);
-      return;
-    }
+  //   if (error) {
+  //     console.log(error.message);
+  //     setIsLoading(false);
+  //     return;
+  //   }
 
-    setIsLoading(false);
-    setDepartments(data);
-  };
-  useEffect(() => {
-    getDepartments();
-  }, [company]);
+  //   setIsLoading(false);
+  //   // setDepartments(data);
+  // };
+  // useEffect(() => {
+  //   getDepartments();
+  // }, [company]);
 
   return (
     <div className="mx-auto  w-full">
       <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
         Departamentos
       </h2>
-      <div className="flex flex-col lg:flex-row flex-wrap">
+      {/* <div className="flex flex-col lg:flex-row flex-wrap">
         {!isLoading && departments ? (
           departments.map((department: any) => {
             return (
@@ -71,8 +71,8 @@ const CompanyDepartments = ({ company }: any) => {
             <FaPlus className="text-white absolute right-2" />
           </div>
         )}
-      </div>
-      <SelectedDepartment department={selectedDepartment} />
+      </div> */}
+      {/* <SelectedDepartment department={selectedDepartment} /> */}
     </div>
   );
 };

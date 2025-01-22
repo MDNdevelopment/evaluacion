@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useCompanyStore } from "@/stores/useCompanyStore";
 import { Skeleton } from "@/components/ui/skeleton";
-import { COMPANY_OPTIONS } from "@/constants/companyOptions.ts";
 import { CompanyOptions } from "../components/CompanyOptions";
 import CompanyConfig from "@/components/CompanyConfig";
 import CompanyDownload from "@/components/CompanyDownload";

@@ -1,6 +1,5 @@
 import { supabase } from "@/services/supabaseClient";
 import { useEffect, useState } from "react";
-import Spinner from "./Spinner";
 
 export default function SelectedDepartment({ department }: any) {
   const [employeesQuantity, setEmployeesQuantity] = useState<Number | null>(
@@ -22,6 +21,7 @@ export default function SelectedDepartment({ department }: any) {
       return;
     }
 
+    console.log(employeesQuantity);
     setEmployeesQuantity(0);
   };
 
@@ -39,7 +39,7 @@ export default function SelectedDepartment({ department }: any) {
           {department.name}
         </h3>
 
-        <div>
+        {/* <div>
           <p className="text-sm text-gray-500">
             Total empleados:{" "}
             {employeesQuantity === null ? (
@@ -52,7 +52,7 @@ export default function SelectedDepartment({ department }: any) {
           <h3 className="mt-10 scroll-m-20 text-xl font-semibold tracking-tight">
             Preguntas
           </h3>
-        </div>
+        </div> */}
       </div>
     );
 }

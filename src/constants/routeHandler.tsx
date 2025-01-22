@@ -3,11 +3,9 @@ interface Props {
 }
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { useUserStore } from "@/stores/useUserStore";
-import { supabase } from "@/services/supabaseClient";
 
 //Function to check if the user is authenticated
 const isAuthenticated = () => {

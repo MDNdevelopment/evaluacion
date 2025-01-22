@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
 import { useCompanyStore } from "@/stores/useCompanyStore";
-import { supabase } from "@/services/supabaseClient";
 import { useSessionStore } from "@/stores/useSessionStore";
 
 export default function Login() {

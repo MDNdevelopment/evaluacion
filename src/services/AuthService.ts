@@ -1,5 +1,4 @@
 import { supabase } from "../services/supabaseClient";
-import Cookies from "js-cookie";
 import { User } from "../stores/useUserStore";
 import { Company } from "@/stores/useCompanyStore";
 
