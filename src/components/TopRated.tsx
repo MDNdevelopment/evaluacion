@@ -58,7 +58,6 @@ export default function TopRated() {
       return;
     }
 
-    console.log(data);
     setEvaluations(data);
     setIsLoading(false);
   };

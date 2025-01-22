@@ -15,16 +15,8 @@ interface CompanyState {
   clearCompany: () => void;
 }
 
-export const useCompanyStore = create<CompanyState>()(
-  persist(
-    (set) => ({
-      company: null,
-      setCompany: (company: Company) => set({ company }),
-      clearCompany: () => set({ company: null }),
-    }),
-    {
-      name: "company-storage",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+export const useCompanyStore = create<CompanyState>()((set) => ({
+  company: null,
+  setCompany: (company: Company) => set({ company }),
+  clearCompany: () => set({ company: null }),
+}));

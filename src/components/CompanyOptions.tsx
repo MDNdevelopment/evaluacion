@@ -13,7 +13,7 @@ export function CompanyOptions({ setSelectedOption }: any) {
           return (
             <Button
               key={option.option}
-              className="w-full text-left border rounded-md my-1.5 px-2 py-1 text-sm font-light shadow-sm hover:bg-gray-100 transition-all ease-in-out"
+              className="w-full text-left border rounded-md my-1.5 px-2 py-1 text-sm font-light shadow-sm hover:bg-gray-100 transition-all ease-in-out cursor-pointer"
               onClick={() => setSelectedOption(index)}
             >
               {option.option}

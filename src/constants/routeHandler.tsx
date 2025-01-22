@@ -5,15 +5,17 @@ interface Props {
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import Navbar from "../components/Navbar";
-
-//Function to get the access token from cookies
-const getAccessToken = () => {
-  return Cookies.get("auth-token");
-};
+import { useSessionStore } from "@/stores/useSessionStore";
+import { useUserStore } from "@/stores/useUserStore";
+import { supabase } from "@/services/supabaseClient";
 
 //Function to check if the user is authenticated
 const isAuthenticated = () => {
-  return !!getAccessToken();
+  const session = useSessionStore.getState().session;
+  if (session) {
+    return true;
+  }
+  return false;
 };
 
 const checkPermissions = (access_level: number | null) => {
@@ -23,6 +25,7 @@ const checkPermissions = (access_level: number | null) => {
 };
 
 export const AuthRoute = ({ children }: Props) => {
+  const loc = useLocation();
   const location = window.location;
 
   // If we're on the password reset page, allow access even if not authenticated
@@ -35,24 +38,29 @@ export const AuthRoute = ({ children }: Props) => {
   }
 
   // Otherwise, if authenticated, redirect to dashboard
-  return isAuthenticated() ? <Navigate to="/dashboard" replace /> : children;
+  if (isAuthenticated()) {
+    console.log({ path: loc.pathname });
+    return <Navigate to={loc.pathname} replace />;
+  }
+
+  // If not authenticated, render the children
+  return children;
 };
 
 export const PrivateRoute = ({ children }: Props) => {
   const location = useLocation();
+  const user = useUserStore((state) => state.user);
+  const session = useSessionStore((state) => state.session);
   const isSettingsPage = location.pathname === "/perfil";
+
+  if (session === undefined) {
+    return <p>Loading...</p>;
+  }
   // If the user is not authenticated, redirect to login
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
-  const userItem = localStorage.getItem("user-storage");
-  if (userItem === null) {
-    Cookies.remove("auth-token");
-    <Navigate to={`/login`} />;
-    return;
-  }
-  const userData = JSON.parse(userItem).state.user;
   if (isSettingsPage) {
     return (
       <>
@@ -62,15 +70,17 @@ export const PrivateRoute = ({ children }: Props) => {
       </>
     );
   }
-  if (!checkPermissions(userData.access_level)) {
-    return (
-      <>
-        <Navbar />
-        <Navigate to={`/empleado/${userData.id}`} />
-        <Outlet />
-        {children}
-      </>
-    );
+  if (user) {
+    if (!checkPermissions(user.access_level)) {
+      return (
+        <>
+          <Navbar />
+          <Navigate to={`/empleado/${user.id}`} />
+          <Outlet />
+          {children}
+        </>
+      );
+    }
   }
   // If authenticated, render the Navbar and the protected content
   return (

@@ -1,6 +1,8 @@
-import CompanyConfig from "./CompanyConfig";
-import CompanyDownload from "./CompanyDownload";
-import CompanyDepartments from "./CompanyDepartments";
-import CompanyEmployees from "./CompanyEmployees";
-
-export { CompanyConfig, CompanyDownload, CompanyDepartments, CompanyEmployees };
+export * from "./CompanyConfig";
+export * from "./CompanyDepartments";
+export * from "./CompanyDownload";
+export * from "./CompanyEmployees";
+export * from "./CompanyOptions.tsx";
+export * from "./EvaluateModal";
+export * from "./EvaluatedBadge";
+export * from "./SelectedDepartment";

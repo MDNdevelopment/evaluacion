@@ -4,6 +4,8 @@ import Cookies from "js-cookie";
 import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
 import { useCompanyStore } from "@/stores/useCompanyStore";
+import { supabase } from "@/services/supabaseClient";
+import { useSessionStore } from "@/stores/useSessionStore";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -12,6 +14,8 @@ export default function Login() {
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
   const setCompany = useCompanyStore((state) => state.setCompany);
+  const setSession = useSessionStore((state) => state.setSession);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { ok } = await loginUser({
@@ -20,6 +24,7 @@ export default function Login() {
       setError,
       setUser,
       setCompany,
+      setSession,
     });
     if (!ok) {
       console.log("Error login");
@@ -30,17 +35,11 @@ export default function Login() {
   };
 
   //   Check if the user is already authenticated and has the auth-token cookie
-  useEffect(() => {
-    const authToken = Cookies.get("auth-token");
-    if (authToken) {
-      // Redirect to dashboard if token exists
-      navigate("/dashboard");
-    }
-  }, [navigate]);
+  useEffect(() => {}, [navigate]);
 
   return (
     <>
-      <div className="flex min-h-full max-w-[500px] mx-auto mt-20 rounded-lg bg-gray-50 flex-col justify-center px-6 py-12 lg:px-4 shadow-lg 	">
+      <div className="flex max-w-[500px] mx-auto mt-20 rounded-lg bg-gray-50 flex-col justify-center px-6 py-12 lg:px-4 shadow-lg 	">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             alt="Your Company"

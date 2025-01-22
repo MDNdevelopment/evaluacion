@@ -9,6 +9,7 @@ interface Props {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   setUser: (user: User) => void;
   setCompany: (company: Company) => void;
+  setSession: (session: any) => void;
 }
 
 export const loginUser = async ({
@@ -17,6 +18,7 @@ export const loginUser = async ({
   setError,
   setUser,
   setCompany,
+  setSession,
 }: Props) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -72,7 +74,9 @@ export const loginUser = async ({
         logo_url: employeeData.companies.logo_url,
       });
 
-      Cookies.set("auth-token", data.session.access_token, { expires: 7 }); // 7-day expiration
+      console.log(data);
+      setSession(data.session);
+
       return {
         ok: true,
       };
@@ -85,7 +89,5 @@ export const loginUser = async ({
 
 export const logOutUser = async () => {
   const { error } = await supabase.auth.signOut();
-  localStorage.removeItem("user-storage");
-  Cookies.remove("auth-token");
   return error;
 };

@@ -1,9 +1,7 @@
-import {
-  CompanyConfig,
-  CompanyDepartments,
-  CompanyDownload,
-  CompanyEmployees,
-} from "@/components";
+import CompanyConfig from "@/components/CompanyConfig";
+import CompanyDepartments from "@/components/CompanyDepartments";
+import CompanyDownload from "@/components/CompanyDownload";
+import CompanyEmployees from "@/components/CompanyEmployees";
 
 export const COMPANY_OPTIONS = [
   { option: "Configuración", role: "admin", component: CompanyConfig },

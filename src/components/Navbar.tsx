@@ -27,7 +27,7 @@ export default function Navbar() {
     { name: "Empleados", href: "/empleados", current: false },
     { name: "Resumen", href: "/resumen", current: false },
     { name: "Mi perfil", href: `/empleado/${user?.id}`, current: false },
-    { name: "Mi empresa", href: "/company", current: false },
+    { name: "Organización", href: "/company", current: false },
   ];
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -111,7 +111,7 @@ export default function Navbar() {
                     }
                     to={`/company`}
                   >
-                    Mi empresa
+                    Organización
                   </Link>
                 </div>
               </div>
