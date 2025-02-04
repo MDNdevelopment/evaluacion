@@ -63,7 +63,6 @@ export default function SelectedDepartment({
       return;
     }
 
-    console.log(employeesQuantity);
     setEmployeesQuantity(0);
   };
 
@@ -84,7 +83,7 @@ export default function SelectedDepartment({
           Departamento: <span className="font-normal">{department.name}</span>
         </h3>
 
-        {/* <div>
+        <div>
           <p className="text-sm text-gray-500">
             Total empleados:{" "}
             {employeesQuantity === null ? (
@@ -120,50 +119,48 @@ export default function SelectedDepartment({
           <h3 className="mt-10 scroll-m-20 text-xl font-semibold tracking-tight">
             Cargos
           </h3>
-          <div className="flex flex-row flex-wrap w-5/6 mt-3  items-start">
-            {positions && positions.length > 0 ? (
-              positions.map((position) => {
-                return (
-                  <div
-                    key={position.name}
-                    onClick={() => setSelectedPosition(position)}
-                    className={`py-1 px-2 border w-fit rounded-lg  cursor-pointer  mx-1 text-darkText text-sm font-normal ${
-                      position.id === selectedPosition?.id
-                        ? "bg-darkText hover:bg-darkText-darker text-white"
-                        : "hover:bg-gray-100"
-                    }`}
-                  >
-                    <h4>{position.name}</h4>
-                  </div>
-                );
-              })
-            ) : (
-              <p className="text-gray-500 text-sm">
-                No se encontraron cargos...
-              </p>
-            )}
-          </div>
-
-          {selectedPosition && !isLoading && (
-            <>
-              <DepartmentQuestions
-                departmentName={department.name}
-                departmentId={department.id}
-                position={selectedPosition}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-              />
-              <DeletePosition
-                company={company}
-                positionName={selectedPosition?.name}
-                positionId={selectedPosition?.id}
-                setIsLoading={setIsLoading}
-                setSelectedDepartment={setSelectedDepartment}
-                department={department}
-              />
-            </>
+        </div>
+        <div className="flex flex-row flex-wrap w-5/6 mt-3  items-start">
+          {positions && positions.length > 0 ? (
+            positions.map((position) => {
+              return (
+                <div
+                  key={position.name}
+                  onClick={() => setSelectedPosition(position)}
+                  className={`py-1 px-2 border w-fit rounded-lg  cursor-pointer  mx-1 text-darkText text-sm font-normal ${
+                    position.id === selectedPosition?.id
+                      ? "bg-darkText hover:bg-darkText-darker text-white"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <h4>{position.name}</h4>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-gray-500 text-sm">No se encontraron cargos...</p>
           )}
         </div>
+
+        {selectedPosition && !isLoading && (
+          <>
+            <DepartmentQuestions
+              departmentName={department.name}
+              departmentId={department.id}
+              position={selectedPosition}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+            />
+            <DeletePosition
+              company={company}
+              positionName={selectedPosition?.name}
+              positionId={selectedPosition?.id}
+              setIsLoading={setIsLoading}
+              setSelectedDepartment={setSelectedDepartment}
+              department={department}
+            />
+          </>
+        )}
       </div>
     );
 }

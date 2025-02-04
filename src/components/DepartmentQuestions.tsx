@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/services/supabaseClient";
-import { useCompanyStore } from "@/stores";
-import { XIcon } from "lucide-react";
 import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
-import { getCategoryName } from "../utils/getCategoryName";
 
 interface Question {
   id: Number;
@@ -18,9 +15,7 @@ export default function DepartmentQuestions({
   isLoading,
   setIsLoading,
 }: any) {
-  const company = useCompanyStore((state) => state.company);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
 
   const getQuestions = async () => {
     if (position) {

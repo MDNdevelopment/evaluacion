@@ -15,14 +15,12 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -166,9 +164,7 @@ export const columns: ColumnDef<Employee>[] = [
   {
     id: "actions",
     header: "Acciones",
-    cell: ({ row }) => {
-      const payment = row.original;
-
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -200,7 +196,7 @@ export function EmployeesTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const { firstDay, lastDay } = getPastMonthRange();
+  const { firstDay } = getPastMonthRange();
   const [rowSelection, setRowSelection] = useState({});
   const company = useCompanyStore((state) => state.company);
   const user = useUserStore((state) => state.user);
@@ -242,7 +238,7 @@ export function EmployeesTable() {
         return;
       }
 
-      const employeesList = data.map((employee) => {
+      const employeesList: any = data.map((employee) => {
         const evaluation = evaluations.find(
           (evaluation) => evaluation.employee_id === employee.user_id
         );
@@ -254,7 +250,7 @@ export function EmployeesTable() {
       });
 
       //sort the employees by department
-      employeesList.sort((a, b) => {
+      employeesList.sort((a: any, b: any) => {
         const deptA: any = a.departments;
         const deptB: any = b.departments;
 

@@ -16,7 +16,6 @@ import { useState } from "react";
 export function DeletePosition({
   positionName,
   positionId,
-  company,
   setIsLoading,
   setSelectedDepartment,
   department,

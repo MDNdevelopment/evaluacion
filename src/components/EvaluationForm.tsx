@@ -11,8 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import { XIcon } from "lucide-react";
@@ -20,7 +18,6 @@ import { toast } from "react-toastify";
 import Spinner from "./Spinner";
 
 export default function EvaluationForm({
-  userId,
   userPosition,
   userName,
 }: {
@@ -203,7 +200,7 @@ export default function EvaluationForm({
         ) / categoriesScores.length,
     };
 
-    const { error } = await supabase.from("evaluations_sessions").insert({});
+    await supabase.from("evaluations_sessions").insert({});
   };
 
   return (

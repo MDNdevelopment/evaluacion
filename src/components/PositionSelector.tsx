@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import {
   Select,
   SelectContent,
@@ -9,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NumberDomain } from "recharts/types/util/types";
 import { useEffect, useState } from "react";
 import { supabase } from "@/services/supabaseClient";
 

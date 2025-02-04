@@ -10,6 +10,7 @@ import { useUserStore, useSessionStore, useCompanyStore } from "./stores";
 function App() {
   const setUser = useUserStore((state) => state.setUser);
   const setCompany = useCompanyStore((state) => state.setCompany);
+
   const getUserData = async (userId: string) => {
     const { data: employeeData } = await supabase
       .from("users")
@@ -51,13 +52,13 @@ function App() {
   };
   const checkSession = () => {
     supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event);
       if (session) {
         useSessionStore.getState().setSession(session);
         getUserData(session.user.id);
       } else {
         useSessionStore.getState().setSession(null);
       }
-      console.log(event);
     });
   };
 
