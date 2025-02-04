@@ -72,7 +72,10 @@ const CompanyDepartments = ({ company }: any) => {
           </div>
         )}
       </div>
-      <SelectedDepartment department={selectedDepartment} />
+      <SelectedDepartment
+        setSelectedDepartment={setSelectedDepartment}
+        department={selectedDepartment}
+      />
     </div>
   );
 };

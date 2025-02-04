@@ -7,6 +7,7 @@ import Profile from "../pages/Profile";
 import PasswordReset from "../pages/PasswordReset";
 import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
+import PrototypeForm from "@/pages/PrototypeForm";
 
 export const Routes = [
   {
@@ -86,6 +87,15 @@ export const Routes = [
     element: (
       <PrivateRoute>
         <Company />
+      </PrivateRoute>
+    ),
+  },
+
+  {
+    path: "/prototypeForm",
+    element: (
+      <PrivateRoute>
+        <PrototypeForm />
       </PrivateRoute>
     ),
   },
