@@ -386,7 +386,7 @@ export default function Employee() {
         </div>
       </div>
 
-      {user && user.access_level === 4 && employeeData.access_level > 1 ? (
+      {user && user.role === "admin" && employeeData.access_level > 1 ? (
         <EvaluationsMadeBy employeeData={employeeData} />
       ) : null}
 

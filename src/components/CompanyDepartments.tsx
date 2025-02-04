@@ -71,8 +71,16 @@ const CompanyDepartments = ({ company }: any) => {
             <FaPlus className="text-white absolute right-2" />
           </div>
         )}
+<<<<<<< HEAD
       </div> */}
       {/* <SelectedDepartment department={selectedDepartment} /> */}
+=======
+      </div>
+      <SelectedDepartment
+        setSelectedDepartment={setSelectedDepartment}
+        department={selectedDepartment}
+      />
+>>>>>>> development
     </div>
   );
 };

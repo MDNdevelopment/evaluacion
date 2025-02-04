@@ -208,7 +208,6 @@ export default function Team() {
   };
   return (
     <div className="max-w-[1200px] mx-auto p-10  mt-10 rounded-lg">
-      {/* <p>{JSON.stringify(user)}</p> */}
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Empleados
       </h1>
