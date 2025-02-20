@@ -20,6 +20,10 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
   const getDirectorsNames = async () => {
     const fetchedDirectors: Director[] = [];
 
+    if (!evaluationsData) {
+      setLoading(false);
+      return;
+    }
     for (const directorList of evaluationsData.made_by) {
       const director = directorList[0]; // Access the first element in the array
 
@@ -31,7 +35,12 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
 
       if (error) {
         console.error(error.message);
-        continue; // Skip this iteration on error
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        console.log({ data });
       }
 
       const newDirector: Director = {
@@ -56,6 +65,10 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
     }
   }, [evaluationsData]);
 
+  if ((!loading && !directors.length) || evaluationsData === null) {
+    return <></>;
+  }
+
   if (loading) {
     return (
       <div className="w-full flex justify-center items-center mt-5">
@@ -64,9 +77,6 @@ export default function RecentEvaluations({ evaluationsData = null }: any) {
     );
   }
 
-  if (directors.length === 0 || evaluationsData === null) {
-    return <></>;
-  }
   return (
     <>
       <div className="mt-10">

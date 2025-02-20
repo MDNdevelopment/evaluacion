@@ -16,14 +16,19 @@ import getPastMonthRange from "@/utils/getPastMonthRange";
 import { XIcon } from "lucide-react";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import { useUserStore } from "@/stores";
+import formatDateForDisplay from "@/utils/formatDateForDisplay";
 
 export default function EvaluationForm({
+  userId,
   userPosition,
   userName,
+  setTableIsLoading,
 }: {
   userId: string;
   userPosition: string | undefined;
   userName: string;
+  setTableIsLoading: (value: boolean) => void;
 }) {
   type CheckedState = {
     [key: string]: {
@@ -35,16 +40,16 @@ export default function EvaluationForm({
     };
   };
 
-  const [questions, setQuestions] = useState<any>({});
+  const [organizedQuestions, setOrganizedQuestions] = useState<any>({});
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [categories, setCategories] = useState<any>([]);
   const [checkedState, setCheckedState] = useState<any>({});
   const { firstDay, lastDay } = getPastMonthRange();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const user = useUserStore((state) => state.user);
 
   const organizeQuestions = (questions: any) => {
-    console.log({ preguntass: questions });
     const organizedQuestions = questions.reduce((acc: any, question: any) => {
       if (!acc[question.categories.name]) {
         acc[question.categories.name] = [];
@@ -75,7 +80,6 @@ export default function EvaluationForm({
       });
     });
     setCheckedState(initialCheckedState);
-    console.log({ initialCheckedState });
   };
 
   const getQuestions = async () => {
@@ -90,7 +94,6 @@ export default function EvaluationForm({
     }
 
     if (data) {
-      console.log(data);
       if (data.length === 0) {
         setIsOpen(false);
         toast.error("No hay preguntas para este cargo.", {
@@ -99,7 +102,7 @@ export default function EvaluationForm({
         return;
       }
       const finalQuestions = organizeQuestions(data);
-      setQuestions(finalQuestions);
+      setOrganizedQuestions(finalQuestions);
       setCategories(Object.keys(finalQuestions));
       initializeCheckedState(finalQuestions);
       setIsLoading(false);
@@ -137,28 +140,31 @@ export default function EvaluationForm({
         </div>
 
         <ol className="list-decimal">
-          {questions &&
+          {organizedQuestions &&
             categories &&
-            questions[categories[currentStep]]?.map((question: any) => {
-              return (
-                <li key={question.text} className="flex flex-row mt-5">
-                  <Checkbox
-                    id={question.text}
-                    name={question.text}
-                    checked={checkedState[question.id].value}
-                    onCheckedChange={() => handleCheckboxChange(question.id)}
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <label
-                      htmlFor={question.text}
-                      className="text-md font-regular leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
-                    >
-                      {question.text}
-                    </label>
-                  </div>
-                </li>
-              );
-            })}
+            organizedQuestions[categories[currentStep]]?.map(
+              (question: any) => {
+                return (
+                  <li key={question.text} className="flex flex-row mt-5">
+                    <Checkbox
+                      id={question.text}
+                      name={question.text}
+                      checked={checkedState[question.id].value}
+                      onCheckedChange={() => handleCheckboxChange(question.id)}
+                      disabled={false}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label
+                        htmlFor={question.text}
+                        className="text-md font-regular leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-2"
+                      >
+                        {question.text}
+                      </label>
+                    </div>
+                  </li>
+                );
+              }
+            )}
         </ol>
       </>
     );
@@ -177,15 +183,15 @@ export default function EvaluationForm({
   };
 
   const handleSubmit = async () => {
-    console.log({ checkedState });
+    if (!user) return;
     //I need to calculate how many questions there are for each category and calculate the score based in how many questions are checked in that category
     let categoriesScores = categories.map((category: any) => {
-      const questionsInCategory = questions[category].length;
+      const questionsInCategory = organizedQuestions[category].length;
       const checkedQuestions = Object.values(checkedState).filter(
         (question: any) => question.category === category && question.value
       ).length;
       return {
-        category_id: questions[category][0].category_id,
+        category_id: organizedQuestions[category][0].category_id,
         category: category,
         score: (checkedQuestions / questionsInCategory) * 10,
       };
@@ -200,7 +206,42 @@ export default function EvaluationForm({
         ) / categoriesScores.length,
     };
 
-    await supabase.from("evaluations_sessions").insert({});
+    // upload a new evaluation in evaluation_sessions
+    const { data, error } = await supabase
+      .from("evaluation_sessions")
+      .insert({
+        manager_id: user.id,
+        employee_id: userId,
+        period: firstDay,
+        total_score: categoriesScores.totalScore,
+      })
+      .select("id");
+
+    if (error) {
+      console.error(error.message);
+      return;
+    }
+
+    Object.keys(checkedState).forEach(async (question) => {
+      const { error: responsesError } = await supabase
+        .from("evaluation_responses")
+        .insert({
+          response: checkedState[question].value,
+          question_id: checkedState[question].question_id,
+          evaluation_id: data[0].id,
+        });
+
+      if (responsesError) {
+        console.error(responsesError.message);
+        return;
+      }
+    });
+
+    setIsOpen(false);
+    toast.success("Evaluación enviada con éxito.", {
+      position: "bottom-right",
+    });
+    setTableIsLoading(true);
   };
 
   return (
@@ -220,35 +261,40 @@ export default function EvaluationForm({
           </DialogClose>
           <DialogHeader>
             <DialogTitle>Evaluación a {userName}</DialogTitle>
-            <DialogDescription>
-              Período {firstDay} - {lastDay}
+            <DialogDescription className="font-light">
+              Período: {formatDateForDisplay(firstDay)} -{" "}
+              {formatDateForDisplay(lastDay)}
             </DialogDescription>
           </DialogHeader>
           {!isLoading ? (
             <>
               {renderCurrentCategory()}
-              <DialogFooter>
-                <button
-                  onClick={() => {
-                    handlePreviousStep();
-                  }}
-                  disabled={currentStep === 0}
-                  className="bg-darkText text-white rounded-sm px-2 py-1 mr-5 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  Anterior
-                </button>
-                <button
-                  onClick={() => {
-                    currentStep === categories.length - 1
-                      ? handleSubmit()
-                      : handleNextStep();
-                  }}
-                  className="bg-darkText text-white rounded-sm px-2 py-1 mr-5 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  {currentStep === categories.length - 1
-                    ? "Finalizar"
-                    : "Siguiente"}
-                </button>
+              <DialogFooter className="mt-3">
+                <div className="flex flex-row justify-between w-full">
+                  <div>
+                    <button
+                      onClick={() => {
+                        handlePreviousStep();
+                      }}
+                      disabled={currentStep === 0}
+                      className="bg-darkText text-white rounded-sm px-2 py-1 mr-5 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    <button
+                      onClick={() => {
+                        currentStep === categories.length - 1
+                          ? handleSubmit()
+                          : handleNextStep();
+                      }}
+                      className="bg-darkText text-white rounded-sm px-2 py-1 mr-5 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {currentStep === categories.length - 1
+                        ? "Finalizar"
+                        : "Siguiente"}
+                    </button>
+                  </div>
+                </div>
               </DialogFooter>
             </>
           ) : (

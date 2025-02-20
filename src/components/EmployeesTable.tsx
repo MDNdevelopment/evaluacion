@@ -36,6 +36,9 @@ import { useCompanyStore, useUserStore } from "@/stores";
 import { supabase } from "@/services/supabaseClient";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import EvaluationForm from "./EvaluationForm";
+import { useNavigate } from "react-router-dom";
+import { CheckEvaluation } from "./CheckEvaluation";
+import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
 
 export type Employee = {
   company_id: string;
@@ -47,151 +50,6 @@ export type Employee = {
   evaluation: any;
 };
 
-export const columns: ColumnDef<Employee>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
-  {
-    accessorKey: "first_name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Nombre
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize pl-3">{row.getValue("first_name")}</div>
-    ),
-  },
-  {
-    accessorKey: "last_name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Apellido
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize pl-3">{row.getValue("last_name")}</div>
-    ),
-  },
-  {
-    accessorKey: "departments",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Departamento
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const department = row.original.departments;
-      if (Array.isArray(department)) {
-        return department.map((dept) => <div key={dept.id}>{dept.name}</div>);
-      }
-      return <div className="pl-3">{department.name}</div>;
-    },
-    sortingFn: (rowA, rowB) => {
-      const deptA = rowA.original.departments;
-      const deptB = rowB.original.departments;
-
-      const nameA = Array.isArray(deptA) ? deptA[0]?.name : deptA.name;
-      const nameB = Array.isArray(deptB) ? deptB[0]?.name : deptB.name;
-
-      return nameA.localeCompare(nameB);
-    },
-  },
-  {
-    id: "position",
-    header: "Cargo",
-    cell({ row }) {
-      return <div>{row.original.positions.name}</div>;
-    },
-  },
-  {
-    id: "evaluation",
-    header: "Evaluación",
-    cell: ({ row }) => {
-      const evaluation = row.original.evaluation;
-      return evaluation ? (
-        <div>
-          {evaluation.created_at} - {evaluation.id}
-        </div>
-      ) : (
-        <>
-          <EvaluationForm
-            userId={row.original.user_id}
-            userPosition={row.original.positions.id.toString()}
-            userName={`${row.original.first_name} ${row.original.last_name}`}
-          />
-        </>
-      );
-    },
-  },
-  {
-    id: "actions",
-    header: "Acciones",
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-
-            <DropdownMenuItem
-              onClick={() => {
-                console.log("View employee");
-                //take user to
-              }}
-              className="cursor-pointer"
-            >
-              Ver empleado
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
 export function EmployeesTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -201,6 +59,141 @@ export function EmployeesTable() {
   const company = useCompanyStore((state) => state.company);
   const user = useUserStore((state) => state.user);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
+  const navigate = useNavigate();
+
+  const columns: ColumnDef<Employee>[] = [
+    {
+      accessorKey: "first_name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Nombre
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize pl-3">{row.getValue("first_name")}</div>
+      ),
+    },
+    {
+      accessorKey: "last_name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Apellido
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize pl-3">{row.getValue("last_name")}</div>
+      ),
+    },
+    {
+      accessorKey: "departments",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Departamento
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => {
+        const department = row.original.departments;
+        if (Array.isArray(department)) {
+          return department.map((dept) => <div key={dept.id}>{dept.name}</div>);
+        }
+        return <div className="pl-3">{department.name}</div>;
+      },
+      sortingFn: (rowA, rowB) => {
+        const deptA = rowA.original.departments;
+        const deptB = rowB.original.departments;
+
+        const nameA = Array.isArray(deptA) ? deptA[0]?.name : deptA.name;
+        const nameB = Array.isArray(deptB) ? deptB[0]?.name : deptB.name;
+
+        return nameA.localeCompare(nameB);
+      },
+    },
+    {
+      id: "position",
+      header: "Cargo",
+      cell({ row }) {
+        return <div>{row.original.positions.name}</div>;
+      },
+    },
+    {
+      id: "evaluation",
+      header: "Evaluación",
+      cell: ({ row }) => {
+        const evaluation = row.original.evaluation;
+        return evaluation?.id ? (
+          <CheckEvaluation
+            evaluationId={evaluation.id}
+            setIsLoadingTable={setIsLoading}
+            employeeData={{
+              name: `${row.original.first_name} ${row.original.last_name}`,
+              position: row.original.positions.name,
+              department: Array.isArray(row.original.departments)
+                ? row.original.departments[0].name
+                : row.original.departments.name,
+            }}
+          />
+        ) : (
+          <EvaluationForm
+            userId={row.original.user_id}
+            userPosition={row.original.positions.id.toString()}
+            userName={`${row.original.first_name} ${row.original.last_name}`}
+            setTableIsLoading={setIsLoading}
+          />
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Acciones",
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  //take user to the employee profile
+                  navigate(`/empleado/${row.original.user_id}`, {
+                    replace: true,
+                  });
+                }}
+                className="cursor-pointer"
+              >
+                Ver empleado
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
 
   const getEmployees = async () => {
     if (company && user) {
@@ -222,14 +215,11 @@ export function EmployeesTable() {
         console.log(error.message);
         return;
       }
-      if (data) {
-        console.log({ data });
-      }
 
       //Get the evaluations made by the logged user for this period
       const { data: evaluations, error: errorEvaluations } = await supabase
         .from("evaluation_sessions")
-        .select("employee_id, id, period, created_at")
+        .select("employee_id, id, period, created_at, manager_id")
         .eq("manager_id", user.id)
         .eq("period", firstDay);
 
@@ -261,6 +251,7 @@ export function EmployeesTable() {
       });
 
       setEmployees(employeesList);
+      setIsLoading(false);
     } else {
       console.log("no company");
     }
@@ -268,7 +259,8 @@ export function EmployeesTable() {
 
   useEffect(() => {
     getEmployees();
-  }, [company]);
+    setEvaluation(null);
+  }, [company, isLoading]);
 
   const table = useReactTable({
     data: employees,
@@ -288,6 +280,20 @@ export function EmployeesTable() {
       columnVisibility,
       rowSelection,
     },
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const firstName = row.original.first_name.toLowerCase();
+      const lastName = row.original.last_name.toLowerCase();
+      const searchValue = filterValue.toLowerCase();
+      if (searchValue.indexOf(" ") !== -1) {
+        const splitWords = searchValue.split(" ");
+
+        return (
+          firstName.includes(splitWords[0]) && lastName.includes(splitWords[1])
+        );
+      }
+
+      return firstName.includes(searchValue) || lastName.includes(searchValue);
+    },
   });
 
   return (
@@ -295,12 +301,10 @@ export function EmployeesTable() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Buscar..."
-          value={
-            (table.getColumn("first_name")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("first_name")?.setFilterValue(event.target.value)
-          }
+          // value={
+          //   (table.getColumn("first_name")?.getFilterValue() as string) ?? ""
+          // }
+          onChange={(event) => table.setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -380,30 +384,7 @@ export function EmployeesTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        {/* <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div> */}
-      </div>
+      <div className="flex items-center justify-end space-x-2 py-4"></div>
     </div>
   );
 }

@@ -62,6 +62,7 @@ export const EvaluationsChart = ({ evaluationsData }: any) => {
   const dataKeys =
     evaluationsData.length > 0 ? Object.keys(evaluationsData[0]) : [];
 
+  console.log({ dataKeys, evaluationsData });
   // Filter out keys that you don't want to include as lines
   const metricKeys = dataKeys.filter(
     (key) => key !== "period" && key !== "made_by"

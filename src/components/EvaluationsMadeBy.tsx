@@ -24,7 +24,6 @@ export const EvaluationsMadeBy = ({ employeeData }: any) => {
   }, [employeeData]);
 
   const getEvaluationsByEmployee = async () => {
-    console.log({ firstDay, lastDay });
     const { data, error } = await supabase
       .from("evaluations")
       .select("*, users!target_employee (first_name, last_name)")
@@ -39,8 +38,6 @@ export const EvaluationsMadeBy = ({ employeeData }: any) => {
     }
 
     if (data) {
-      console.log(data);
-
       //Sort the evaluations by the employee first name from A to Z
       data.sort((a: any, b: any) =>
         a.users.first_name > b.users.first_name ? 1 : -1

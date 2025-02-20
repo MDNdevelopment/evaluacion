@@ -8,6 +8,7 @@ import PasswordReset from "../pages/PasswordReset";
 import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
 import PrototypeForm from "@/pages/PrototypeForm";
+// import EmployeeProfile from "@/pages/EmployeeProfile";
 
 export const Routes = [
   {
