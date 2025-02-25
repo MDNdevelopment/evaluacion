@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
-import { set } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export function PositionDialog({
