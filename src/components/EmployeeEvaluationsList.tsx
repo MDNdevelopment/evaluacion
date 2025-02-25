@@ -137,9 +137,7 @@ export default function EmployeeEvaluationsList({
           })
         ) : (
           <div className="rounded-md shadow-sm bg-white flex justify-center items-center w-full h-24">
-            <p className="text-gray-500">
-              No se encontraron evaluaciones {idColumn}
-            </p>
+            <p className="text-gray-500">No se encontraron evaluaciones</p>
           </div>
         )}
       </div>
