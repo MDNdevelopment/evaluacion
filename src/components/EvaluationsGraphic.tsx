@@ -120,7 +120,7 @@ export const EvaluationsGraphic = ({ evaluationsData }: any) => {
                 stroke={colors[1]}
                 strokeWidth={2}
                 dot={false}
-                name="Promedio total"
+                name="Puntaje total"
               />
               {[...Object.keys(chartConfig)].map((category: any) => (
                 <Line

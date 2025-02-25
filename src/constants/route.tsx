@@ -2,13 +2,13 @@ import { Login, Dashboard } from "../pages/index";
 import { AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
 import Team from "../pages/Team";
-import Employee from "../pages/Employee";
+// import Employee from "../pages/Employee";
 import Profile from "../pages/Profile";
 import PasswordReset from "../pages/PasswordReset";
 import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
 import PrototypeForm from "@/pages/PrototypeForm";
-// import EmployeeProfile from "@/pages/EmployeeProfile";
+import EmployeeProfile from "@/pages/EmployeeProfile";
 
 export const Routes = [
   {
@@ -55,7 +55,7 @@ export const Routes = [
     path: "/empleado/:id",
     element: (
       <PrivateRoute>
-        <Employee />
+        <EmployeeProfile />
       </PrivateRoute>
     ),
   },
@@ -70,9 +70,9 @@ export const Routes = [
   {
     path: "/recuperacion",
     element: (
-      // <AuthRoute>
-      <PasswordReset />
-      // </AuthRoute>
+      <AuthRoute>
+        <PasswordReset />
+      </AuthRoute>
     ),
   },
   {

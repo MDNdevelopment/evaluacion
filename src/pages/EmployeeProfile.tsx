@@ -253,16 +253,26 @@ export default function EmployeeProfile() {
         </div>
       </div>
 
-      <div className="mt-5">
-        {user &&
-        employeeData &&
-        user.role === "admin" &&
-        employeeData.access_level > 1 ? (
-          <EmployeeEvaluationsList evaluatorId={employeeData.user_id} />
-        ) : null}
-      </div>
+      {user && user.role === "admin" && (
+        <div className="mt-10">
+          <h2 className="text-darkText text-xl  font-black mb-3">
+            Evaluaciones hechas por{" "}
+            {`${employeeData.first_name} ${employeeData.last_name}`}
+          </h2>
+          {user &&
+          employeeData &&
+          user.role === "admin" &&
+          employeeData.access_level > 1 ? (
+            <EmployeeEvaluationsList evaluatorId={employeeData.user_id} />
+          ) : null}
+        </div>
+      )}
 
-      <div className="mt-5">
+      <div className="mt-14">
+        <h2 className="text-darkText text-xl  font-black mb-3">
+          Evaluaciones hechas a{" "}
+          {`${employeeData.first_name} ${employeeData.last_name}`}
+        </h2>
         <EmployeeEvaluationsList employeeId={employeeData.user_id} />
       </div>
     </div>

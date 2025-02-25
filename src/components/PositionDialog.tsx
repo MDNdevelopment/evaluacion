@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
+import { set } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export function PositionDialog({
   departmentId,
@@ -27,6 +29,8 @@ export function PositionDialog({
   setIsLoading: any;
 }) {
   const [newPosition, setNewPosition] = useState("");
+  const [positionsCounter, setPositionsCounter] = useState<number>(0);
+
   const [isOpen, setIsOpen] = useState(false);
   const handleSubmit = async () => {
     const { error } = await supabase.from("positions").insert({
@@ -40,8 +44,17 @@ export function PositionDialog({
       return;
     }
 
-    setIsLoading(true);
+    setNewPosition("");
+    toast.success("Cargo agregado con éxito", {
+      position: "bottom-right",
+      autoClose: 1500,
+    });
+    setPositionsCounter(positionsCounter + 1);
+  };
+
+  const handleClose = () => {
     setIsOpen(false);
+    if (positionsCounter > 0) setIsLoading(true);
   };
 
   return (
@@ -59,7 +72,7 @@ export function PositionDialog({
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
         <DialogClose asChild={true}>
           <XIcon
-            className="flex flex-row justify-self-end cursor-pointer"
+            className="absolute top-3 right-3 flex flex-row justify-self-end cursor-pointer"
             onClick={() => setIsOpen(false)}
           />
         </DialogClose>
@@ -84,9 +97,15 @@ export function PositionDialog({
           </div>
           <div className="grid grid-cols-4 items-center gap-4"></div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row justify-end items-end">
           <Button onClick={handleSubmit} type="submit">
-            Guardar
+            Agregar
+          </Button>
+          <Button
+            onClick={handleClose}
+            className="bg-darkText hover:bg-darkText-darker"
+          >
+            Listo
           </Button>
         </DialogFooter>
       </DialogContent>

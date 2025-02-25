@@ -27,6 +27,7 @@ module.exports = {
         darkText: {
           DEFAULT: "#2a2a2a",
           darker: "#1e1e1e",
+          lighter: "#5e5e5e",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

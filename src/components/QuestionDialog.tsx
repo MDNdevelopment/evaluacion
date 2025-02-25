@@ -16,6 +16,7 @@ import { supabase } from "@/services/supabaseClient";
 import { PositionSelector } from "./PositionSelector";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
+import { toast } from "react-toastify";
 
 export function QuestionDialog({
   departmentId,
@@ -32,6 +33,12 @@ export function QuestionDialog({
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState("");
+  const [questionsCounter, setQuestionsCounter] = useState<number>(0);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (questionsCounter > 0) setIsLoading(true);
+  };
 
   const handleSubmit = async () => {
     const { error } = await supabase.from("questions").insert({
@@ -44,8 +51,13 @@ export function QuestionDialog({
       console.log(error.message);
       return;
     }
-    setIsLoading(true);
-    setIsOpen(false);
+
+    setNewQuestion("");
+    toast.success("Pregunta agregada con éxito", {
+      position: "bottom-right",
+      autoClose: 1500,
+    });
+    setQuestionsCounter(questionsCounter + 1);
   };
 
   return (
@@ -65,8 +77,8 @@ export function QuestionDialog({
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
         <DialogClose asChild={true}>
           <XIcon
-            className="flex flex-row justify-self-end cursor-pointer"
-            onClick={() => setIsOpen(false)}
+            className=" absolute top-3 right-3 flex flex-row justify-self-end cursor-pointer"
+            onClick={handleClose}
           />
         </DialogClose>
         <DialogHeader>
@@ -120,9 +132,15 @@ export function QuestionDialog({
             />
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row justify-end items-end">
           <Button onClick={handleSubmit} type="submit">
-            Guardar
+            Agregar
+          </Button>
+          <Button
+            onClick={handleClose}
+            className="bg-darkText hover:bg-darkText-darker"
+          >
+            Listo
           </Button>
         </DialogFooter>
       </DialogContent>

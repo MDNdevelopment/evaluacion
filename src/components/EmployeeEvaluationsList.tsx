@@ -30,7 +30,7 @@ export default function EmployeeEvaluationsList({
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
-        "*, users!employee_id(*, positions(name), departments(name)), evaluator:users!manager_id(first_name, last_name)"
+        "*, users!employee_id(*, positions(name), departments(name)), evaluator:users!manager_id(first_name, last_name, positions(name), departments(name))"
       )
       .eq(idColumn, idToUse)
       .gte("period", firstDay)
@@ -49,54 +49,80 @@ export default function EmployeeEvaluationsList({
     if (user) {
       getEvaluationsMadeByUser();
     }
-  }, []);
+  }, [evaluatorId, employeeId]);
   return (
     <>
-      <h1>Employee evaluations list</h1>
-      <div className="grid grid-cols-3 gap-4">
+      <div
+        className={`grid gap-4 ${
+          userEvaluations && userEvaluations.length > 0
+            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            : ""
+        }`}
+      >
         {userEvaluations && userEvaluations.length > 0 ? (
           userEvaluations.map((evaluation) => {
-            console.log({ evaluation });
+            const evaluatorName = `${evaluation.evaluator.first_name} ${evaluation.evaluator.last_name}`;
+            const evaluatorDepartment = evaluation.evaluator.departments.name;
+            const evaluatorPosition = evaluation.evaluator.positions.name;
+            const employeeName = `${evaluation.users.first_name} ${evaluation.users.last_name}`;
+            const employeeDepartment = evaluation.users.departments.name;
+            const employeePosition = evaluation.users.positions.name;
+
+            console.log({
+              evaluatorName,
+              evaluatorDepartment,
+              evaluatorPosition,
+              employeeName,
+              employeeDepartment,
+              employeePosition,
+              idColumn,
+            });
             return (
               <Card key={`evaluation-${evaluation.id}`} className="shadow-sm">
                 <CardHeader>
                   <CardTitle>
-                    {idColumn === "manager_id" ? (
-                      <span className="text-muted-foreground">
-                        Evaluación a {evaluation.users.first_name}{" "}
-                        {evaluation.users.last_name}
+                    <span className="text-darkText-lighter">
+                      Evaluación{" "}
+                      {user && user.access_level > 1
+                        ? idColumn === "manager_id"
+                          ? "a "
+                          : "de "
+                        : "recibida"}
+                      <span className="text-darkText font-bold">
+                        {user && user.access_level > 1
+                          ? idColumn === "manager_id"
+                            ? employeeName
+                            : evaluatorName
+                          : null}
                       </span>
-                    ) : (
-                      <span className="text-muted-foreground">
-                        Evaluación hecha por {evaluation.evaluator.first_name}{" "}
-                        {evaluation.evaluator.last_name}
-                      </span>
-                    )}
+                    </span>
                   </CardTitle>
                   <CardDescription>
                     <p>
                       Departamento:{" "}
-                      <span className="font-bold">
-                        {evaluation.users.departments.name}
+                      <span className="font-bold text-darkText">
+                        {idColumn === "manager_id"
+                          ? employeeDepartment
+                          : evaluatorDepartment}
                       </span>
                     </p>
-                    <p>
-                      Posición:{" "}
-                      <span className="font-bold">
-                        {evaluation.users.positions.name}
-                      </span>
-                    </p>
-                    <p className="text-[1.2em] text-gray-800">
-                      Puntaje total:{" "}
-                      <span className="font-bold">
-                        {evaluation.total_score.toFixed(2)}
-                      </span>
-                    </p>
+                    {user && user.access_level > 1 && (
+                      <p>
+                        Posición:{" "}
+                        <span className="font-bold text-darkText">
+                          {idColumn === "manager_id"
+                            ? employeePosition
+                            : evaluatorPosition}
+                        </span>
+                      </p>
+                    )}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="">
+                <CardContent className="flex justify-between">
+                  <p className="text-3xl text-darkText  font-black">
+                    {evaluation.total_score.toFixed(2)}
+                  </p>
                   <CheckEvaluation
-                    period={firstDay}
                     setIsLoadingTable={null}
                     evaluationId={evaluation.id}
                     employeeData={{
@@ -110,25 +136,13 @@ export default function EmployeeEvaluationsList({
             );
           })
         ) : (
-          <p>No evaluations found</p>
+          <div className="rounded-md shadow-sm bg-white flex justify-center items-center w-full h-24">
+            <p className="text-gray-500">
+              No se encontraron evaluaciones {idColumn}
+            </p>
+          </div>
         )}
       </div>
     </>
   );
-}
-
-{
-  /* <CheckEvaluation
-            openEvaluationId={openEvaluationId}
-            setOpenEvaluationId={setOpenEvaluationId}
-            evaluationId={evaluation.id}
-            setIsLoadingTable={setIsLoading}
-            employeeData={{
-              name: `${row.original.first_name} ${row.original.last_name}`,
-              position: row.original.positions.name,
-              department: Array.isArray(row.original.departments)
-                ? row.original.departments[0].name
-                : row.original.departments.name,
-            }}
-          /> */
 }

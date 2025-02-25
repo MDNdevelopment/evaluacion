@@ -26,12 +26,6 @@
   }
 }
 
-html,
-body,
-#root {
-  height: 100%;
-}
-
 .card {
   padding: 2em;
 }

@@ -15,6 +15,7 @@ import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PositionSelector } from "./PositionSelector";
+import { toast } from "react-toastify";
 
 export function CategoryDialog({
   departmentId,
@@ -32,6 +33,7 @@ export function CategoryDialog({
   const [newCategory, setNewCategory] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const [categoriesCounter, setCategoriesCounter] = useState<number>(0);
   const handleSubmit = async () => {
     console.log(selectedPosition);
     if (selectedPosition === null) {
@@ -66,7 +68,17 @@ export function CategoryDialog({
       return;
     }
 
-    setIsLoading(true);
+    setNewCategory("");
+    toast.success("Categoría agregada con éxito", {
+      position: "bottom-right",
+      autoClose: 1500,
+    });
+    setCategoriesCounter(categoriesCounter + 1);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (categoriesCounter > 0) setIsLoading(true);
   };
 
   useEffect(() => {
@@ -87,6 +99,12 @@ export function CategoryDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
+        <DialogClose asChild={true}>
+          <XIcon
+            className=" absolute top-3 right-3 flex flex-row justify-self-end cursor-pointer"
+            onClick={handleClose}
+          />
+        </DialogClose>
         <div className="flex flex-row items-start">
           <DialogHeader>
             <DialogTitle>
@@ -97,12 +115,6 @@ export function CategoryDialog({
               click en guardar una vez que termines.
             </DialogDescription>
           </DialogHeader>
-          <DialogClose asChild={true}>
-            <XIcon
-              className="flex flex-row justify-self-end cursor-pointer"
-              onClick={() => setIsOpen(false)}
-            />
-          </DialogClose>
         </div>
 
         <div className="grid gap-4 py-4>">
@@ -132,9 +144,15 @@ export function CategoryDialog({
             disabled={selectedPosition === null}
           />
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row justify-end items-end">
           <Button onClick={handleSubmit} type="submit">
-            Guardar
+            Agregar
+          </Button>
+          <Button
+            onClick={handleClose}
+            className="bg-darkText hover:bg-darkText-darker"
+          >
+            Listo
           </Button>
         </DialogFooter>
       </DialogContent>

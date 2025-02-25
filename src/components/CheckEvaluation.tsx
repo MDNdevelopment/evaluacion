@@ -4,6 +4,7 @@ import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import remapMonths from "@/utils/remapMoths";
 // Dummy data
 
 interface employeeData {
@@ -16,14 +17,12 @@ interface CheckEvaluationProps {
   evaluationId: string;
   setIsLoadingTable: null | ((isLoading: boolean) => void);
   employeeData: employeeData;
-  period?: undefined | string;
 }
 
 export const CheckEvaluation = ({
   evaluationId,
   setIsLoadingTable,
   employeeData,
-  period,
 }: CheckEvaluationProps) => {
   const [open, setOpen] = useState(false);
   const evaluation = useEvaluationCheckStore((state) => state.evaluation);
@@ -31,7 +30,7 @@ export const CheckEvaluation = ({
   const [retrievedAnswers, setRetrievedAnswers] = useState<any>(null);
   const [categoriesTotal, setCategoriesTotal] = useState<any>(null);
   const [loadingData, setLoadingData] = useState<boolean>(true);
-
+  const [evaluationPeriod, setEvaluationPeriod] = useState<string | null>(null);
   const handleClick = () => {
     if (!open) {
       if (evaluation?.id !== evaluationId) {
@@ -76,9 +75,12 @@ export const CheckEvaluation = ({
       return;
     }
     setRetrievedAnswers(data);
-
-    console.log({ dataaaa: data });
-
+    const period = `${remapMonths(data.period.split("-").slice(2).join("-"))}-${
+      data.period.split("-")[0]
+    }`;
+    setEvaluationPeriod(period);
+    console.log({ period });
+    console.log({ data });
     const categoriesTotals = data.evaluation_responses.reduce(
       (acc: any, response: any) => {
         if (!acc[response.questions.category.name]) {
@@ -133,7 +135,7 @@ export const CheckEvaluation = ({
     return (
       <div>
         <button
-          className="border border-gray-300 bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg"
+          className="border border-gray-300 bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-sm"
           onClick={handleClick}
         >
           Ver evaluación
@@ -146,22 +148,31 @@ export const CheckEvaluation = ({
               initial={
                 setIsLoadingTable
                   ? { x: "-60%", y: "-55%", scale: 0 }
-                  : { scale: 0 }
+                  : { x: "-30%", y: "-55%", scale: 0 }
               }
               animate={
                 setIsLoadingTable
                   ? { x: "-105%", y: "-25%", scale: 1 }
-                  : { x: "25%", y: "-100%", scale: 1 }
+                  : { x: "40%", y: "-100%", scale: 1 }
               }
-              exit={{
-                scale: 0.2,
-                x: "-60%",
-                y: "-45%",
-                opacity: 0,
-              }}
+              exit={
+                setIsLoadingTable
+                  ? {
+                      scale: 0.2,
+                      x: "-60%",
+                      y: "-45%",
+                      opacity: 0,
+                    }
+                  : {
+                      scale: 0.2,
+                      x: "-10%",
+                      y: "-65%",
+                      opacity: 0,
+                    }
+              }
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className={`flex flex-col absolute h-full max-h-[700px] bg-white overflow-y-hidden  z-10 evaluation-container max-w-4xl mx-auto p-6  border-2  shadow-lg rounded-lg ${
-                setIsLoadingTable ? "w-[40%]" : "w-[30%]"
+              className={`flex flex-col absolute  max-h-[700px] bg-white overflow-y-hidden  z-10 evaluation-container max-w-4xl mx-auto p-6  border-2  shadow-lg rounded-lg ${
+                setIsLoadingTable ? "w-[40%] h-full" : "w-[25%] h-[80%]"
               }`}
             >
               {/* Evaluation Metadata Header */}
@@ -180,7 +191,7 @@ export const CheckEvaluation = ({
                   <strong>Departamento:</strong> {employeeData.department}
                 </p>
                 <p className="text-gray-600">
-                  <strong>Periodo de Evaluación:</strong> {period}
+                  <strong>Periodo de Evaluación:</strong> {evaluationPeriod}
                 </p>
                 <p className="text-gray-600 text-base">
                   <strong>Puntaje:</strong>{" "}
