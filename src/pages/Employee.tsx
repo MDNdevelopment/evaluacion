@@ -281,7 +281,7 @@ export default function Employee() {
                 <CardHeader className="py-4">
                   <CardTitle>Promedio Total</CardTitle>
                   <CardDescription>
-                    Promedio generado a lo largo de los meses
+                    Promedio generado a lo largo de los meses.
                   </CardDescription>
                 </CardHeader>
               </div>
@@ -313,7 +313,7 @@ export default function Employee() {
                     )}
                   </CardTitle>
                   <CardDescription>
-                    Promedio generado para el mes actual
+                    Promedio generado para el mes actual.
                   </CardDescription>
                 </CardHeader>
               </div>

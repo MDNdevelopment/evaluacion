@@ -2,6 +2,7 @@ import CompanyConfig from "@/components/CompanyConfig";
 import CompanyDepartments from "@/components/CompanyDepartments";
 import CompanyDownload from "@/components/CompanyDownload";
 import CompanyEmployees from "@/components/CompanyEmployees";
+import { CompanyQuestions } from "@/components/CompanyQuestions";
 
 export const COMPANY_OPTIONS = [
   { option: "Configuración", role: "admin", component: CompanyConfig },
@@ -12,4 +13,9 @@ export const COMPANY_OPTIONS = [
   },
   { option: "Departamentos", role: "admin", component: CompanyDepartments },
   { option: "Empleados", role: "admin", component: CompanyEmployees },
+  {
+    option: "Preguntas",
+    role: "admin",
+    component: CompanyQuestions,
+  },
 ];

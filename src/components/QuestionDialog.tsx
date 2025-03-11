@@ -29,7 +29,6 @@ export function QuestionDialog({
   company: any;
   setIsLoading: any;
 }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState("");
@@ -44,8 +43,6 @@ export function QuestionDialog({
     const { error } = await supabase.from("questions").insert({
       text: newQuestion,
       position: selectedPosition,
-
-      category_id: selectedCategory,
     });
     if (error) {
       console.log(error.message);
@@ -65,7 +62,6 @@ export function QuestionDialog({
       open={isOpen}
       onOpenChange={() => {
         setNewQuestion("");
-        setSelectedCategory(null);
         setSelectedPosition(null);
       }}
     >
@@ -102,7 +98,8 @@ export function QuestionDialog({
               setSelectedPosition={setSelectedPosition}
             />
           </div>
-          <div className="grid gap-4 py-4>">
+          {/*Category is no longer needed to create a question */}
+          {/* <div className="grid gap-4 py-4>">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
                 Categoría
@@ -114,7 +111,7 @@ export function QuestionDialog({
                 selectedPosition={selectedPosition}
               />
             </div>
-          </div>
+          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               Pregunta
@@ -124,11 +121,9 @@ export function QuestionDialog({
               id="name"
               value={newQuestion}
               className={`col-span-3 ${
-                selectedCategory === null || selectedPosition === null
-                  ? "bg-gray-200"
-                  : ""
+                selectedPosition === null ? "bg-gray-200" : ""
               }`}
-              disabled={selectedCategory === null || selectedPosition === null}
+              disabled={selectedPosition === null}
             />
           </div>
         </div>
