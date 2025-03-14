@@ -1,74 +1,38 @@
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useEffect, useState } from "react";
-import { supabase } from "@/services/supabaseClient";
+import { Position } from "@/types";
+import PositionItem from "./PositionItem";
 
 export function PositionSelector({
-  departmentId,
-  companyId,
-  setSelectedPosition,
+  positions,
 }: {
-  departmentId: string;
-  companyId: string;
-  setSelectedPosition: any;
+  positions: { [key: string]: Position[] };
 }) {
-  const [positions, setPositions] = useState<any[]>([]);
+  //
 
-  const getPositions = async () => {
-    const { data, error } = await supabase
-      .from("positions")
-      .select("name, id")
-      .eq("company_id", companyId)
-      .eq("department_id", departmentId);
-
-    if (error) {
-      console.log(error.message);
-      return;
-    }
-
-    if (data) {
-      setPositions(data);
-    }
-  };
-
-  useEffect(() => {
-    getPositions();
-  }, [departmentId]);
   return (
-    <Select
-      onValueChange={(e) => {
-        setSelectedPosition(e);
-      }}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Seleccionar" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {positions.length > 0 ? (
-            positions.map((position) => {
-              return (
-                <SelectItem
-                  className="cursor-pointer"
-                  key={position.id}
-                  value={position.id}
-                >
-                  {position.name}
-                </SelectItem>
-              );
-            })
-          ) : (
-            <SelectLabel>No hay cargos disponibles</SelectLabel>
-          )}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <div className="flex flex-col">
+      <div className=" grid grid-cols-4">
+        {Object.keys(positions).map((departmentName: string) => {
+          return (
+            <div
+              key={departmentName}
+              className="flex flex-col  my-3 border border-gray-200 p-4 rounded-md mx-1"
+            >
+              <h4 className="mb-2 font-bold text-md hover:underline cursor-pointer">
+                {departmentName}
+              </h4>
+              {positions[departmentName].map((position: Position) => {
+                return (
+                  <PositionItem
+                    key={`${departmentName}-${position.id}`}
+                    position={position}
+                    departmentName={departmentName}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

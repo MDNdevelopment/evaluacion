@@ -11,50 +11,77 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { CategorySelector } from "./CategorySelector";
-import { supabase } from "@/services/supabaseClient";
 import { PositionSelector } from "./PositionSelector";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
+import { Company, Position } from "@/types";
+import { FormProvider, useForm } from "react-hook-form";
+import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 
 export function QuestionDialog({
-  departmentId,
-  departmentName,
   company,
-  setIsLoading,
+  positions,
 }: {
-  departmentId: string;
-  departmentName: string;
-  company: any;
-  setIsLoading: any;
+  company: Company;
+  positions: { [key: string]: Position[] };
 }) {
-  const [selectedPosition, setSelectedPosition] = useState(null);
+  const methods = useForm({
+    defaultValues: {
+      question: "",
+      positions: null,
+    },
+  });
+
+  console.log(company);
+  const [_selectedPosition, setSelectedPosition] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [newQuestion, setNewQuestion] = useState("");
-  const [questionsCounter, setQuestionsCounter] = useState<number>(0);
+  const [_newQuestion, setNewQuestion] = useState("");
+
+  var isValid = !(
+    methods.watch("question") === "" || methods.watch("positions") === null
+  );
 
   const handleClose = () => {
     setIsOpen(false);
-    if (questionsCounter > 0) setIsLoading(true);
   };
 
-  const handleSubmit = async () => {
-    const { error } = await supabase.from("questions").insert({
-      text: newQuestion,
-      position: selectedPosition,
-    });
+  const onSubmit = async (data: any) => {
+    // insert question into the database
+    const { data: questionResult, error } = await supabase
+      .from("questions")
+      .insert({
+        text: data.question,
+      })
+      .select()
+      .single();
+
     if (error) {
       console.log(error.message);
+      toast.error("Error al agregar la pregunta - EP01");
       return;
     }
+    //insert the question-position relation into the question_positions table
+    data.positions.forEach(async (position: number) => {
+      const { error: positionError } = await supabase
+        .from("question_positions")
+        .insert({
+          question_id: questionResult.id,
+          position_id: position,
+        });
 
-    setNewQuestion("");
-    toast.success("Pregunta agregada con éxito", {
-      position: "bottom-right",
-      autoClose: 1500,
+      if (positionError) {
+        console.log(positionError.message);
+        toast.error("Error al agregar la pregunta - EP02");
+        return;
+      }
     });
-    setQuestionsCounter(questionsCounter + 1);
+
+    toast.success("Pregunta agregada correctamente", {
+      position: "bottom-right",
+    });
+    methods.setValue("question", "");
+    console.log(data);
   };
 
   return (
@@ -65,12 +92,16 @@ export function QuestionDialog({
         setSelectedPosition(null);
       }}
     >
-      <DialogTrigger className="ml-3" asChild>
-        <Button onClick={() => setIsOpen(true)} variant="outline">
+      <DialogTrigger asChild>
+        <Button
+          className="bg-green-600 rounded-md py-1 px-3 text-white font-bold border-r-2 border-r-green-700 border-b-2 border-b-green-700  transition-all ease-linear text-md hover:bg-green-700 hover:text-white"
+          onClick={() => setIsOpen(true)}
+          variant="outline"
+        >
           Agregar pregunta
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] [&>button]:hidden">
+      <DialogContent className="sm:max-w-[1125px] [&>button]:hidden max-h-[50rem] overflow-y-scroll">
         <DialogClose asChild={true}>
           <XIcon
             className=" absolute top-3 right-3 flex flex-row justify-self-end cursor-pointer"
@@ -78,64 +109,48 @@ export function QuestionDialog({
           />
         </DialogClose>
         <DialogHeader>
-          <DialogTitle>
-            Agregar nueva pregunta en {departmentName} categoría{" "}
-          </DialogTitle>
+          <DialogTitle>Agregar nueva pregunta</DialogTitle>
           <DialogDescription>
-            Selecciona la categoría e ingresa la pregunta. Haz click en guardar
-            una vez que termines.
+            Ingresa la pregunta y escoge los cargos en los que va a aplicar.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Cargo
-            </Label>
-
-            <PositionSelector
-              companyId={company.id}
-              departmentId={departmentId}
-              setSelectedPosition={setSelectedPosition}
-            />
-          </div>
-          {/*Category is no longer needed to create a question */}
-          {/* <div className="grid gap-4 py-4>">
-            <div className="grid grid-cols-4 items-center gap-4">
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Label htmlFor="name" className="text-right">
-                Categoría
+                Pregunta
               </Label>
-              <CategorySelector
-                companyId={company.id}
-                departmentId={departmentId}
-                setSelectedCategory={setSelectedCategory}
-                selectedPosition={selectedPosition}
+              <Input
+                className={`col-span-3 border-2 border-gray-400`}
+                {...methods.register("question")}
               />
-            </div>
-          </div> */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Pregunta
-            </Label>
-            <Input
-              onChange={(e) => setNewQuestion(e.target.value)}
-              id="name"
-              value={newQuestion}
-              className={`col-span-3 ${
-                selectedPosition === null ? "bg-gray-200" : ""
-              }`}
-              disabled={selectedPosition === null}
-            />
-          </div>
+              <div className="">
+                {/* Select the positions where the question will be available */}
+                <PositionSelector positions={positions} />
+              </div>
+
+              <div className="flex flex-row justify-center ">
+                <button
+                  className={`mx-2 ${
+                    isValid
+                      ? "bg-green-600 hover:bg-green-700 cursor-pointer"
+                      : "bg-gray-400 cursor-not-allowed"
+                  }  text-white rounded-md py-1 px-3 hover:text-white ease-linear transition-all`}
+                  type="submit"
+                  disabled={!isValid}
+                >
+                  Agregar
+                </button>
+              </div>
+            </form>
+          </FormProvider>
         </div>
         <DialogFooter className="flex flex-row justify-end items-end">
-          <Button onClick={handleSubmit} type="submit">
-            Agregar
-          </Button>
           <Button
             onClick={handleClose}
             className="bg-darkText hover:bg-darkText-darker"
           >
-            Listo
+            Terminé
           </Button>
         </DialogFooter>
       </DialogContent>

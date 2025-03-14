@@ -1,12 +1,5 @@
 import { create } from "zustand";
-
-export interface Company {
-  id: string;
-  name: string;
-  created_at: string;
-  owner_user_id: string;
-  logo_url?: string;
-}
+import { Company } from "@/types";
 
 interface CompanyState {
   company: Company | null;

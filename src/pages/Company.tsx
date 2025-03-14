@@ -6,11 +6,31 @@ import CompanyConfig from "@/components/CompanyConfig";
 import CompanyDownload from "@/components/CompanyDownload";
 import CompanyDepartments from "@/components/CompanyDepartments";
 import CompanyEmployees from "@/components/CompanyEmployees";
+import CompanyQuestions from "@/components/CompanyQuestions";
 
 export default function Company() {
   const company = useCompanyStore((state) => state.company);
   const [logoIsLoading, setLogoIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(0);
+
+  const renderSelectedOption = () => {
+    if (company) {
+      switch (selectedOption) {
+        case 0:
+          return <CompanyConfig />;
+        case 1:
+          return <CompanyDownload />;
+        case 2:
+          return <CompanyDepartments company={company} />;
+        case 3:
+          return <CompanyEmployees />;
+        case 4:
+          return <CompanyQuestions company={company} />;
+        default:
+          return <CompanyConfig />;
+      }
+    }
+  };
   if (company === null) {
     return <p>Loading company...</p>;
   }
@@ -35,10 +55,7 @@ export default function Company() {
           <CompanyOptions setSelectedOption={setSelectedOption} />
         </div>
         <div className="flex flex-col  flex-1 pl-5">
-          {selectedOption === 0 && <CompanyConfig />}
-          {selectedOption === 1 && <CompanyDownload />}
-          {selectedOption === 2 && <CompanyDepartments company={company} />}
-          {selectedOption === 3 && <CompanyEmployees />}
+          {renderSelectedOption()}
         </div>
       </div>
       {/* I want to show a spinner while the image loads, and when it finally loads show the image and hide the spinner */}
