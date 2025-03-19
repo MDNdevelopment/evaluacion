@@ -47,6 +47,7 @@ export function QuestionDialog({
 
   const [savedText, setSavedText] = useState("");
   const [savedTags, setSavedTags] = useState<string[]>([]);
+  const [savedPositions, setSavedPositions] = useState<Position[]>([]);
   const fetchQuestion = async () => {
     const { data, error } = await supabase
       .from("questions")
@@ -120,7 +121,6 @@ export function QuestionDialog({
           toast.error("Error al actualizar la pregunta - AP-01");
           return;
         }
-        changed = true;
       }
 
       if (JSON.stringify(newTags) !== JSON.stringify(savedTags)) {
@@ -162,6 +162,51 @@ export function QuestionDialog({
           console.log(data);
         });
       }
+
+      if (JSON.stringify(newPositions) !== JSON.stringify(markedPositions)) {
+        const removePositions = markedPositions.filter(
+          (position) => newPositions.indexOf(position) === -1
+        );
+        const addPositions = newPositions.filter(
+          (position) => markedPositions.indexOf(position) === -1
+        );
+
+        //delete positions
+        removePositions.forEach(async (position: number) => {
+          const response = await supabase
+            .from("question_positions")
+            .delete()
+            .eq("position_id", position)
+            .eq("question_id", questionId);
+
+          if (response.error) {
+            console.log(response.error.message);
+            toast.error("Error al actualizar la pregunta - AP-05");
+            return;
+          }
+
+          console.log(data);
+        });
+
+        //add positions
+        addPositions.forEach(async (position: number) => {
+          const { data, error } = await supabase
+            .from("question_positions")
+            .insert({
+              position_id: position,
+              question_id: questionId,
+            });
+
+          if (error) {
+            console.log(error.message);
+            toast.error("Error al actualizar la pregunta - AP-04");
+            return;
+          }
+
+          console.log(data);
+        });
+      }
+
       toast.success("Pregunta actualizada correctamente", {
         position: "bottom-right",
       });
