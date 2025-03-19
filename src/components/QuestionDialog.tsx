@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PositionSelector } from "./PositionSelector";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
@@ -18,71 +18,223 @@ import { Company, Position } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
+import { DropdownMenuItem } from "./ui/dropdown-menu";
+import { FaPen } from "react-icons/fa";
 
 export function QuestionDialog({
   company,
   positions,
+  setFetchingQuestions,
+  questionId = null,
 }: {
   company: Company;
   positions: { [key: string]: Position[] };
+  setFetchingQuestions: React.Dispatch<React.SetStateAction<boolean>>;
+  questionId?: number | null;
 }) {
   const methods = useForm({
     defaultValues: {
       question: "",
-      positions: null,
+      positions: [],
+      tags: "",
     },
   });
 
-  console.log(company);
-  const [_selectedPosition, setSelectedPosition] = useState(null);
+  const [selectedPosition, setSelectedPosition] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [_newQuestion, setNewQuestion] = useState("");
+  const [newQuestion, setNewQuestion] = useState("");
+  const [markedPositions, setMarkedPositions] = useState<number[]>([]);
+
+  const [savedText, setSavedText] = useState("");
+  const [savedTags, setSavedTags] = useState<string[]>([]);
+  const fetchQuestion = async () => {
+    const { data, error } = await supabase
+      .from("questions")
+      .select(
+        "*, positions:question_positions(position_id), tags:question_tags(tag)"
+      )
+      .eq("id", questionId)
+      .single();
+    if (error) {
+      console.log(error.message);
+      return;
+    }
+    console.log(data);
+    methods.setValue("question", data.text);
+    setSavedText(data.text);
+    const tagsArray = data.tags.map((tag: any) => {
+      return tag.tag;
+    });
+
+    setSavedTags(tagsArray);
+    methods.setValue("tags", tagsArray.join(", "));
+    const positionsArray = data.positions.map(
+      (position: { position_id: number }) => position.position_id
+    );
+    setMarkedPositions(positionsArray);
+  };
+
+  useEffect(() => {
+    if (questionId && isOpen) {
+      //The user is editing a question
+      fetchQuestion();
+    }
+    return;
+  }, [questionId, isOpen]);
 
   var isValid = !(
-    methods.watch("question") === "" || methods.watch("positions") === null
+    methods.watch("question") === "" || methods.watch("positions").length === 0
   );
 
   const handleClose = () => {
     setIsOpen(false);
+    setFetchingQuestions(true);
+
+    console.log("closiiing");
   };
 
-  const onSubmit = async (data: any) => {
-    // insert question into the database
-    const { data: questionResult, error } = await supabase
-      .from("questions")
-      .insert({
-        text: data.question,
-      })
-      .select()
-      .single();
+  const onSubmit = async (data: {
+    question: string;
+    positions: number[];
+    tags: string;
+  }) => {
+    if (questionId) {
+      // update question in the database
+      const newPositions = data.positions;
+      const newText: string = data.question;
+      const newTags = convertTags(data.tags);
 
-    if (error) {
-      console.log(error.message);
-      toast.error("Error al agregar la pregunta - EP01");
-      return;
-    }
-    //insert the question-position relation into the question_positions table
-    data.positions.forEach(async (position: number) => {
-      const { error: positionError } = await supabase
-        .from("question_positions")
-        .insert({
-          question_id: questionResult.id,
-          position_id: position,
+      if (newText !== savedText) {
+        console.log("the text is different");
+        console.log({ questionId });
+        //update the question's text
+        const { data, error: textError } = await supabase
+          .from("questions")
+          .update({
+            text: newText,
+          })
+          .eq("id", questionId);
+
+        if (textError) {
+          console.log(textError.message);
+          toast.error("Error al actualizar la pregunta - AP-01");
+          return;
+        }
+        changed = true;
+      }
+
+      if (JSON.stringify(newTags) !== JSON.stringify(savedTags)) {
+        const removeTags = savedTags.filter(
+          (tag) => newTags.indexOf(tag) === -1
+        );
+        const addTags = newTags.filter((tag) => savedTags.indexOf(tag) === -1);
+
+        //delete tags
+        removeTags.forEach(async (tag: string) => {
+          const response = await supabase
+            .from("question_tags")
+            .delete()
+            .eq("tag", tag)
+            .eq("question_id", questionId);
+
+          if (response.error) {
+            console.log(response.error.message);
+            toast.error("Error al actualizar la pregunta - AP-03");
+            return;
+          }
+
+          console.log(data);
         });
 
-      if (positionError) {
-        console.log(positionError.message);
-        toast.error("Error al agregar la pregunta - EP02");
+        //add tags
+        addTags.forEach(async (tag: string) => {
+          const { data, error } = await supabase.from("question_tags").insert({
+            tag: tag,
+            question_id: questionId,
+          });
+
+          if (error) {
+            console.log(error.message);
+            toast.error("Error al actualizar la pregunta - AP-02");
+            return;
+          }
+
+          console.log(data);
+        });
+      }
+      toast.success("Pregunta actualizada correctamente", {
+        position: "bottom-right",
+      });
+      return;
+    } else {
+      // insert question into the database
+      const { data: questionResult, error } = await supabase
+        .from("questions")
+        .insert({
+          text: data.question,
+          company_id: company.id,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.log(error.message);
+        toast.error("Error al agregar la pregunta - EP01");
         return;
       }
+      //insert the question-position relation into the question_positions table
+      data.positions.forEach(async (position: number) => {
+        const { error: positionError } = await supabase
+          .from("question_positions")
+          .insert({
+            question_id: questionResult.id,
+            position_id: position,
+          });
+
+        if (positionError) {
+          console.log(positionError.message);
+          toast.error("Error al agregar la pregunta - EP02");
+          return;
+        }
+      });
+
+      const tagsList = convertTags(data.tags);
+
+      //insert the tags into the tags table
+      tagsList.forEach(async (tag: string) => {
+        const { error: tagError } = await supabase
+          .from("question_tags")
+          .insert({
+            tag: tag,
+            question_id: questionResult.id,
+          });
+
+        if (tagError) {
+          console.log(tagError.message);
+          toast.error("Error al agregar la pregunta - EP03");
+          return;
+        }
+
+        console.log("added new tag");
+      });
+
+      console.log(tagsList);
+      toast.success("Pregunta agregada correctamente", {
+        position: "bottom-right",
+      });
+    }
+    methods.setValue("question", "");
+  };
+
+  function convertTags(tags: string) {
+    let tagsList = tags.split(",").filter((tag: string) => tag.trim() !== "");
+    tagsList = tagsList.map((tag: string) => {
+      tag = tag.trim();
+      return tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
     });
 
-    toast.success("Pregunta agregada correctamente", {
-      position: "bottom-right",
-    });
-    methods.setValue("question", "");
-    console.log(data);
-  };
+    return tagsList;
+  }
 
   return (
     <Dialog
@@ -93,15 +245,25 @@ export function QuestionDialog({
       }}
     >
       <DialogTrigger asChild>
-        <Button
-          className="bg-green-600 rounded-md py-1 px-3 text-white font-bold border-r-2 border-r-green-700 border-b-2 border-b-green-700  transition-all ease-linear text-md hover:bg-green-700 hover:text-white"
-          onClick={() => setIsOpen(true)}
-          variant="outline"
-        >
-          Agregar pregunta
-        </Button>
+        {!questionId ? (
+          <Button
+            className="bg-green-600 rounded-md py-1 px-3 text-white font-bold border-r-2 border-r-green-700 border-b-2 border-b-green-700  transition-all ease-linear text-md hover:bg-green-700 hover:text-white"
+            onClick={() => setIsOpen(true)}
+            variant="outline"
+          >
+            Agregar pregunta
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="w-full p-2  text-darkText flex items-center justify-center"
+            variant="ghost"
+          >
+            <FaPen className="mr-2" />
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[1125px] [&>button]:hidden max-h-[50rem] overflow-y-scroll">
+      <DialogContent className="sm:max-w-[1125px] [&>button]:hidden max-h-[50rem] overflow-y-scroll ">
         <DialogClose asChild={true}>
           <XIcon
             className=" absolute top-3 right-3 flex flex-row justify-self-end cursor-pointer"
@@ -115,6 +277,7 @@ export function QuestionDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          {JSON.stringify(methods.watch("positions"))}
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Label htmlFor="name" className="text-right">
@@ -124,9 +287,22 @@ export function QuestionDialog({
                 className={`col-span-3 border-2 border-gray-400`}
                 {...methods.register("question")}
               />
+
+              <Label htmlFor="name" className="text-right">
+                Tags{" "}
+                <span className="text-gray-400 italic text-xs">(opcional)</span>
+              </Label>
+              <Input
+                placeholder="Escribe los tags separados por comas. Ejemplo: diseño, jefes, etc."
+                className={`col-span-3 border-2 border-gray-400`}
+                {...methods.register("tags")}
+              />
               <div className="">
                 {/* Select the positions where the question will be available */}
-                <PositionSelector positions={positions} />
+                <PositionSelector
+                  markedPositions={markedPositions}
+                  positions={positions}
+                />
               </div>
 
               <div className="flex flex-row justify-center ">
@@ -139,7 +315,7 @@ export function QuestionDialog({
                   type="submit"
                   disabled={!isValid}
                 >
-                  Agregar
+                  {questionId ? "Actualizar" : "Agregar"}
                 </button>
               </div>
             </form>

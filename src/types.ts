@@ -13,3 +13,17 @@ export interface Position {
   departmentName: string;
   departmentId: string;
 }
+
+export interface Question {
+  id: number;
+  text: string;
+  company_id: string;
+  positions: {
+    id: number;
+    name: string;
+  }[];
+  tags: {
+    tag: string;
+    id: number;
+  }[];
+}

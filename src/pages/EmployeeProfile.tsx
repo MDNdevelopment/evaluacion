@@ -54,7 +54,7 @@ export default function EmployeeProfile() {
     const { data: evaluations, error: evaluationsError } = await supabase
       .from("evaluation_sessions")
       .select(
-        "id, total_score, period, evaluation_responses(*, questionData:questions(text, categories(name))) "
+        "id, total_score, period, evaluation_responses(*, questionData:questions(text)) "
       )
       .eq("employee_id", id);
 

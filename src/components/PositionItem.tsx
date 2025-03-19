@@ -1,23 +1,53 @@
 import { Position } from "@/types";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
 export default function PositionItem({
   position,
-  departmentName,
+  markedPositions,
 }: {
   position: Position;
-  departmentName: string;
+  markedPositions: number[];
 }) {
-  const { register } = useFormContext();
-  console.log(departmentName);
+  const { setValue, getValues, watch } = useFormContext();
+
+  // Watch the current state of "positions" in the form
+  const positions = watch("positions") || [];
+
+  // Set initial checked state based on `markedPositions`
+  useEffect(() => {
+    if (markedPositions.includes(position.id)) {
+      const currentPositions = getValues("positions") || [];
+      if (!currentPositions.includes(position.id)) {
+        setValue("positions", [...currentPositions, position.id]);
+      }
+    }
+  }, [markedPositions, position.id, getValues, setValue]);
+
+  // Handle manual toggle of the checkbox
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const currentPositions = getValues("positions") || [];
+    if (event.target.checked) {
+      // Add the position ID if checked
+      setValue("positions", [...currentPositions, position.id]);
+    } else {
+      // Remove the position ID if unchecked
+      setValue(
+        "positions",
+        currentPositions.filter((id: number) => id !== position.id)
+      );
+    }
+  };
+
   return (
     <div key={`${position.id}-${position.name}`}>
       <label key={position.id}>
         <input
-          className="my-2 "
+          className="my-2"
           type="checkbox"
           value={position.id}
-          {...register(`positions`)}
+          checked={positions.includes(position.id)} // Controlled by the form state
+          onChange={handleChange} // Handle manual toggle
         />
         <span className="ml-2 text-sm">{position.name}</span>
       </label>
