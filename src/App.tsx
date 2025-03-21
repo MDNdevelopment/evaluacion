@@ -64,6 +64,7 @@ function App() {
 
   useEffect(() => {
     checkSession();
+    console.log("APP RE RENDERED");
   }, []);
   return (
     <>

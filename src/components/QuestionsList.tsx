@@ -32,13 +32,9 @@ import { QuestionDialog } from "./QuestionDialog";
 import { FaTrash } from "react-icons/fa";
 
 export default function QuestionsList({
-  questions,
-  setFetchingQuestions,
   company,
   positions,
 }: {
-  questions: Question[];
-  setFetchingQuestions: React.Dispatch<React.SetStateAction<boolean>>;
   company: Company;
   positions: { [key: string]: Position[] };
 }) {
@@ -48,15 +44,49 @@ export default function QuestionsList({
   const [rowSelection, setRowSelection] = useState({});
   const [itemsPerPage, _setItemsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>(
-    questions.slice(0, 10)
-  );
+  const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+
+  const [fetchingQuestions, setFetchingQuestions] = useState(true);
+
+  const fetchQuestions = async () => {
+    console.log("fetching questions");
+    const { data, error } = await supabase
+      .from("questions")
+      .select(
+        "*, positions:question_positions(...positions(id, name)),tags:question_tags(id, tag)"
+      )
+      .eq("company_id", company.id);
+
+    if (error) {
+      console.log(error.message);
+      return;
+    }
+    if (data && data.length > 0) {
+      console.log(data);
+      //sort the questions based on the creation date, newest first
+      const sortedQuestions = data.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      console.log(sortedQuestions);
+      setQuestions(sortedQuestions);
+      setDisplayedQuestions(data.slice(0, 10));
+      return;
+    }
+    setQuestions([]);
+    setDisplayedQuestions([]);
+  };
 
   useEffect(() => {
-    if (questions.length > 0) {
-      setDisplayedQuestions(questions.slice(0, 10));
+    console.log("MOUNTING QUESTION LIST");
+    if (fetchingQuestions) {
+      fetchQuestions();
+      setFetchingQuestions(false);
     }
-  }, [questions]);
+  }, [company, fetchingQuestions]);
+
   const handleDeleteQuestion = async (questionId: number) => {
     // delete question from the database
     const response = await supabase
@@ -72,6 +102,7 @@ export default function QuestionsList({
 
     toast.success("Pregunta eliminada correctamente", {
       position: "bottom-right",
+      autoClose: 1000,
     });
 
     setFetchingQuestions(true);
@@ -121,8 +152,8 @@ export default function QuestionsList({
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize pl-3 w-full flex flex-col items-start">
-          P: {row.original.text}
+        <div className=" pl-3 w-full flex flex-col items-start">
+          {row.original.text}
           <div className="mt-4">
             <div className="flex flex-row fles-wrap">
               {row.original.tags.length > 0 &&
@@ -209,6 +240,12 @@ export default function QuestionsList({
 
   return (
     <>
+      <QuestionDialog
+        company={company}
+        setFetchingQuestions={setFetchingQuestions}
+        positions={positions}
+        questionId={null}
+      />
       <div className="max-w-[1200px] mx-auto">
         <div className="flex flex-row justify-between items-end py-4 ">
           <Input
@@ -248,33 +285,6 @@ export default function QuestionsList({
               Página {currentPage + 1} de {Math.ceil(questions.length / 10)}
             </p>
           </div>
-
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columnas <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu> */}
         </div>
 
         <div className="rounded-md border">
@@ -301,6 +311,7 @@ export default function QuestionsList({
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
+                    className="hover:bg-gray-100 transition-all ease-linear"
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
@@ -320,7 +331,7 @@ export default function QuestionsList({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No hay preguntas.
                   </TableCell>
                 </TableRow>
               )}
@@ -340,50 +351,3 @@ function Tag({ text }: { text: string }) {
     </div>
   );
 }
-
-/*
-
-<div className="w-full mt-5 pr-4 overflow-y-scroll max-h-[50rem]">
-      {questions.map((question) => (
-        <div
-          key={question.id}
-          className="border-t  border-gray-300 p-3 flex  flex-row flex-wrap items-center justify-between"
-        >
-          <div>
-            <span className="w-4/6 font-medium ">{question.text}</span>
-            <div>
-              {question.tags.length > 0 && (
-                <div className="w-full  flex flex-col items-start mt-3">
-                  <span className="text-xs font-medium text-italic mb-1 ">
-                    Etiquetas:
-                  </span>
-                  <div className="flex flex-row flesx-wrap">
-                    {question.tags.length > 0 &&
-                      question.tags.map((tag) => {
-                        return <Tag key={tag.id} text={tag.tag} />;
-                      })}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col w-1/6 items-start">
-            <div>
-              <p className="text-xs my-1">
-                <span className="font-bold">Se aplica a: </span>
-                {question.positions.length} cargos
-              </p>
-            </div>
-            <div className="flex flex-row w-full justify-start ">
-              <FaPencilAlt />
-              <FaTrashAlt
-                className="cursor-pointer"
-                onClick={() => handleDeleteQuestion(question.id)}
-              />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-    */

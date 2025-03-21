@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCompanyStore } from "@/stores/useCompanyStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyOptions } from "../components/CompanyOptions";
@@ -7,11 +7,16 @@ import CompanyDownload from "@/components/CompanyDownload";
 import CompanyDepartments from "@/components/CompanyDepartments";
 import CompanyEmployees from "@/components/CompanyEmployees";
 import CompanyQuestions from "@/components/CompanyQuestions";
+import { shallow } from "zustand/shallow";
 
 export default function Company() {
-  const company = useCompanyStore((state) => state.company);
+  const company = useCompanyStore((state) => state.company, shallow);
   const [logoIsLoading, setLogoIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(0);
+
+  useEffect(() => {
+    console.log("COMPANY RE RENDERED");
+  }, []);
 
   const renderSelectedOption = () => {
     if (company) {
@@ -34,6 +39,7 @@ export default function Company() {
   if (company === null) {
     return <p>Loading company...</p>;
   }
+
   return (
     <div className="max-w-[1200px] pt-10 mx-auto flex flex-col ">
       <div className="flex flex-row items-stretch  ">

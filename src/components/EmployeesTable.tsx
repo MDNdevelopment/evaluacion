@@ -39,6 +39,7 @@ import EvaluationForm from "./EvaluationForm";
 import { useNavigate } from "react-router-dom";
 import { CheckEvaluation } from "./CheckEvaluation";
 import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
+import { shallow } from "zustand/shallow";
 
 export type Employee = {
   company_id: string;
@@ -56,12 +57,18 @@ export function EmployeesTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const { firstDay } = getPastMonthRange();
   const [rowSelection, setRowSelection] = useState({});
-  const company = useCompanyStore((state) => state.company);
-  const user = useUserStore((state) => state.user);
+  const company = useCompanyStore((state) => state.company, shallow);
+  const user = useUserStore((state) => state.user, shallow);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getEmployees();
+    setEvaluation(null);
+    console.log("EmployeesTable Rendered");
+  }, [company, isLoading]);
 
   const columns: ColumnDef<Employee>[] = [
     {
@@ -154,9 +161,10 @@ export function EmployeesTable() {
           />
         ) : (
           <EvaluationForm
-            userId={row.original.user_id}
-            userPosition={row.original.positions.id.toString()}
-            userName={`${row.original.first_name} ${row.original.last_name}`}
+            userId={user.id}
+            employeeId={row.original.user_id}
+            employeePosition={row.original.positions.id.toString()}
+            employeeName={`${row.original.first_name} ${row.original.last_name}`}
             setTableIsLoading={setIsLoading}
           />
         );
@@ -256,11 +264,6 @@ export function EmployeesTable() {
       console.log("no company");
     }
   };
-
-  useEffect(() => {
-    getEmployees();
-    setEvaluation(null);
-  }, [company, isLoading]);
 
   const table = useReactTable({
     data: employees,

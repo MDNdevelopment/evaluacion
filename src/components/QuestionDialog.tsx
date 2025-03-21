@@ -18,7 +18,6 @@ import { Company, Position } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
-import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { FaPen } from "react-icons/fa";
 
 export function QuestionDialog({
@@ -40,14 +39,14 @@ export function QuestionDialog({
     },
   });
 
-  const [selectedPosition, setSelectedPosition] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [newQuestion, setNewQuestion] = useState("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [markedPositions, setMarkedPositions] = useState<number[]>([]);
 
   const [savedText, setSavedText] = useState("");
   const [savedTags, setSavedTags] = useState<string[]>([]);
-  const [savedPositions, setSavedPositions] = useState<Position[]>([]);
+  const [savedPositions, setSavedPositions] = useState<number[]>([]);
+  const [uploadingData, setUploadingData] = useState(false);
+
   const fetchQuestion = async () => {
     const { data, error } = await supabase
       .from("questions")
@@ -73,9 +72,12 @@ export function QuestionDialog({
       (position: { position_id: number }) => position.position_id
     );
     setMarkedPositions(positionsArray);
+    setSavedPositions(positionsArray);
   };
 
   useEffect(() => {
+    console.log("MOUNTING QUESTIONDIALOG", questionId);
+
     if (questionId && isOpen) {
       //The user is editing a question
       fetchQuestion();
@@ -87,11 +89,187 @@ export function QuestionDialog({
     methods.watch("question") === "" || methods.watch("positions").length === 0
   );
 
+  var sameText = methods.watch("question") === savedText;
+  var samePositions =
+    JSON.stringify(methods.watch("positions").sort((a, b) => a - b)) ===
+    JSON.stringify(savedPositions.sort((a, b) => a - b));
+  var sameTags =
+    savedTags.join(", ").toLowerCase() === methods.watch("tags").toLowerCase();
+
+  var isTheSame = sameText && samePositions && sameTags;
+
+  const handleCreateQuestion = async (data: any) => {
+    // insert question into the database
+    const { data: questionResult, error } = await supabase
+      .from("questions")
+      .insert({
+        text: data.question,
+        company_id: company.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.log(error.message);
+      toast.error("Error al agregar la pregunta - EP01");
+      return;
+    }
+
+    const tagsList = convertTags(data.tags);
+
+    //insert the tags into the tags table
+    tagsList.forEach(async (tag: string) => {
+      const { error: tagError } = await supabase.from("question_tags").insert({
+        tag: tag,
+        question_id: questionResult.id,
+      });
+
+      if (tagError) {
+        console.log(tagError.message);
+        toast.error("Error al agregar la pregunta - EP03");
+        return;
+      }
+    });
+
+    //insert the question-position relation into the question_positions table
+    data.positions.forEach(async (position: number) => {
+      const { error: positionError } = await supabase
+        .from("question_positions")
+        .insert({
+          question_id: questionResult.id,
+          position_id: position,
+        });
+
+      if (positionError) {
+        console.log(positionError.message);
+        toast.error("Error al agregar la pregunta - EP02");
+        return;
+      }
+    });
+
+    toast.success("Pregunta agregada correctamente", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
+  };
+
+  const handleUpdateQuestion = async (data: any) => {
+    // update question in the database
+    const newPositions = data.positions;
+    const newText: string = data.question;
+    const newTags = convertTags(data.tags);
+
+    if (newText !== savedText) {
+      console.log("the text is different");
+      console.log({ questionId });
+      //update the question's text
+      const { error: textError } = await supabase
+        .from("questions")
+        .update({
+          text: newText,
+        })
+        .eq("id", questionId);
+
+      if (textError) {
+        console.log(textError.message);
+        toast.error("Error al actualizar la pregunta - AP-01");
+        return;
+      }
+    }
+
+    if (JSON.stringify(newTags) !== JSON.stringify(savedTags)) {
+      const removeTags = savedTags.filter((tag) => newTags.indexOf(tag) === -1);
+      const addTags = newTags.filter((tag) => savedTags.indexOf(tag) === -1);
+
+      //delete tags
+      removeTags.forEach(async (tag: string) => {
+        const response = await supabase
+          .from("question_tags")
+          .delete()
+          .eq("tag", tag)
+          .eq("question_id", questionId);
+
+        if (response.error) {
+          console.log(response.error.message);
+          toast.error("Error al actualizar la pregunta - AP-03");
+          return;
+        }
+
+        console.log(data);
+      });
+
+      //add tags
+      addTags.forEach(async (tag: string) => {
+        const { data, error } = await supabase.from("question_tags").insert({
+          tag: tag,
+          question_id: questionId,
+        });
+
+        if (error) {
+          console.log(error.message);
+          toast.error("Error al actualizar la pregunta - AP-02");
+          return;
+        }
+
+        console.log(data);
+      });
+    }
+
+    if (
+      JSON.stringify(newPositions.sort((a: number, b: number) => a - b)) !==
+      JSON.stringify(markedPositions.sort((a, b) => a - b))
+    ) {
+      const removePositions = markedPositions.filter(
+        (position) => newPositions.indexOf(position) === -1
+      );
+      const addPositions = newPositions.filter(
+        (position: number) => markedPositions.indexOf(position) === -1
+      );
+
+      //delete positions
+      removePositions.forEach(async (position: number) => {
+        const response = await supabase
+          .from("question_positions")
+          .delete()
+          .eq("position_id", position)
+          .eq("question_id", questionId);
+
+        if (response.error) {
+          console.log(response.error.message);
+          toast.error("Error al actualizar la pregunta - AP-05");
+          return;
+        }
+
+        console.log(data);
+      });
+
+      //add positions
+      addPositions.forEach(async (position: number) => {
+        console.log("Adding position", position);
+        const { data, error } = await supabase
+          .from("question_positions")
+          .insert({
+            position_id: position,
+            question_id: questionId,
+          });
+
+        if (error) {
+          console.log(error.message);
+          toast.error("Error al actualizar la pregunta - AP-06");
+          return;
+        }
+
+        console.log(data);
+      });
+    }
+
+    toast.success("Pregunta actualizada correctamente", {
+      position: "bottom-right",
+    });
+  };
+
   const handleClose = () => {
     setIsOpen(false);
-    setFetchingQuestions(true);
-
-    console.log("closiiing");
   };
 
   const onSubmit = async (data: {
@@ -99,176 +277,22 @@ export function QuestionDialog({
     positions: number[];
     tags: string;
   }) => {
+    setUploadingData(true);
     if (questionId) {
-      // update question in the database
-      const newPositions = data.positions;
-      const newText: string = data.question;
-      const newTags = convertTags(data.tags);
-
-      if (newText !== savedText) {
-        console.log("the text is different");
-        console.log({ questionId });
-        //update the question's text
-        const { data, error: textError } = await supabase
-          .from("questions")
-          .update({
-            text: newText,
-          })
-          .eq("id", questionId);
-
-        if (textError) {
-          console.log(textError.message);
-          toast.error("Error al actualizar la pregunta - AP-01");
-          return;
-        }
-      }
-
-      if (JSON.stringify(newTags) !== JSON.stringify(savedTags)) {
-        const removeTags = savedTags.filter(
-          (tag) => newTags.indexOf(tag) === -1
-        );
-        const addTags = newTags.filter((tag) => savedTags.indexOf(tag) === -1);
-
-        //delete tags
-        removeTags.forEach(async (tag: string) => {
-          const response = await supabase
-            .from("question_tags")
-            .delete()
-            .eq("tag", tag)
-            .eq("question_id", questionId);
-
-          if (response.error) {
-            console.log(response.error.message);
-            toast.error("Error al actualizar la pregunta - AP-03");
-            return;
-          }
-
-          console.log(data);
-        });
-
-        //add tags
-        addTags.forEach(async (tag: string) => {
-          const { data, error } = await supabase.from("question_tags").insert({
-            tag: tag,
-            question_id: questionId,
-          });
-
-          if (error) {
-            console.log(error.message);
-            toast.error("Error al actualizar la pregunta - AP-02");
-            return;
-          }
-
-          console.log(data);
-        });
-      }
-
-      if (JSON.stringify(newPositions) !== JSON.stringify(markedPositions)) {
-        const removePositions = markedPositions.filter(
-          (position) => newPositions.indexOf(position) === -1
-        );
-        const addPositions = newPositions.filter(
-          (position) => markedPositions.indexOf(position) === -1
-        );
-
-        //delete positions
-        removePositions.forEach(async (position: number) => {
-          const response = await supabase
-            .from("question_positions")
-            .delete()
-            .eq("position_id", position)
-            .eq("question_id", questionId);
-
-          if (response.error) {
-            console.log(response.error.message);
-            toast.error("Error al actualizar la pregunta - AP-05");
-            return;
-          }
-
-          console.log(data);
-        });
-
-        //add positions
-        addPositions.forEach(async (position: number) => {
-          const { data, error } = await supabase
-            .from("question_positions")
-            .insert({
-              position_id: position,
-              question_id: questionId,
-            });
-
-          if (error) {
-            console.log(error.message);
-            toast.error("Error al actualizar la pregunta - AP-04");
-            return;
-          }
-
-          console.log(data);
-        });
-      }
-
-      toast.success("Pregunta actualizada correctamente", {
-        position: "bottom-right",
-      });
-      return;
+      await handleUpdateQuestion(data);
     } else {
-      // insert question into the database
-      const { data: questionResult, error } = await supabase
-        .from("questions")
-        .insert({
-          text: data.question,
-          company_id: company.id,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.log(error.message);
-        toast.error("Error al agregar la pregunta - EP01");
-        return;
-      }
-      //insert the question-position relation into the question_positions table
-      data.positions.forEach(async (position: number) => {
-        const { error: positionError } = await supabase
-          .from("question_positions")
-          .insert({
-            question_id: questionResult.id,
-            position_id: position,
-          });
-
-        if (positionError) {
-          console.log(positionError.message);
-          toast.error("Error al agregar la pregunta - EP02");
-          return;
-        }
-      });
-
-      const tagsList = convertTags(data.tags);
-
-      //insert the tags into the tags table
-      tagsList.forEach(async (tag: string) => {
-        const { error: tagError } = await supabase
-          .from("question_tags")
-          .insert({
-            tag: tag,
-            question_id: questionResult.id,
-          });
-
-        if (tagError) {
-          console.log(tagError.message);
-          toast.error("Error al agregar la pregunta - EP03");
-          return;
-        }
-
-        console.log("added new tag");
-      });
-
-      console.log(tagsList);
-      toast.success("Pregunta agregada correctamente", {
-        position: "bottom-right",
-      });
+      await handleCreateQuestion(data);
     }
-    methods.setValue("question", "");
+
+    await setTimeout(() => {
+      setFetchingQuestions(true);
+      setIsOpen(false);
+      setUploadingData(false);
+      methods.setValue("question", "");
+      methods.setValue("tags", "");
+      methods.setValue("positions", []);
+    }, 500);
+    return;
   };
 
   function convertTags(tags: string) {
@@ -282,19 +306,13 @@ export function QuestionDialog({
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={() => {
-        setNewQuestion("");
-        setSelectedPosition(null);
-      }}
-    >
+    <Dialog open={isOpen}>
       <DialogTrigger asChild>
         {!questionId ? (
           <Button
-            className="bg-green-600 rounded-md py-1 px-3 text-white font-bold border-r-2 border-r-green-700 border-b-2 border-b-green-700  transition-all ease-linear text-md hover:bg-green-700 hover:text-white"
-            onClick={() => setIsOpen(true)}
             variant="outline"
+            className="cursor-pointer"
+            onClick={() => setIsOpen(true)}
           >
             Agregar pregunta
           </Button>
@@ -322,7 +340,6 @@ export function QuestionDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          {JSON.stringify(methods.watch("positions"))}
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <Label htmlFor="name" className="text-right">
@@ -350,30 +367,31 @@ export function QuestionDialog({
                 />
               </div>
 
-              <div className="flex flex-row justify-center ">
-                <button
-                  className={`mx-2 ${
-                    isValid
-                      ? "bg-green-600 hover:bg-green-700 cursor-pointer"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }  text-white rounded-md py-1 px-3 hover:text-white ease-linear transition-all`}
-                  type="submit"
-                  disabled={!isValid}
+              <DialogFooter className="flex flex-row justify-end items-end">
+                <div className="flex flex-row justify-center ">
+                  <Button
+                    className={`mx-2 ${
+                      isValid && !isTheSame && !uploadingData
+                        ? "bg-green-600 hover:bg-green-700 cursor-pointer"
+                        : "bg-gray-400 cursor-not-allowed"
+                    }  text-white rounded-md py-1 px-3 hover:text-white ease-linear transition-all`}
+                    type="submit"
+                    disabled={!isValid || isTheSame || uploadingData}
+                  >
+                    {questionId ? "Actualizar" : "Agregar"}
+                  </Button>
+                </div>
+                <Button
+                  onClick={handleClose}
+                  className="bg-darkText hover:bg-darkText-darker"
+                  type="button"
                 >
-                  {questionId ? "Actualizar" : "Agregar"}
-                </button>
-              </div>
+                  Cancelar
+                </Button>
+              </DialogFooter>
             </form>
           </FormProvider>
         </div>
-        <DialogFooter className="flex flex-row justify-end items-end">
-          <Button
-            onClick={handleClose}
-            className="bg-darkText hover:bg-darkText-darker"
-          >
-            Terminé
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -6,6 +6,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { useUserStore } from "@/stores/useUserStore";
+import { useEffect } from "react";
 
 //Function to check if the user is authenticated
 const isAuthenticated = () => {
@@ -50,6 +51,10 @@ export const PrivateRoute = ({ children }: Props) => {
   const user = useUserStore((state) => state.user);
   const session = useSessionStore((state) => state.session);
   const isSettingsPage = location.pathname === "/perfil";
+
+  useEffect(() => {
+    console.log("private route re rendered");
+  }, []);
 
   if (session === undefined) {
     return <p>Loading...</p>;

@@ -18,11 +18,11 @@ export interface Question {
   id: number;
   text: string;
   company_id: string;
-  positions: {
+  positions?: {
     id: number;
     name: string;
   }[];
-  tags: {
+  tags?: {
     tag: string;
     id: number;
   }[];
