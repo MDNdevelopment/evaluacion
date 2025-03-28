@@ -37,7 +37,6 @@ import { supabase } from "@/services/supabaseClient";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import EvaluationForm from "./EvaluationForm";
 import { useNavigate } from "react-router-dom";
-import { CheckEvaluation } from "./CheckEvaluation";
 import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
 import { shallow } from "zustand/shallow";
 
@@ -146,26 +145,14 @@ export function EmployeesTable() {
       id: "evaluation",
       header: "Evaluación",
       cell: ({ row }) => {
-        const evaluation = row.original.evaluation;
-        return evaluation?.id ? (
-          <CheckEvaluation
-            evaluationId={evaluation.id}
-            setIsLoadingTable={setIsLoading}
-            employeeData={{
-              name: `${row.original.first_name} ${row.original.last_name}`,
-              position: row.original.positions.name,
-              department: Array.isArray(row.original.departments)
-                ? row.original.departments[0].name
-                : row.original.departments.name,
-            }}
-          />
-        ) : (
+        return (
           <EvaluationForm
-            userId={user.id}
+            userId={user?.id || ""}
             employeeId={row.original.user_id}
             employeePosition={row.original.positions.id.toString()}
             employeeName={`${row.original.first_name} ${row.original.last_name}`}
             setTableIsLoading={setIsLoading}
+            evaluationId={row.original.evaluation?.id}
           />
         );
       },

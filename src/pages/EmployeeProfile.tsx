@@ -5,6 +5,12 @@ import { supabase } from "../services/supabaseClient";
 
 import { useUserStore } from "../stores/useUserStore";
 // import { toast } from "react-toastify";
+
+import { EvaluationsGraphic } from "@/components/EvaluationsGraphic";
+import { formatScore } from "@/utils/scoreUtils";
+import EmployeeEvaluationsList from "@/components/EmpoloyeeEvaluationsList";
+import { getMonthName } from "@/utils/getMonthName";
+import { getScoreColor } from "@/utils/getScoreColor";
 import {
   Card,
   CardContent,
@@ -12,27 +18,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { EvaluationsGraphic } from "@/components/EvaluationsGraphic";
-import EmployeeEvaluationsList from "@/components/EmployeeEvaluationsList";
-import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
-import remapMonths from "@/utils/remapMoths";
+import { set } from "react-hook-form";
 
 export default function EmployeeProfile() {
   const { id } = useParams();
   const [employeeData, setEmployeeData] = useState<any>();
-  const [evaluationsData, setEvaluationsData] = useState<any>();
-  const [evaluationsChart, setEvaluationsChart] = useState<any>();
-  const [totalAverage, setTotalAverage] = useState<number | null>();
-  // const [averages, setAverages] = useState<any>(null);
+  const [evaluationsData, setEvaluationsData] = useState<any>(null);
+  const [evaluationsChart, setEvaluationsChart] = useState<any>([]);
+  const [totalAverage, setTotalAverage] = useState<number | null>(null);
   const user = useUserStore((state) => state.user);
-  const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setEvaluation(null);
-  }, [id]);
-
-  // const user = useUserStore((state) => state.user);
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
@@ -50,6 +45,14 @@ export default function EmployeeProfile() {
       return;
     }
 
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setEmployeeData(data);
+    setIsLoading(false);
+
     //Get the evaluations data
     const { data: evaluations, error: evaluationsError } = await supabase
       .from("evaluation_sessions")
@@ -62,120 +65,128 @@ export default function EmployeeProfile() {
       console.log(evaluationsError.message);
       return;
     }
-    //Group evaluations by month
-    const groupedEvaluations = evaluations?.reduce((agg: any, curr: any) => {
-      if (!agg[curr.period]) {
-        agg[curr.period] = [];
-      }
 
-      //Group the questions/answers by category for each evaluation
-      const groupedResponses = curr.evaluation_responses.reduce(
-        (responseAgg: any, responseCurr: any) => {
-          const categoryName = responseCurr.questionData.categories.name;
-          if (!responseAgg[categoryName]) {
-            responseAgg[categoryName] = {
-              questions: [],
-              totalQuestions: 0,
-              trueResponses: 0,
-              score: 0,
-            };
-          }
-          responseAgg[categoryName].questions.push({
-            question: responseCurr.questionData.text,
-            response: responseCurr.response,
-          });
-
-          responseAgg[categoryName].totalQuestions += 1;
-
-          if (responseCurr.response) {
-            responseAgg[categoryName].trueResponses += 1;
-          }
-          responseAgg[categoryName].score =
-            (responseAgg[categoryName].trueResponses /
-              responseAgg[categoryName].totalQuestions) *
-            10;
-
-          return responseAgg;
-        },
-        {}
-      );
-
-      agg[curr.period].push({
-        ...curr,
-        groupedResponses,
-      });
-
-      return agg;
-    }, {});
-
-    //Get the avg score for each category
-    const summedEvaluations = Object.keys(groupedEvaluations).reduce(
+    //Group evaluations by period
+    const groupedEvaluationsByDate = evaluations?.reduce(
       (agg: any, curr: any) => {
-        let period = curr.slice(0, -3).split("-").reverse().join("-");
-        period = `${remapMonths(period.split("-")[0])}-${period.split("-")[1]}`;
-        if (!agg[curr]) {
-          agg[curr] = {
-            totalRate: 0,
+        if (!agg[curr.period]) {
+          agg[curr.period] = {
             totalEvaluations: 0,
-            categories: {},
-            period: period,
+            totalScore: 0,
+            questions: {
+              totalQuestions: 0,
+              questionsData: [],
+            },
           };
         }
 
-        groupedEvaluations[curr].forEach((evaluation: any) => {
-          Object.keys(evaluation.groupedResponses).forEach((category: any) => {
-            if (!agg[curr].categories[category]) {
-              agg[curr].categories[category] = {
-                totalRate: 0,
-                totalEvaluations: 0,
-              };
-            }
+        agg[curr.period].totalEvaluations += 1;
+        agg[curr.period].totalScore += curr.total_score;
 
-            agg[curr].categories[category].totalRate +=
-              evaluation.groupedResponses[category].score;
-            agg[curr].categories[category].totalEvaluations += 1;
+        agg[curr.period].totalScore =
+          agg[curr.period].totalScore / agg[curr.period].totalEvaluations;
+
+        curr.evaluation_responses.forEach((response: any) => {
+          agg[curr.period].questions.totalQuestions += 1;
+          if (
+            !agg[curr.period].questions.questionsData.find(
+              (question: any) => question.text === response.questionData.text
+            )
+          ) {
+            agg[curr.period].questions.questionsData.push({
+              text: response.questionData.text,
+              totalResponses: 0,
+              totalScore: 0,
+              responses: [],
+            });
+          }
+
+          const questionIndex = agg[
+            curr.period
+          ].questions.questionsData.findIndex(
+            (question: any) => question.text === response.questionData.text
+          );
+          agg[curr.period].questions.questionsData[
+            questionIndex
+          ].totalResponses += 1;
+
+          agg[curr.period].questions.questionsData[questionIndex].totalScore +=
+            response.response;
+
+          //Save all the responses for each question
+          agg[curr.period].questions.questionsData[
+            questionIndex
+          ].responses.push({
+            response: response.response,
+            evaluationId: curr.id,
           });
-          agg[curr].totalRate += evaluation.total_score;
-          agg[curr].totalEvaluations += 1;
-        });
 
-        //Calculate the average for each category
-        Object.keys(agg[curr].categories).forEach((category: any) => {
-          agg[curr].categories[category].average =
-            //No estoy seguro pero creo que esta bien que divida el totalRate entre el total de evaluaciones de cada pregunta especifica porque puede que no todas las preguntas tengan la misma cantidad de evaluaciones si se hace un cambio en el periodo de evaluacion
-            agg[curr].categories[category].totalRate /
-            agg[curr].categories[category].totalEvaluations;
-        });
+          //Divide the totalScore by the number of responses to get the average score for that specific question
 
-        agg[curr].totalRate = (
-          agg[curr].totalRate / agg[curr].totalEvaluations
-        ).toFixed(2);
+          agg[curr.period].questions.questionsData[questionIndex].totalScore =
+            agg[curr.period].questions.questionsData[questionIndex].totalScore /
+            agg[curr.period].questions.questionsData[questionIndex]
+              .totalResponses;
+        });
 
         return agg;
       },
       {}
     );
 
-    const evaluationsArray = [];
-    for (const key in summedEvaluations) {
-      const element = summedEvaluations[key];
+    //Calculate the total average of all the evaluations
+    const totalScoreAllTime =
+      Object.keys(groupedEvaluationsByDate).reduce((agg: any, curr: any) => {
+        agg += groupedEvaluationsByDate[curr].totalScore;
+        return agg;
+      }, 0) / Object.keys(groupedEvaluationsByDate).length;
 
-      evaluationsArray.push(element);
+    const chartData: any[] = [];
+    //Set the chartData
+    Object.keys(groupedEvaluationsByDate).forEach((key) => {
+      const month: String = `${key.split("-")[1]} ${key.split("-")[0]}`;
+      chartData.push({
+        period: month,
+        totalScore: groupedEvaluationsByDate[key].totalScore,
+        totalEvaluations: groupedEvaluationsByDate[key].totalEvaluations,
+        scoreResult: groupedEvaluationsByDate[key].totalScore.toFixed(2),
+        formattedScore: formatScore(
+          parseFloat(groupedEvaluationsByDate[key].totalScore)
+        ),
+      });
+    });
+
+    // Helper function to parse the period into a Date object
+    const parsePeriodToDate = (period: string) => {
+      const [month, year] = period.trim().split(" ");
+      return new Date(parseInt(year), parseInt(month)); // Create a Date object
+    };
+
+    // Sort the chartData based on the parsed date
+    chartData.sort((a: any, b: any) => {
+      const dateA = parsePeriodToDate(a.period);
+      const dateB = parsePeriodToDate(b.period);
+      return dateA.getTime() - dateB.getTime(); // Sort in ascending order
+    });
+
+    chartData.forEach((data: any) => {
+      const [month, year] = data.period.split(" ");
+      data.period = `${getMonthName(month)} ${year}`;
+    });
+
+    if (Object.keys(groupedEvaluationsByDate).length > 0) {
+      setEvaluationsData(groupedEvaluationsByDate);
     }
 
-    let calcTotalAverage = evaluationsArray.reduce((acc, curr) => {
-      return acc + Number.parseFloat(curr.totalRate);
-    }, 0);
-
-    calcTotalAverage = calcTotalAverage / evaluationsArray.length;
-    setTotalAverage(calcTotalAverage);
-    setEvaluationsData(evaluationsArray);
-    setEvaluationsChart(summedEvaluations);
-    setIsLoading(false);
-    setEmployeeData(data);
+    //Set the states
+    setTotalAverage(totalScoreAllTime);
+    setEvaluationsChart(chartData);
+    // setIsLoading(false);
   };
 
   useEffect(() => {
+    setEvaluationsData(null);
+    setTotalAverage(null);
     retrieveEmployeeData();
   }, [id]);
 
@@ -199,59 +210,94 @@ export default function EmployeeProfile() {
               {employeeData.departments.name} - {employeeData.positions.name}
             </h4>
           </div>
-          <div className=" pt-10 mx-auto pb-5 lg:pb-0">
-            <Card className=" flex-1 h-full flex flex-col justify-between">
-              <div className="flex flex-row items-center pl-3">
-                <CardContent className="py-1 px-2 bg-primary rounded-md text-white flex justify-center items-center text-2xl mx-auto w-fit font-bold">
-                  {totalAverage ? totalAverage.toFixed(2) : 0}
-                </CardContent>
-                <CardHeader className="py-4">
-                  <CardTitle>Promedio Total</CardTitle>
-                  <CardDescription>
-                    Promedio generado a lo largo de los meses.
-                  </CardDescription>
-                </CardHeader>
+          <div className=" mx-auto pb-5 lg:pb-0">
+            <div className=" min-h-[7rem] flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
+              <div
+                className={`${
+                  totalAverage
+                    ? getScoreColor(Math.floor(totalAverage))
+                    : "bg-gray-400"
+                } w-2/5 flex items-center justify-center`}
+              >
+                <div className="flex flex-col font-black text-center text-white text-4xl uppercase">
+                  {totalAverage ? totalAverage.toFixed(2) : "N/A"}
+                  {!!totalAverage && (
+                    <span className="text-xs font-medium">
+                      (
+                      {totalAverage &&
+                        formatScore(parseFloat(totalAverage.toFixed(2)))}
+                      )
+                    </span>
+                  )}
+                </div>
               </div>
-
-              <div className="border-b w-60 mx-auto " />
-
-              <div className="flex flex-row items-center pl-3">
-                <CardContent className="py-1 px-2 bg-primary rounded-md text-white flex justify-center items-center text-2xl mx-auto w-fit font-bold">
-                  {evaluationsData.length > 0
-                    ? evaluationsData[evaluationsData.length - 1].totalRate
-                    : 0}
-                </CardContent>
-                <CardHeader className="py-4">
-                  <CardTitle className="flex flex-row">
-                    Promedio Actual{" "}
-                    {/* {evaluationsData.length > 1 &&
-                    totalAverage &&
-                    evaluationsData[evaluationsData.length - 1].total_rate <
-                      totalAverage ? (
-                      <FaArrowTrendDown
-                        size={20}
-                        className="ml-2 text-red-500"
-                      />
-                    ) : (
-                      <FaArrowTrendUp
-                        size={20}
-                        className="ml-2 text-green-500"
-                      />
-                    )} */}
-                  </CardTitle>
-                  <CardDescription>
-                    Promedio generado para el mes actual.
-                  </CardDescription>
-                </CardHeader>
+              <div className="w-3/5 p-3  flex flex-col justify-center">
+                <h4 className="font-bold">Promedio Total</h4>
+                <p className="text-sm  text-gray-500">
+                  Promedio generado a lo largo de los meses.
+                </p>
               </div>
-            </Card>
+            </div>
+
+            <div className="  min-h-[7rem] mt-3 flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
+              <div
+                className={`${
+                  totalAverage
+                    ? getScoreColor(
+                        evaluationsData[
+                          Object.keys(evaluationsData)[0]
+                        ].totalScore.toFixed(2)
+                      )
+                    : "bg-gray-400"
+                } w-2/5 flex items-center justify-center`}
+              >
+                <div className="flex flex-col font-black text-center text-white text-4xl uppercase">
+                  {evaluationsData
+                    ? evaluationsData[
+                        Object.keys(evaluationsData)[0]
+                      ]?.totalScore.toFixed(2)
+                    : "N/A"}
+
+                  {!!totalAverage && (
+                    <span className="text-xs font-medium">
+                      (
+                      {evaluationsData &&
+                        formatScore(
+                          parseFloat(
+                            evaluationsData[
+                              Object.keys(evaluationsData)[0]
+                            ]?.totalScore.toFixed(2)
+                          )
+                        )}
+                      )
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="w-3/5 p-3 flex flex-col justify-center">
+                <h4 className="font-bold">Promedio actual</h4>
+                <p className="text-sm  text-gray-500">
+                  Promedio generado para el mes actual.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+
         <div className="lg:w-3/4 w-full">
           {" "}
-          {<EvaluationsGraphic evaluationsData={evaluationsChart} />}
+          {<EvaluationsGraphic evaluationsArray={evaluationsChart} />}
         </div>
       </div>
+
+      {evaluationsData && (
+        <div className="flex flex-row">
+          <Promedios
+            current={evaluationsData[Object.keys(evaluationsData)[0]]}
+          />
+          <Promedios historic={evaluationsData} />
+        </div>
+      )}
 
       {user && user.role === "admin" && (
         <div className="mt-10">
@@ -278,3 +324,133 @@ export default function EmployeeProfile() {
     </div>
   );
 }
+
+const Promedios = ({
+  current,
+  historic,
+}: {
+  current?: any;
+  historic?: any;
+}) => {
+  console.log({ historic, current });
+  const [answersAvg, setAnswersAvg] = useState<any>([]);
+
+  const calculateHistoricAvg = (questions: any) => {
+    const avg = Object.keys(questions).reduce((acc: any, period: any) => {
+      const periodData = questions[period];
+      if (
+        !periodData ||
+        !periodData.questions ||
+        !periodData.questions.questionsData
+      ) {
+        console.warn("Missing questions data for period:", period);
+        return acc;
+      }
+
+      const questionsData = periodData.questions.questionsData;
+      questionsData.forEach(
+        (question: {
+          text: string;
+          responses: [
+            {
+              response: number;
+              evaluationId: number;
+            }
+          ];
+          totalResponses: number;
+          totalScore: number;
+        }) => {
+          if (!acc[question.text]) {
+            acc[question.text] = {
+              totalResponses: 0,
+              totalScore: 0,
+              text: question.text,
+            };
+          }
+
+          acc[question.text].totalResponses += 1;
+          acc[question.text].totalScore += question.totalScore;
+          acc[question.text].text = question.text;
+        }
+      );
+
+      return acc;
+    }, {});
+
+    Object.keys(avg).forEach((question: any) => {
+      avg[question].totalScore =
+        avg[question].totalScore / avg[question].totalResponses;
+    });
+
+    const avgArray: {
+      text: string;
+      totalScore: number;
+      totalResponses: number;
+    }[] = [];
+    Object.keys(avg).forEach((question: any) => {
+      avgArray.push(avg[question]);
+    });
+
+    setAnswersAvg(avgArray);
+  };
+
+  useEffect(() => {
+    if (historic) {
+      calculateHistoricAvg(historic);
+      return;
+    }
+
+    setAnswersAvg(current.questions.questionsData);
+  }, [historic, current]);
+  return (
+    <Card className="mx-3 w-3/6 max-h-[600px] overflow-y-scroll mt-10">
+      <CardHeader>
+        <CardTitle>
+          Promedio de preguntas {current ? "en este período" : "histórico"}
+        </CardTitle>
+        <CardDescription>
+          Promedio de resultados obtenidos en cada pregunta durante{" "}
+          {current ? "el período actual" : "todos los períodos"}.
+        </CardDescription>
+        <CardContent className="p-0">
+          {answersAvg ? (
+            answersAvg.map((question: any) => {
+              return (
+                <div
+                  className="flex flex-row items-stretch justify-between mb-2 rounded-sm overflow-hidden bg-gray-100"
+                  key={question.text}
+                >
+                  <div className=" w-4/6 p-2">
+                    <h4 className="text-sm font-bold ">Pregunta</h4>
+                    <span className="text-sm">{question.text}</span>
+                  </div>
+
+                  <div
+                    className={`${getScoreColor(
+                      question.totalScore.toFixed(2)
+                    )} text-white p-2 flex flex-col items-center justify-between  w-2/6 `}
+                  >
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                      <span className="text-lg font-black ">
+                        {question.totalScore.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-center">
+                        (
+                        {formatScore(
+                          parseFloat(question.totalScore.toFixed(2))
+                        )}
+                        )
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <>historic</>
+          )}
+        </CardContent>
+      </CardHeader>
+    </Card>
+  );
+};

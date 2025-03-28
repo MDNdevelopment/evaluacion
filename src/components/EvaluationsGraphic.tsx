@@ -15,21 +15,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 
 const chartConfig: any = {};
 
-export const EvaluationsGraphic = ({ evaluationsData }: any) => {
-  const evaluationsArray = [];
-
-  if (evaluationsData) {
-    for (const key in evaluationsData) {
-      const element = evaluationsData[key];
-
-      evaluationsArray.push(element);
-    }
-  }
-
+export const EvaluationsGraphic = ({
+  evaluationsArray,
+}: {
+  evaluationsArray: [];
+}) => {
   const colors = [
     "#F4B000", // Vibrant Yellow
     "#8884d8", // Soft Indigo
@@ -43,12 +37,12 @@ export const EvaluationsGraphic = ({ evaluationsData }: any) => {
   ];
 
   evaluationsArray.forEach((period: any) => {
-    Object.keys(period.categories).forEach((category) => {
+    Object.keys(period).forEach((category) => {
       if (!chartConfig[category]) {
         chartConfig[category] = {
           label: category,
           color: colors[Object.keys(chartConfig).length + 2],
-          dataKey: `categories.${category}.average`,
+          dataKey: `${category}.totalScore`,
           stroke: "#fff",
           strokeWidth: 2,
           dot: false,
@@ -61,13 +55,13 @@ export const EvaluationsGraphic = ({ evaluationsData }: any) => {
   // Create a unique set of categories
   const uniqueCategories = new Set();
   evaluationsArray.forEach((period: any) => {
-    Object.keys(period.categories).forEach((category) => {
+    Object.keys(period).forEach((category) => {
       uniqueCategories.add(category);
     });
   });
 
   return (
-    <Card>
+    <Card className="shadow-sm ">
       <CardHeader>
         <CardTitle>Resultados mensuales</CardTitle>
         <CardDescription>
@@ -94,15 +88,52 @@ export const EvaluationsGraphic = ({ evaluationsData }: any) => {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={7}
-                tickCount={6}
-                padding={{ top: 15, bottom: 15 }}
-              />
-              <Tooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
+                tickCount={5}
+                domain={[1, 5]}
+                padding={{ top: 15 }}
               />
 
-              {/* <ChartLegend content={<ChartLegendContent />} /> */}
+              <Tooltip
+                cursor={false}
+                content={({ payload }) => {
+                  if (payload && payload.length > 0) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-2 shadow-md rounded">
+                        <p className="text-sm font-medium">
+                          Período: {data.period}
+                        </p>
+                        <div className="flex flex-row items-center justify-start ">
+                          <div className="w-1/8 ">
+                            <div className="h-2 w-2 rounded-full bg-[#F4B000] mr-3"></div>
+                          </div>
+                          <p className="text-sm font-light">
+                            Evaluaciones:{" "}
+                            <span className="font-medium">
+                              {data.totalEvaluations}{" "}
+                            </span>
+                          </p>
+                        </div>
+
+                        <div className="flex flex-row items-center justify-start ">
+                          <div className="w-1/8 ">
+                            <div className="h-2 w-2 rounded-full bg-[#8884d8] mr-2"></div>
+                          </div>
+
+                          <p className="text-sm font-light">
+                            Consistencia en funciones:{" "}
+                            <span className="font-medium">
+                              {data.scoreResult}{" "}
+                              <span className="">({data.formattedScore})</span>
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
 
               <Line
                 key={"totalEvaluations"}
@@ -114,25 +145,25 @@ export const EvaluationsGraphic = ({ evaluationsData }: any) => {
                 name="Evaluaciones"
               />
               <Line
-                key={"totalRate"}
+                key={"scoreResult"}
                 type={"monotone"}
-                dataKey={"totalRate"}
+                dataKey={"totalScore"}
                 stroke={colors[1]}
                 strokeWidth={2}
                 dot={false}
-                name="Puntaje total"
+                name="Rendimiento promedio"
               />
-              {[...Object.keys(chartConfig)].map((category: any) => (
+              {/* {[...Object.keys(chartConfig)].map((category: any) => (
                 <Line
                   key={category}
                   type={"monotone"}
-                  dataKey={`categories.${category}.average`}
+                  dataKey={`${category}`}
                   stroke={chartConfig[category].color}
                   strokeWidth={2}
                   dot={false}
                   name={chartConfig[category].label}
                 />
-              ))}
+              ))} */}
             </LineChart>
           </ChartContainer>
         </ResponsiveContainer>

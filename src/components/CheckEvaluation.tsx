@@ -4,8 +4,9 @@ import { useEvaluationCheckStore } from "@/stores/useEvaluationCheckStore";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
-import remapMonths from "@/utils/remapMoths";
-// Dummy data
+import { getMonthName } from "@/utils/getMonthName";
+import { formatScore } from "@/utils/scoreUtils";
+import { getScoreColor } from "../utils/getScoreColor";
 
 interface employeeData {
   name: string;
@@ -28,8 +29,7 @@ export const CheckEvaluation = ({
   const evaluation = useEvaluationCheckStore((state) => state.evaluation);
   const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
   const [retrievedAnswers, setRetrievedAnswers] = useState<any>(null);
-  const [categoriesTotal, setCategoriesTotal] = useState<any>(null);
-  const [loadingData, setLoadingData] = useState<boolean>(true);
+  const [_loadingData, setLoadingData] = useState<boolean>(true);
   const [evaluationPeriod, setEvaluationPeriod] = useState<string | null>(null);
   const handleClick = () => {
     if (!open) {
@@ -63,63 +63,25 @@ export const CheckEvaluation = ({
   };
 
   const getEvaluationData = async () => {
-    const { data, error } = await supabase
+    const { data: evaluations, error } = await supabase
       .from("evaluation_sessions")
-      .select(
-        "*, evaluation_responses(*, questions(text, category: categories(name)))"
-      )
+      .select("*, evaluation_responses(response, question:questions(text))")
       .eq("id", evaluationId)
       .single();
     if (error) {
       console.error(error.message);
       return;
     }
-    setRetrievedAnswers(data);
-    const period = `${remapMonths(data.period.split("-").slice(2).join("-"))}-${
-      data.period.split("-")[0]
+
+    console.log({ evaluations });
+    setRetrievedAnswers(evaluations);
+
+    const period = `${getMonthName(evaluations.period.split("-")[1])}-${
+      evaluations.period.split("-")[0]
     }`;
     setEvaluationPeriod(period);
-    console.log({ period });
-    console.log({ data });
-    const categoriesTotals = data.evaluation_responses.reduce(
-      (acc: any, response: any) => {
-        if (!acc[response.questions.category.name]) {
-          acc[response.questions.category.name] = {
-            total: 0,
-            checked: 0,
-            questions: [],
-          };
-        }
 
-        acc[response.questions.category.name].questions.push({
-          text: response.questions.text,
-          answer: response.response.toString(),
-        });
-        acc[response.questions.category.name].total++;
-        if (response.response) {
-          acc[response.questions.category.name].checked++;
-        }
-        return acc;
-      },
-      {}
-    );
-
-    console.log({ totals: categoriesTotals });
-
-    Object.keys(categoriesTotals).forEach((category) => {
-      const questionValue = 10 / categoriesTotals[category].total;
-      const score = questionValue * categoriesTotals[category].checked;
-      categoriesTotals[category] = {
-        total: categoriesTotals[category].total,
-        checked: categoriesTotals[category].checked,
-        score: score,
-        questions: categoriesTotals[category].questions,
-      };
-    });
-
-    setCategoriesTotal(categoriesTotals);
     setLoadingData(false);
-    console.log(categoriesTotals);
   };
 
   useEffect(() => {
@@ -153,7 +115,7 @@ export const CheckEvaluation = ({
               animate={
                 setIsLoadingTable
                   ? { x: "-105%", y: "-25%", scale: 1 }
-                  : { x: "40%", y: "-100%", scale: 1 }
+                  : { x: "0%", y: "-110%", scale: 1 }
               }
               exit={
                 setIsLoadingTable
@@ -172,7 +134,7 @@ export const CheckEvaluation = ({
               }
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
               className={`flex flex-col absolute  max-h-[700px] bg-white overflow-y-hidden  z-10 evaluation-container max-w-4xl mx-auto p-6  border-2  shadow-lg rounded-lg ${
-                setIsLoadingTable ? "w-[40%] h-full" : "w-[25%] h-[80%]"
+                setIsLoadingTable ? "w-[40%] h-full" : "w-[32rem] h-[80%]"
               }`}
             >
               {/* Evaluation Metadata Header */}
@@ -218,51 +180,32 @@ export const CheckEvaluation = ({
 
               {/* Categories Section */}
               <div className="categories-section h-[100%]  overflow-y-scroll">
-                {categoriesTotal &&
-                  categoriesTotal !== null &&
-                  !loadingData &&
-                  Object.keys(categoriesTotal).map((category, catIndex) => (
-                    <div key={catIndex} className="category-section mb-6">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                        {category}:
-                        <span className="text-gray-600 ml-2 font-light">
-                          {categoriesTotal[category].score.toFixed(2)} pts - (
-                          {categoriesTotal[category].checked}/
-                          {categoriesTotal[category].total})
-                        </span>
-                      </h3>
-
-                      {/* Question Cards for each category */}
-                      {categoriesTotal[category].questions.map(
-                        (
-                          question: { text: string; answer: string },
-                          index: number
-                        ) => (
-                          <div
-                            key={question.text}
-                            className="question-card mb-4 p-4 border border-gray-300 rounded-lg"
-                          >
-                            <div className="question">
-                              <p className="font-medium text-gray-800">
-                                <strong>{`P${index + 1}:`}</strong>{" "}
-                                {question.text}
-                              </p>
-                            </div>
-                            <div className="answer mt-2">
-                              <p className="text-gray-700">
-                                <strong>Respuesta:</strong>{" "}
-                                {question.answer === "true" ? "Sí" : "No"}
-                              </p>
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  ))}
-                {loadingData && (
-                  <div className="flex justify-center items-center h-[10rem]">
-                    <Spinner />
-                  </div>
+                {retrievedAnswers ? (
+                  retrievedAnswers.evaluation_responses.map((response: any) => {
+                    return (
+                      <div
+                        key={`response-${response.question.text}`}
+                        className="bg-gray-100 p-0 min-h-[6.5rem] flex flex-row justify-between items-stretch mb-4 rounded-lg shadow-md"
+                      >
+                        <span className="w-4/5 p-4">
+                          {response.question.text}
+                        </span>{" "}
+                        <div
+                          className={`${getScoreColor(
+                            response.response
+                          )} p-4 flex flex-col justify-center items-center font-black text-2xl text-white rounded-r-lg w-1/5`}
+                        >
+                          {" "}
+                          {response.response}
+                          <span className="text-xs text-center">
+                            {formatScore(response.response)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <Spinner />
                 )}
               </div>
             </motion.div>

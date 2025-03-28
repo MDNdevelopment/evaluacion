@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -42,7 +42,7 @@ export default function QuestionsList({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [itemsPerPage, _setItemsPerPage] = useState<number>(10);
+  const [_itemsPerPage, _setItemsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -156,8 +156,8 @@ export default function QuestionsList({
           {row.original.text}
           <div className="mt-4">
             <div className="flex flex-row fles-wrap">
-              {row.original.tags.length > 0 &&
-                row.original.tags.map((tag) => {
+              {(row.original.tags ?? []).length > 0 &&
+                (row.original.tags ?? []).map((tag) => {
                   return <Tag key={tag.id} text={tag.tag} />;
                 })}
             </div>
@@ -167,7 +167,7 @@ export default function QuestionsList({
     },
 
     {
-      accessorFn: (row) => row.positions.length,
+      accessorFn: (row) => (row.positions ?? []).length,
       accessorKey: "positions",
       header: ({ column }) => {
         return (

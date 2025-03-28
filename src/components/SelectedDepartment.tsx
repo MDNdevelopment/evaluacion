@@ -1,7 +1,5 @@
 import { supabase } from "@/services/supabaseClient";
 import { useEffect, useState } from "react";
-import { QuestionDialog } from "./QuestionDialog";
-import { CategoryDialog } from "./CategoryDialog";
 import DepartmentQuestions from "./DepartmentQuestions";
 import { useCompanyStore } from "@/stores";
 import { PositionDialog } from "./PositionDialog";
@@ -97,19 +95,6 @@ export default function SelectedDepartment({
             Opciones
           </h3>
           <PositionDialog
-            departmentName={department.name}
-            departmentId={department.id}
-            company={company}
-            setIsLoading={setIsLoading}
-          />
-          <CategoryDialog
-            departmentName={department.name}
-            departmentId={department.id}
-            company={company}
-            setIsLoading={setIsLoading}
-            isLoading={isLoading}
-          />
-          <QuestionDialog
             departmentName={department.name}
             departmentId={department.id}
             company={company}

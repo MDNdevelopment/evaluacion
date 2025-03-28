@@ -14,8 +14,8 @@ import {
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import { XIcon } from "lucide-react";
 import formatDateForDisplay from "@/utils/formatDateForDisplay";
-import { Question } from "@/types";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export default function EvaluationForm({
   userId,
@@ -23,42 +23,87 @@ export default function EvaluationForm({
   employeePosition,
   employeeName,
   setTableIsLoading,
+  evaluationId,
 }: {
   userId: string;
   employeeId: string;
   employeePosition: string | undefined;
   employeeName: string;
   setTableIsLoading: (value: boolean) => void;
+  evaluationId?: string;
 }) {
+  const [disabledForm, setDisabledForm] = useState(!!evaluationId);
+
   const [isOpen, setIsOpen] = useState(false);
   const { firstDay, lastDay } = getPastMonthRange();
-  const [questions, setQuestions] = useState<Question[] | []>([]);
+  const [questions, setQuestions] = useState<any[] | []>([]);
+  const [evaluationData, setEvaluationData] = useState<any | null>(null);
 
   const methods = useForm({
+    disabled: disabledForm,
     defaultValues: {
       responses: {},
     },
   });
 
+  const setAnswers = (
+    retrievedAnswers: [{ question_id: number; response: number }]
+  ) => {
+    retrievedAnswers.forEach(
+      (answer: { question_id: number; response: number }) => {
+        methods.setValue("responses", {
+          ...methods.getValues("responses"),
+          [answer.question_id]: answer.response,
+        });
+
+        console.log(methods.watch("responses"));
+      }
+    );
+    setDisabledForm(true);
+  };
+
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("questions")
-      .select("*, question_positions(*)")
-      .eq("question_positions.position_id", employeePosition);
+      .from("question_positions")
+      .select("id:question_id, position_id, ...questions(text)")
+      .eq("position_id", employeePosition);
 
     if (error) {
       console.log(error);
       return;
     }
     if (data) {
+      console.log(data);
       setQuestions(data);
     }
   };
 
+  const getAnswers = async () => {
+    const { data, error } = await supabase
+      .from("evaluation_sessions")
+      .select("*, evaluation_responses!evaluation_id(*)")
+      .eq("id", evaluationId)
+      .single();
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+    console.log({ data });
+    console.log("setting answers");
+    setAnswers(data.evaluation_responses);
+    setEvaluationData({
+      totalScore: data.total_score,
+      period: data.period,
+    });
+  };
+
   useEffect(() => {
-    console.log("EvaluationFORM RE RENDERED");
     if (isOpen) {
       getQuestions();
+      if (evaluationId) {
+        getAnswers();
+      }
     }
   }, [isOpen]);
 
@@ -67,12 +112,14 @@ export default function EvaluationForm({
     console.log(userId);
 
     const totalScore: number =
-      (Object.values(data.responses) as number[]).reduce(
+      ((Object.values(data.responses) as number[]).reduce(
         (acc: number, agg: number) => {
           return acc + agg;
         },
         0
-      ) / questions.length;
+      ) /
+        (questions.length * 5)) *
+      5;
     const { data: createData, error: createError } = await supabase
       .from("evaluation_sessions")
       .insert({
@@ -104,6 +151,31 @@ export default function EvaluationForm({
         return;
       }
     });
+
+    toast.success("Evaluación enviada.", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
+    setIsOpen(false);
+    setTableIsLoading(true);
+  };
+
+  const handleDelete = async () => {
+    const response = await supabase
+      .from("evaluation_sessions")
+      .delete()
+      .eq("id", evaluationId);
+
+    if (response.error) {
+      console.log(response.error);
+      return;
+    }
+    toast.success("Evaluación eliminada.", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
+    setIsOpen(false);
+    setTableIsLoading(true);
   };
 
   return (
@@ -111,14 +183,13 @@ export default function EvaluationForm({
       <Dialog open={isOpen}>
         <DialogTrigger asChild>
           <Button
-            className={`${employeePosition === "49" && "bg-red-600"}`}
             onClick={() => {
               setIsOpen(true);
               methods.setValue("responses", {});
             }}
             variant="outline"
           >
-            Evaluar
+            {evaluationId ? "Ver evaluación" : "Evaluar"}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[725px] [&>button]:hidden">
@@ -137,23 +208,47 @@ export default function EvaluationForm({
               Período: {formatDateForDisplay(firstDay)} -{" "}
               {formatDateForDisplay(lastDay)}
             </DialogDescription>
+            {evaluationData && (
+              <h3 className="scroll-m-20 text-md font-semibold tracking-tight">
+                Puntaje promedio:{" "}
+                <span>{evaluationData.totalScore.toFixed(2)}</span>
+              </h3>
+            )}
           </DialogHeader>
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(handleSubmit)}>
-              <EvaluationList questions={questions} />
-
-              <DialogFooter>
-                <Button
-                  disabled={
-                    Object.keys(methods.watch("responses")).length !==
-                    questions?.length
-                  }
-                  className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
-                  variant={"outline"}
-                  type="submit"
-                >
-                  Enviar
-                </Button>
+            <form
+              aria-disabled={disabledForm}
+              className="max-w-full w-full"
+              onSubmit={methods.handleSubmit(handleSubmit)}
+            >
+              <EvaluationList
+                evaluationId={evaluationId}
+                questions={questions}
+              />
+              <DialogFooter className="pt-2">
+                {!!evaluationId ? (
+                  <Button
+                    onClick={() => {
+                      handleDelete();
+                    }}
+                    variant={"destructive"}
+                    type="button"
+                  >
+                    Eliminar evaluación
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={
+                      Object.keys(methods.watch("responses")).length !==
+                        questions?.length || !!evaluationId
+                    }
+                    className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
+                    variant={"outline"}
+                    type="submit"
+                  >
+                    Enviar
+                  </Button>
+                )}
               </DialogFooter>
             </form>
           </FormProvider>
@@ -180,8 +275,14 @@ const responseLabels = (response: number) => {
   }
 };
 
-const EvaluationList = ({ questions }: { questions: Question[] | null }) => {
-  const { setValue, getValues, watch, register } = useFormContext();
+const EvaluationList = ({
+  questions,
+  evaluationId,
+}: {
+  questions: any[] | null;
+  evaluationId?: string;
+}) => {
+  const { setValue, getValues, watch } = useFormContext();
 
   const handleChange = (questionId: number, value: number) => {
     console.log({ questionId, value });
@@ -189,9 +290,10 @@ const EvaluationList = ({ questions }: { questions: Question[] | null }) => {
     console.log(watch("responses"));
   };
   return (
-    <div className="overflow-y-scroll h-[400px]">
+    <div className="overflow-y-scroll h-[600px]">
       {questions &&
         questions.map((question) => {
+          console.log(question);
           return (
             <div
               className="border p-2 text-center my-2 rounded-md hover:bg-gray-100"
@@ -203,20 +305,28 @@ const EvaluationList = ({ questions }: { questions: Question[] | null }) => {
               <div className="grid grid-cols-5 border-t pt-3">
                 {[...Array(5)].map((_, index) => {
                   return (
-                    <div className="flex flex-col cursor-pointer" key={index}>
-                      <input
-                        name={`responses.${question.id}`}
-                        id={`responses.${question.id}.${index}`}
-                        type="radio"
-                        value={index}
-                        onChange={() => {
-                          handleChange(question.id, index);
-                        }}
-                      />
+                    <div className="flex flex-col  items-center" key={index}>
                       <label
-                        className="text-sm"
+                        className="flex flex-col items-center text-sm gap-1"
                         htmlFor={`responses.${question.id}.${index}`}
                       >
+                        <input
+                          // name={`responses.${question.id}`}
+                          id={`responses.${question.id}.${index}`}
+                          type="radio"
+                          value={index + 1}
+                          // {...register(`responses.${question.id}`)}
+                          checked={
+                            watch(`responses.${question.id}`) == index + 1
+                          }
+                          onChange={() => {
+                            handleChange(question.id, index + 1);
+                          }}
+                          disabled={!!evaluationId}
+                          className="bg-white peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-400 checked:border-slate-500 checked:bg-primary  transition-all disabled:cursor-not-allowed
+                          disabled:checked:bg-gray-400"
+                        />
+
                         {responseLabels(index + 1)}
                       </label>
                     </div>

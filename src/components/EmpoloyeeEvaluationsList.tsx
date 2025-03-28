@@ -15,7 +15,6 @@ interface EmployeeEvaluationsListProps {
   employeeId?: string | undefined;
   evaluatorId?: string | undefined;
 }
-
 export default function EmployeeEvaluationsList({
   employeeId,
   evaluatorId,
@@ -41,7 +40,6 @@ export default function EmployeeEvaluationsList({
       return;
     }
 
-    console.log(data);
     setUserEvaluations(data);
   };
 
@@ -68,15 +66,6 @@ export default function EmployeeEvaluationsList({
             const employeeDepartment = evaluation.users.departments.name;
             const employeePosition = evaluation.users.positions.name;
 
-            console.log({
-              evaluatorName,
-              evaluatorDepartment,
-              evaluatorPosition,
-              employeeName,
-              employeeDepartment,
-              employeePosition,
-              idColumn,
-            });
             return (
               <Card key={`evaluation-${evaluation.id}`} className="shadow-sm">
                 <CardHeader>

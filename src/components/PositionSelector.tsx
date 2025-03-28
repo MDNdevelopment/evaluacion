@@ -1,6 +1,5 @@
 import { Position } from "@/types";
 import PositionItem from "./PositionItem";
-import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 export function PositionSelector({

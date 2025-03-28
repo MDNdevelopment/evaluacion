@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { PositionSelector } from "./PositionSelector";
 import { toast } from "react-toastify";
 
 export function CategoryDialog({
@@ -122,12 +121,6 @@ export function CategoryDialog({
             <Label htmlFor="name" className="text-right">
               Cargo
             </Label>
-
-            <PositionSelector
-              companyId={company.id}
-              departmentId={departmentId}
-              setSelectedPosition={setSelectedPosition}
-            />
           </div>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">

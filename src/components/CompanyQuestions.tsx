@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Company, Position, Question } from "@/types";
+import { Company, Position } from "@/types";
 import { supabase } from "@/services/supabaseClient";
 import QuestionsList from "./QuestionsList";
 

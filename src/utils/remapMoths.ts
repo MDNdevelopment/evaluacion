@@ -1,29 +1,29 @@
 export default function remapMonths(month: string) {
   switch (month) {
-    case "01":
-      return "Ene";
-    case "02":
-      return "Feb";
-    case "03":
-      return "Mar";
-    case "04":
-      return "Abr";
-    case "05":
-      return "May";
-    case "06":
-      return "Jun";
-    case "07":
-      return "Jul";
-    case "08":
-      return "Ago";
-    case "09":
-      return "Sep";
-    case "10":
-      return "Oct";
-    case "11":
-      return "Nov";
-    case "12":
-      return "Dic";
+    case "Ene":
+      return "01";
+    case "Feb":
+      return "02";
+    case "Mar":
+      return "03";
+    case "Abr":
+      return "04";
+    case "May":
+      return "05";
+    case "Jun":
+      return "06";
+    case "Jul":
+      return "07";
+    case "Ago":
+      return "08";
+    case "Sep":
+      return "09";
+    case "Oct":
+      return "10";
+    case "Nov":
+      return "11";
+    case "Dic":
+      return "12";
     default:
       return "Error";
   }
