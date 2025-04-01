@@ -84,6 +84,7 @@ export default function QuestionsList({
     if (fetchingQuestions) {
       fetchQuestions();
       setFetchingQuestions(false);
+      setCurrentPage(0);
     }
   }, [company, fetchingQuestions]);
 

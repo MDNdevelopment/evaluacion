@@ -15,3 +15,23 @@ export const formatScore = (score: number) => {
       return "N/A";
   }
 };
+//TODO: 1: Deficiente, 2: Irregular, 3: Aceptable, 4: Bueno, > 4.5: Excelente o Sobresaliente
+
+export const representScore = (score: number) => {
+  if (score <= 1) {
+    return "Deficiente";
+  }
+  if (score <= 2) {
+    return "Irregular";
+  }
+  if (score <= 3) {
+    return "Aceptable";
+  }
+  if (score < 4.5) {
+    return "Bueno";
+  }
+  if (score >= 4.5) {
+    return "Excelente";
+  }
+  return "N/A";
+};

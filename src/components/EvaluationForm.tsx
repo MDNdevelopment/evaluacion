@@ -43,6 +43,7 @@ export default function EvaluationForm({
     disabled: disabledForm,
     defaultValues: {
       responses: {},
+      comment: "",
     },
   });
 
@@ -81,7 +82,9 @@ export default function EvaluationForm({
   const getAnswers = async () => {
     const { data, error } = await supabase
       .from("evaluation_sessions")
-      .select("*, evaluation_responses!evaluation_id(*)")
+      .select(
+        "*, evaluation_responses!evaluation_id(*), comment:evaluation_comments!evaluation_id(comment)"
+      )
       .eq("id", evaluationId)
       .single();
 
@@ -92,10 +95,13 @@ export default function EvaluationForm({
     console.log({ data });
     console.log("setting answers");
     setAnswers(data.evaluation_responses);
+
     setEvaluationData({
       totalScore: data.total_score,
       period: data.period,
     });
+
+    methods.setValue("comment", data.comment[0]?.comment);
   };
 
   useEffect(() => {
@@ -151,6 +157,18 @@ export default function EvaluationForm({
         return;
       }
     });
+
+    const { error: commentError } = await supabase
+      .from("evaluation_comments")
+      .insert({
+        comment: data.comment,
+        evaluation_id: createData.id,
+      });
+
+    if (commentError) {
+      console.log(commentError);
+      return;
+    }
 
     toast.success("Evaluación enviada.", {
       position: "bottom-right",
@@ -225,6 +243,15 @@ export default function EvaluationForm({
                 evaluationId={evaluationId}
                 questions={questions}
               />
+              <div>
+                <h3 className="font-bold mb-1">Comentario</h3>
+                <textarea
+                  className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-scroll"
+                  placeholder="Escribe un comentario..."
+                  disabled={!!evaluationId}
+                  {...methods.register("comment")}
+                />
+              </div>
               <DialogFooter className="pt-2">
                 {!!evaluationId ? (
                   <Button

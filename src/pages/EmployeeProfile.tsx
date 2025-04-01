@@ -7,7 +7,7 @@ import { useUserStore } from "../stores/useUserStore";
 // import { toast } from "react-toastify";
 
 import { EvaluationsGraphic } from "@/components/EvaluationsGraphic";
-import { formatScore } from "@/utils/scoreUtils";
+import { formatScore, representScore } from "@/utils/scoreUtils";
 import EmployeeEvaluationsList from "@/components/EmpoloyeeEvaluationsList";
 import { getMonthName } from "@/utils/getMonthName";
 import { getScoreColor } from "@/utils/getScoreColor";
@@ -18,16 +18,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { set } from "react-hook-form";
+import getPastMonthRange from "@/utils/getPastMonthRange";
 
 export default function EmployeeProfile() {
   const { id } = useParams();
   const [employeeData, setEmployeeData] = useState<any>();
   const [evaluationsData, setEvaluationsData] = useState<any>(null);
+  const [pastMonthData, setPastMonthData] = useState<any>(null);
   const [evaluationsChart, setEvaluationsChart] = useState<any>([]);
   const [totalAverage, setTotalAverage] = useState<number | null>(null);
   const user = useUserStore((state) => state.user);
   const [isLoading, setIsLoading] = useState(true);
+  const { firstDay } = getPastMonthRange();
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
@@ -150,7 +152,7 @@ export default function EmployeeProfile() {
         totalScore: groupedEvaluationsByDate[key].totalScore,
         totalEvaluations: groupedEvaluationsByDate[key].totalEvaluations,
         scoreResult: groupedEvaluationsByDate[key].totalScore.toFixed(2),
-        formattedScore: formatScore(
+        formattedScore: representScore(
           parseFloat(groupedEvaluationsByDate[key].totalScore)
         ),
       });
@@ -178,6 +180,14 @@ export default function EmployeeProfile() {
       setEvaluationsData(groupedEvaluationsByDate);
     }
 
+    console.log(groupedEvaluationsByDate);
+    console.log(firstDay);
+
+    if (Object.keys(groupedEvaluationsByDate).includes(firstDay)) {
+      setPastMonthData(groupedEvaluationsByDate[firstDay]);
+    }
+
+    console.log({ lastMonth: groupedEvaluationsByDate[firstDay] });
     //Set the states
     setTotalAverage(totalScoreAllTime);
     setEvaluationsChart(chartData);
@@ -222,10 +232,10 @@ export default function EmployeeProfile() {
                 <div className="flex flex-col font-black text-center text-white text-4xl uppercase">
                   {totalAverage ? totalAverage.toFixed(2) : "N/A"}
                   {!!totalAverage && (
-                    <span className="text-xs font-medium">
+                    <span className="text-xs font-medium ">
                       (
                       {totalAverage &&
-                        formatScore(parseFloat(totalAverage.toFixed(2)))}
+                        representScore(parseFloat(totalAverage.toFixed(2)))}
                       )
                     </span>
                   )}
@@ -242,32 +252,20 @@ export default function EmployeeProfile() {
             <div className="  min-h-[7rem] mt-3 flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
               <div
                 className={`${
-                  totalAverage
-                    ? getScoreColor(
-                        evaluationsData[
-                          Object.keys(evaluationsData)[0]
-                        ].totalScore.toFixed(2)
-                      )
+                  pastMonthData
+                    ? getScoreColor(pastMonthData.totalScore.toFixed(2))
                     : "bg-gray-400"
                 } w-2/5 flex items-center justify-center`}
               >
                 <div className="flex flex-col font-black text-center text-white text-4xl uppercase">
-                  {evaluationsData
-                    ? evaluationsData[
-                        Object.keys(evaluationsData)[0]
-                      ]?.totalScore.toFixed(2)
-                    : "N/A"}
+                  {pastMonthData ? pastMonthData.totalScore.toFixed(2) : "N/A"}
 
                   {!!totalAverage && (
-                    <span className="text-xs font-medium">
+                    <span className="text-xs font-medium ">
                       (
                       {evaluationsData &&
-                        formatScore(
-                          parseFloat(
-                            evaluationsData[
-                              Object.keys(evaluationsData)[0]
-                            ]?.totalScore.toFixed(2)
-                          )
+                        representScore(
+                          parseFloat(pastMonthData?.totalScore.toFixed(2))
                         )}
                       )
                     </span>
@@ -292,9 +290,7 @@ export default function EmployeeProfile() {
 
       {evaluationsData && (
         <div className="flex flex-row">
-          <Promedios
-            current={evaluationsData[Object.keys(evaluationsData)[0]]}
-          />
+          <Promedios current={pastMonthData} />
           <Promedios historic={evaluationsData} />
         </div>
       )}
@@ -395,6 +391,9 @@ const Promedios = ({
   };
 
   useEffect(() => {
+    if (!current && !historic) {
+      return;
+    }
     if (historic) {
       calculateHistoricAvg(historic);
       return;
@@ -402,18 +401,20 @@ const Promedios = ({
 
     setAnswersAvg(current.questions.questionsData);
   }, [historic, current]);
+
   return (
     <Card className="mx-3 w-3/6 max-h-[600px] overflow-y-scroll mt-10">
       <CardHeader>
         <CardTitle>
-          Promedio de preguntas {current ? "en este período" : "histórico"}
+          Promedio de preguntas{" "}
+          {current !== undefined ? "en este período" : "histórico"}
         </CardTitle>
         <CardDescription>
           Promedio de resultados obtenidos en cada pregunta durante{" "}
-          {current ? "el período actual" : "todos los períodos"}.
+          {current !== undefined ? "el período actual" : "todos los períodos"}.
         </CardDescription>
         <CardContent className="p-0">
-          {answersAvg ? (
+          {answersAvg && answersAvg.length > 0 ? (
             answersAvg.map((question: any) => {
               return (
                 <div
@@ -447,7 +448,11 @@ const Promedios = ({
               );
             })
           ) : (
-            <>historic</>
+            <div className="py-10 rounded-md bg-gray-200 flex flex-col items-center justify-center w-full h-full">
+              <h4 className="text-sm text-gray-500">
+                No hay datos disponibles
+              </h4>
+            </div>
           )}
         </CardContent>
       </CardHeader>

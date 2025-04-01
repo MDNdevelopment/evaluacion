@@ -115,6 +115,7 @@ export default function EmployeeEvaluationsList({
                     setIsLoadingTable={null}
                     evaluationId={evaluation.id}
                     employeeData={{
+                      id: evaluation.users.user_id,
                       name: `${evaluation.users.first_name} ${evaluation.users.last_name}`,
                       position: evaluation.users.positions.name,
                       department: evaluation.users.departments.name,

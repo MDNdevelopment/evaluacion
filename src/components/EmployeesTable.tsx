@@ -48,6 +48,7 @@ export type Employee = {
   positions: { id: number; name: string };
   user_id: string;
   evaluation: any;
+  access_level: number;
 };
 
 export function EmployeesTable() {
@@ -141,19 +142,56 @@ export function EmployeesTable() {
         return <div>{row.original.positions.name}</div>;
       },
     },
+
     {
       id: "evaluation",
       header: "Evaluación",
       cell: ({ row }) => {
+        if (user && row.original.access_level > user.access_level) {
+          return (
+            <Button
+              className="bg-white text-darkText border cursor-not-allowed"
+              disabled
+            >
+              Evaluar
+            </Button>
+          );
+        }
         return (
-          <EvaluationForm
-            userId={user?.id || ""}
-            employeeId={row.original.user_id}
-            employeePosition={row.original.positions.id.toString()}
-            employeeName={`${row.original.first_name} ${row.original.last_name}`}
-            setTableIsLoading={setIsLoading}
-            evaluationId={row.original.evaluation?.id}
-          />
+          <>
+            <EvaluationForm
+              userId={user?.id || ""}
+              employeeId={row.original.user_id}
+              employeePosition={row.original.positions.id.toString()}
+              employeeName={`${row.original.first_name} ${row.original.last_name}`}
+              setTableIsLoading={setIsLoading}
+              evaluationId={row.original.evaluation?.id}
+            />
+          </>
+        );
+      },
+    },
+    {
+      id: "status",
+      header: "Estado",
+      cell({ row }) {
+        if (row.original.evaluation) {
+          return (
+            <div className="bg-[#3195369f] flex justify-center items-center gap-2 p-1 rounded-md">
+              <p className="text-white">Evaluado</p>
+            </div>
+          );
+        } else if (user && row.original.access_level > user.access_level) {
+          return (
+            <div className="bg-[#f04444cd] flex justify-center items-center gap-2 p-1 rounded-md">
+              <p className="text-[#741313]">No disponible</p>
+            </div>
+          );
+        }
+        return (
+          <div className="bg-[#f0dc44cd] flex justify-center items-center gap-2 p-1 rounded-md">
+            <p className="text-[#746913]">Pendiente</p>
+          </div>
         );
       },
     },
@@ -200,6 +238,7 @@ export function EmployeesTable() {
           first_name,
           last_name,
           company_id,
+          access_level,
           departments(name, id),
           positions(name, id)
         `

@@ -7,8 +7,10 @@ import Spinner from "./Spinner";
 import { getMonthName } from "@/utils/getMonthName";
 import { formatScore } from "@/utils/scoreUtils";
 import { getScoreColor } from "../utils/getScoreColor";
+import { Link } from "react-router-dom";
 
 interface employeeData {
+  id: string;
   name: string;
   position: string;
   department: string;
@@ -65,7 +67,9 @@ export const CheckEvaluation = ({
   const getEvaluationData = async () => {
     const { data: evaluations, error } = await supabase
       .from("evaluation_sessions")
-      .select("*, evaluation_responses(response, question:questions(text))")
+      .select(
+        "*, evaluation_responses(response, question:questions(text)), evaluation_comments(comment)"
+      )
       .eq("id", evaluationId)
       .single();
     if (error) {
@@ -142,9 +146,12 @@ export const CheckEvaluation = ({
                 <h2 className="text-xl font-semibold text-gray-800">
                   Resumen de Evaluación
                 </h2>
-                <p className="text-gray-600">
+                <Link
+                  to={`/empleado/${employeeData.id}`}
+                  className="text-gray-600"
+                >
                   <strong>Empleado:</strong> {employeeData.name}
-                </p>
+                </Link>
 
                 <p className="text-gray-600">
                   <strong>Posición:</strong> {employeeData.position}
@@ -181,29 +188,43 @@ export const CheckEvaluation = ({
               {/* Categories Section */}
               <div className="categories-section h-[100%]  overflow-y-scroll">
                 {retrievedAnswers ? (
-                  retrievedAnswers.evaluation_responses.map((response: any) => {
-                    return (
-                      <div
-                        key={`response-${response.question.text}`}
-                        className="bg-gray-100 p-0 min-h-[6.5rem] flex flex-row justify-between items-stretch mb-4 rounded-lg shadow-md"
-                      >
-                        <span className="w-4/5 p-4">
-                          {response.question.text}
-                        </span>{" "}
-                        <div
-                          className={`${getScoreColor(
-                            response.response
-                          )} p-4 flex flex-col justify-center items-center font-black text-2xl text-white rounded-r-lg w-1/5`}
-                        >
-                          {" "}
-                          {response.response}
-                          <span className="text-xs text-center">
-                            {formatScore(response.response)}
-                          </span>
-                        </div>
+                  <>
+                    {retrievedAnswers.evaluation_responses.map(
+                      (response: any) => {
+                        return (
+                          <div
+                            key={`response-${response.question.text}`}
+                            className="bg-gray-100 p-0 min-h-[6.5rem] flex flex-row justify-between items-stretch mb-4 rounded-lg shadow-md"
+                          >
+                            <span className="w-4/5 p-4">
+                              {response.question.text}
+                            </span>{" "}
+                            <div
+                              className={`${getScoreColor(
+                                response.response
+                              )} p-4 flex flex-col justify-center items-center font-black text-2xl text-white rounded-r-lg w-1/5`}
+                            >
+                              {" "}
+                              {response.response}
+                              <span className="text-xs text-center">
+                                {formatScore(response.response)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+
+                    {retrievedAnswers.evaluation_comments[0]?.comment !==
+                      "" && (
+                      <div className="bg-gray-100 min-h-[6.5rem] p-4">
+                        <h3 className="font-bold">Comentarios adicionales:</h3>
+                        <p className="mt-1 rounded-r-lg text-left w-full">
+                          {retrievedAnswers.evaluation_comments[0].comment}
+                        </p>
                       </div>
-                    );
-                  })
+                    )}
+                  </>
                 ) : (
                   <Spinner />
                 )}

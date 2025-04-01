@@ -1,5 +1,5 @@
 import { Login, Dashboard } from "../pages/index";
-import { AuthRoute, PrivateRoute } from "./routeHandler";
+import { AccessRoute, AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
 import Team from "../pages/Team";
 // import Employee from "../pages/Employee"; // This page is not being used
@@ -31,7 +31,9 @@ export const Routes = [
     path: "/dashboard",
     element: (
       <PrivateRoute>
-        <Dashboard />
+        <AccessRoute access_level={2}>
+          <Dashboard />
+        </AccessRoute>
       </PrivateRoute>
     ),
   },
