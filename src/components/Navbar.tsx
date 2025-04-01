@@ -113,17 +113,6 @@ export default function Navbar() {
                   >
                     Organización
                   </Link>
-
-                  {user && user.role === "admin" && (
-                    <Link
-                      className={
-                        "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                      }
-                      to={`/prototypeForm`}
-                    >
-                      Prototype Form
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>

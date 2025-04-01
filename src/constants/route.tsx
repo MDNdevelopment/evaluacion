@@ -49,7 +49,7 @@ export const Routes = [
     path: "/empleados",
     element: (
       <PrivateRoute>
-        <Team />
+        <PrototypeForm />
       </PrivateRoute>
     ),
   },
@@ -94,14 +94,6 @@ export const Routes = [
     ),
   },
 
-  {
-    path: "/prototypeForm",
-    element: (
-      <PrivateRoute>
-        <PrototypeForm />
-      </PrivateRoute>
-    ),
-  },
   {
     path: "*",
     element: <p>404 Error - No conseguí esa página 🤔</p>,
