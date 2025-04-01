@@ -1,7 +1,6 @@
 import { Login, Dashboard } from "../pages/index";
 import { AccessRoute, AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
-import Team from "../pages/Team";
 // import Employee from "../pages/Employee"; // This page is not being used
 import Profile from "../pages/Profile";
 import PasswordReset from "../pages/PasswordReset";
