@@ -17,10 +17,15 @@ import { useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 
-interface Entity {
-  id: number;
-  name: string;
-  department_id?: number;
+interface Department {
+  department_name: string;
+  department_id: number;
+}
+
+interface Position {
+  position_name: string;
+  position_id: number;
+  department_id: number;
 }
 
 export function EditEmployeeDialog({
@@ -30,8 +35,8 @@ export function EditEmployeeDialog({
   fetchEmployees,
 }: {
   employeeId: string;
-  departments: Entity[];
-  positions: Entity[];
+  departments: Department[];
+  positions: Position[];
   fetchEmployees: () => void;
 }) {
   const { register, setValue, handleSubmit } = useForm({
@@ -45,10 +50,9 @@ export function EditEmployeeDialog({
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [_selectedDepartment, setSelectedDepartment] = useState<Entity | null>(
-    null
-  );
-  const [selectedPositions, setSelectedPositions] = useState<Entity[]>([]);
+  const [_selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
+  const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
 
   const onSubmit = handleSubmit(async (data: any) => {
     const { data: updateData, error } = await supabase
@@ -94,8 +98,8 @@ export function EditEmployeeDialog({
       setValue("department_id", data.department_id);
       setValue("department_name", data.departments.department_name);
       setSelectedDepartment({
-        id: data.department_id,
-        name: data.name,
+        department_id: data.department_id,
+        department_name: data.name,
       });
       setValue("position_id", data.position_id);
       console.log({ dbb: data.department_id });
@@ -198,20 +202,28 @@ export function EditEmployeeDialog({
                 const selectedId = parseInt(e.target.value);
                 setValue("department_id", selectedId);
                 const selectedDepartment = departments.find(
-                  (department) => department.id === selectedId
+                  (department) => department.department_id === selectedId
                 );
                 setSelectedDepartment(selectedDepartment || null);
                 handleDepartmentChange(selectedId);
-                setValue("department_name", selectedDepartment?.name || "");
-                setValue("position_id", positions[0]?.id || 0);
+                setValue(
+                  "department_name",
+                  selectedDepartment?.department_name || ""
+                );
+                setValue("position_id", positions[0]?.position_id || 0);
               }}
               className="border p-1 rounded-md shadow-sm w-full "
             >
-              {departments.map((department) => (
-                <option key={department.id} value={department.id}>
-                  {department.name}
-                </option>
-              ))}
+              {departments &&
+                isDialogOpen &&
+                departments.map((department) => (
+                  <option
+                    key={`${department.department_id}-`}
+                    value={department.department_id}
+                  >
+                    {department.department_name}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-row items-center gap-4">
@@ -223,8 +235,8 @@ export function EditEmployeeDialog({
               className="border p-1 rounded-md shadow-sm w-full "
             >
               {selectedPositions.map((position) => (
-                <option key={position.id} value={position.id}>
-                  {position.name}
+                <option key={position.position_id} value={position.position_id}>
+                  {position.position_name}
                 </option>
               ))}
             </select>
