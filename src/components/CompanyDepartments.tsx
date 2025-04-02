@@ -43,16 +43,18 @@ const CompanyDepartments = ({ company }: any) => {
           departments.map((department: any) => {
             return (
               <div
-                key={department.id}
+                key={department.department_id}
                 onClick={() =>
                   setSelectedDepartment({
-                    id: department.id,
-                    name: department.name,
+                    id: department.department_id,
+                    name: department.department_name,
                   })
                 }
                 className=" pl-3 mx-2 my-2 min-h-20 lg:w-1/6 border border-gray-200 hover:bg-gray-100  shadow-sm rounded-md flex flex-col justify-start py-2 cursor-pointer"
               >
-                <h3 className="text-md font-semibold">{department.name}</h3>
+                <h3 className="text-md font-semibold">
+                  {department.department_name}
+                </h3>
               </div>
             );
           })

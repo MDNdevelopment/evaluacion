@@ -1,4 +1,4 @@
-import { EmployeesTable } from "@/components/EmployeesTable";
+import { EmployeesTable } from "@/components/EmployeesEvaluationsTable";
 
 export default function PrototypeForm() {
   return (

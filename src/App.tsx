@@ -12,14 +12,15 @@ function App() {
   const setCompany = useCompanyStore((state) => state.setCompany);
 
   const getUserData = async (userId: string) => {
-    const { data: employeeData } = await supabase
+    const { data: employeeData, error } = await supabase
       .from("users")
       .select(
         `
             *,
-            departments:department_id (
-            id, 
-            name
+            positions(position_id, position_name),
+            departments(
+            department_id, 
+            department_name
             ),
             companies:company_id(
             *)
@@ -27,15 +28,21 @@ function App() {
       )
       .eq("user_id", userId)
       .single();
+
+    if (error) {
+      console.log("hola");
+      console.error(error.message);
+    }
     if (employeeData) {
       setUser({
         id: userId,
         full_name: `${employeeData.first_name} ${employeeData.last_name}`,
         email: employeeData.email,
-        department: employeeData.departments.name,
+        department_name: employeeData.departments.department_name,
         department_id: employeeData.department_id,
         avatar_url: employeeData.avatar_url,
-        position: employeeData.position,
+        position_id: employeeData.positions.position_id,
+        position_name: employeeData.positions.position_name,
         access_level: employeeData.access_level,
         company_id: employeeData.company_id,
         role: employeeData.role,

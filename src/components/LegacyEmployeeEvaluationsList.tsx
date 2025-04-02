@@ -30,7 +30,7 @@ export default function LegacyEmployeeEvaluationsList({
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
-        "*, users!employee_id(*, positions(name), departments(name)), evaluator:users!manager_id(first_name, last_name, positions(name), departments(name))"
+        "*, users!employee_id(*, positions(position_name), departments(department_name)), evaluator:users!manager_id(first_name, last_name, positions(position_name), departments(department_name))"
       )
       .eq(idColumn, idToUse)
       .gte("period", firstDay)

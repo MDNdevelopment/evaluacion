@@ -241,7 +241,7 @@ export default function Summary() {
                     </th>
                     <td className="px-6 py-4">{employee.department_name}</td>
 
-                    <td className="px-6 py-4">{employee.position}</td>
+                    <td className="px-6 py-4">{employee.position_name}</td>
                     <td className="px-6 py-4 text-center">
                       {employee.evaluation_count}
                     </td>

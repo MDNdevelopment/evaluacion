@@ -54,7 +54,7 @@ export default function QuestionsList({
     const { data, error } = await supabase
       .from("questions")
       .select(
-        "*, positions:question_positions(...positions(id, name)),tags:question_tags(id, tag)"
+        "*, positions:question_positions(...positions(position_id, position_name)),tags:question_tags(id, tag)"
       )
       .eq("company_id", company.id);
 

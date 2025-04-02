@@ -42,10 +42,12 @@ import { shallow } from "zustand/shallow";
 
 export type Employee = {
   company_id: string;
-  departments: { id: number; name: string }[] | { id: number; name: string };
+  departments:
+    | { department_id: number; department_name: string }[]
+    | { department_id: number; department_name: string };
   first_name: string;
   last_name: string;
-  positions: { id: number; name: string };
+  positions: { position_id: number; position_name: string };
   user_id: string;
   evaluation: any;
   access_level: number;
@@ -121,16 +123,22 @@ export function EmployeesTable() {
       cell: ({ row }) => {
         const department = row.original.departments;
         if (Array.isArray(department)) {
-          return department.map((dept) => <div key={dept.id}>{dept.name}</div>);
+          return department.map((dept) => (
+            <div key={dept.department_id}>{dept.department_name}</div>
+          ));
         }
-        return <div className="pl-3">{department.name}</div>;
+        return <div className="pl-3">{department.department_name}</div>;
       },
       sortingFn: (rowA, rowB) => {
         const deptA = rowA.original.departments;
         const deptB = rowB.original.departments;
 
-        const nameA = Array.isArray(deptA) ? deptA[0]?.name : deptA.name;
-        const nameB = Array.isArray(deptB) ? deptB[0]?.name : deptB.name;
+        const nameA = Array.isArray(deptA)
+          ? deptA[0]?.department_name
+          : deptA.department_name;
+        const nameB = Array.isArray(deptB)
+          ? deptB[0]?.department_name
+          : deptB.department_name;
 
         return nameA.localeCompare(nameB);
       },
@@ -139,7 +147,7 @@ export function EmployeesTable() {
       id: "position",
       header: "Cargo",
       cell({ row }) {
-        return <div>{row.original.positions.name}</div>;
+        return <div>{row.original.positions.position_name}</div>;
       },
     },
 
@@ -162,7 +170,7 @@ export function EmployeesTable() {
             <EvaluationForm
               userId={user?.id || ""}
               employeeId={row.original.user_id}
-              employeePosition={row.original.positions.id.toString()}
+              employeePosition={row.original.positions.position_id.toString()}
               employeeName={`${row.original.first_name} ${row.original.last_name}`}
               setTableIsLoading={setIsLoading}
               evaluationId={row.original.evaluation?.id}
@@ -239,8 +247,8 @@ export function EmployeesTable() {
           last_name,
           company_id,
           access_level,
-          departments(name, id),
-          positions(name, id)
+          departments(department_name, department_id),
+          positions(position_name, position_id)
         `
         )
         .eq("company_id", company.id);
@@ -278,8 +286,12 @@ export function EmployeesTable() {
         const deptA: any = a.departments;
         const deptB: any = b.departments;
 
-        const nameA = Array.isArray(deptA) ? deptA[0].name : deptA.name;
-        const nameB = Array.isArray(deptB) ? deptB[0].name : deptB.name;
+        const nameA = Array.isArray(deptA)
+          ? deptA[0].department_name
+          : deptA.department_name;
+        const nameB = Array.isArray(deptB)
+          ? deptB[0].department_name
+          : deptB.department_name;
 
         return nameA.localeCompare(nameB);
       });

@@ -44,7 +44,10 @@ export default function TopRated() {
     }
 
     data.map((department) =>
-      fetchedDepartments.push({ id: department.id, name: department.name })
+      fetchedDepartments.push({
+        id: department.department_id,
+        name: department.department_name,
+      })
     );
 
     setDepartments(fetchedDepartments);
@@ -69,7 +72,7 @@ export default function TopRated() {
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
-        "total_score:total_score.avg(), evaluations_count:total_score.count(), ...users!evaluation_sessions_employee_id_fkey(*, ...departments(department_name: name))"
+        "total_score:total_score.avg(), evaluations_count:total_score.count(), ...users!evaluation_sessions_employee_id_fkey(*, ...departments(department_name))"
       )
       .eq("period", firstDay);
 
@@ -144,6 +147,7 @@ export default function TopRated() {
       <div className="lg:grid lg:grid-cols-3 lg:gap-4 mt-2 flex flex-col mx-auto">
         {departments &&
           departments.map((department) => {
+            console.log({ department });
             if (department.id === 5 || department.id === 6) return;
             return (
               <div className="my-2 lg:my-0 shadow-md flex flex-col items-center justify-between rounded-md flex-1 bg-white min-h-[17rem]">
@@ -151,7 +155,7 @@ export default function TopRated() {
                   {department.name}
                 </h3>
 
-                {averages && averages[department.name] ? (
+                {averages && averages[department.name]?.totalScore > 0 ? (
                   <div className="flex-1 ">
                     <div className="flex justify-center items-center pt-5 flex-col">
                       <h4 className="text-6xl font-black text-[#222]">

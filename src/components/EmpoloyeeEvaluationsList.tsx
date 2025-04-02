@@ -29,7 +29,7 @@ export default function EmployeeEvaluationsList({
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
-        "*, users!employee_id(*, positions(name), departments(name)), evaluator:users!manager_id(first_name, last_name, positions(name), departments(name))"
+        "*, users!employee_id(*, positions(position_name), departments(department_name)), evaluator:users!manager_id(first_name, last_name, positions(position_name), departments(department_name))"
       )
       .eq(idColumn, idToUse)
       .gte("period", firstDay)
@@ -60,11 +60,14 @@ export default function EmployeeEvaluationsList({
         {userEvaluations && userEvaluations.length > 0 ? (
           userEvaluations.map((evaluation) => {
             const evaluatorName = `${evaluation.evaluator.first_name} ${evaluation.evaluator.last_name}`;
-            const evaluatorDepartment = evaluation.evaluator.departments.name;
-            const evaluatorPosition = evaluation.evaluator.positions.name;
+            const evaluatorDepartment =
+              evaluation.evaluator.departments.department_name;
+            const evaluatorPosition =
+              evaluation.evaluator.positions.position_name;
             const employeeName = `${evaluation.users.first_name} ${evaluation.users.last_name}`;
-            const employeeDepartment = evaluation.users.departments.name;
-            const employeePosition = evaluation.users.positions.name;
+            const employeeDepartment =
+              evaluation.users.departments.department_name;
+            const employeePosition = evaluation.users.positions.position_name;
 
             return (
               <Card key={`evaluation-${evaluation.id}`} className="shadow-sm">
@@ -117,8 +120,8 @@ export default function EmployeeEvaluationsList({
                     employeeData={{
                       id: evaluation.users.user_id,
                       name: `${evaluation.users.first_name} ${evaluation.users.last_name}`,
-                      position: evaluation.users.positions.name,
-                      department: evaluation.users.departments.name,
+                      position: evaluation.users.positions.position_name,
+                      department: evaluation.users.departments.department_name,
                     }}
                   />
                 </CardContent>

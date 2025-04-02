@@ -4,10 +4,11 @@ export interface User {
   id: string;
   full_name: string;
   email: string;
-  department: string;
+  department_name: string;
   department_id: number;
   avatar_url?: string;
-  position: string;
+  position_id: string;
+  position_name: string;
   access_level: number;
   company_id: string;
   role: string;

@@ -10,7 +10,7 @@ export default function CompanyQuestions({ company }: { company: Company }) {
     const { data, error } = await supabase
       .from("positions")
       .select(
-        "company_id, id, name, ...departments(departmentId:id,departmentName:name)"
+        "company_id, id, name, ...departments(departmentId:department_id,departmentName:department_name)"
       )
       .eq("company_id", company.id);
     if (error) {

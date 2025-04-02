@@ -6,3 +6,4 @@ export * from "./CompanyOptions.tsx";
 export * from "./EvaluateModal";
 export * from "./EvaluatedBadge";
 export * from "./SelectedDepartment";
+export * from "./DeleteEmployeeDialog.tsx";

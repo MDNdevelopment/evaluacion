@@ -93,7 +93,7 @@ export default function NewEmployee() {
     if (company) {
       const { data: departmentsData, error } = await supabase
         .from("departments")
-        .select("id, name")
+        .select("department_id, department_name")
         .eq("company_id", company.id);
 
       if (error) {
@@ -107,7 +107,7 @@ export default function NewEmployee() {
 
       const { data: positionsData, error: errorPositions } = await supabase
         .from("positions")
-        .select("id, name, department_id")
+        .select("position_id, position_name, department_id")
         .eq("company_id", company.id);
 
       if (errorPositions) {
@@ -115,7 +115,7 @@ export default function NewEmployee() {
         return;
       }
 
-      setSelectedDepartment(departmentsData[0].id);
+      setSelectedDepartment(departmentsData[0].department_id);
 
       //positions grouped by department id
       const groupedPositions = positionsData.reduce(
@@ -130,7 +130,7 @@ export default function NewEmployee() {
       );
 
       setPositions(groupedPositions);
-      setSelectedPosition(groupedPositions[0][0].id);
+      setSelectedPosition(groupedPositions[0][0].position_id);
 
       console.log({ selectedDepartment, selectedPosition });
     }
@@ -355,8 +355,11 @@ export default function NewEmployee() {
                     >
                       {departments &&
                         departments.map((department) => (
-                          <option key={department.id} value={department.id}>
-                            {department.name}
+                          <option
+                            key={department.id}
+                            value={department.department_id}
+                          >
+                            {department.department_name}
                           </option>
                         ))}
                     </select>
@@ -380,10 +383,12 @@ export default function NewEmployee() {
                       {positions &&
                         selectedDepartment !== null &&
                         positions[selectedDepartment].map((position: any) => {
-                          console.log({ position });
                           return (
-                            <option key={position.id} value={position.id}>
-                              {position.name}
+                            <option
+                              key={position.id}
+                              value={position.position_id}
+                            >
+                              {position.position_name}
                             </option>
                           );
                         })}

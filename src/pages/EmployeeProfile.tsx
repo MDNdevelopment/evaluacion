@@ -36,8 +36,8 @@ export default function EmployeeProfile() {
       .from("users")
       .select(
         `
-        *,departments(name),
-        positions(name)`
+        *,departments(department_name),
+        positions(position_name)`
       )
       .eq("user_id", id)
       .single();
@@ -217,7 +217,8 @@ export default function EmployeeProfile() {
               {employeeData.first_name} <br /> {employeeData.last_name}
             </h1>
             <h4 className="text-gray-800">
-              {employeeData.departments.name} - {employeeData.positions.name}
+              {employeeData.departments.department_name} -{" "}
+              {employeeData.positions.position_name}
             </h4>
           </div>
           <div className=" mx-auto pb-5 lg:pb-0">

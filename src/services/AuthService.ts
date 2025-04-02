@@ -39,7 +39,7 @@ export const loginUser = async ({
       .select(
         `
             *,
-            
+            positions(position_name, position_id),
             departments:department_id (
             id, 
             name
@@ -58,8 +58,9 @@ export const loginUser = async ({
         full_name: `${employeeData.first_name} ${employeeData.last_name}`,
         email: employeeData.email,
         department_id: employeeData.department_id,
-        department: employeeData.departments.name,
-        position: employeeData.position,
+        department_name: employeeData.departments.department_name,
+        position_id: employeeData.positions.position_id,
+        position_name: employeeData.positions.position_name,
         access_level: employeeData.access_level,
         company_id: employeeData.company_id,
         role: employeeData.role,

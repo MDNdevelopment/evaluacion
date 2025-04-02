@@ -91,9 +91,6 @@ export default function SelectedDepartment({
             )}
           </p>
 
-          <h3 className="mt-10 mb-3 scroll-m-20 text-xl font-semibold tracking-tight">
-            Opciones
-          </h3>
           <PositionDialog
             departmentName={department.name}
             departmentId={department.id}
