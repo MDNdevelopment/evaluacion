@@ -33,7 +33,7 @@ export function PositionDialog({
   const [isOpen, setIsOpen] = useState(false);
   const handleSubmit = async () => {
     const { error } = await supabase.from("positions").insert({
-      name: newPosition,
+      position_name: newPosition,
       department_id: departmentId,
       company_id: company.id,
     });

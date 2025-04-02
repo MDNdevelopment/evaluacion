@@ -6,8 +6,8 @@ import { PositionDialog } from "./PositionDialog";
 import { DeletePosition } from "./DeletePosition";
 
 interface Position {
-  name: string;
-  id: number;
+  position_name: string;
+  position_id: number;
 }
 
 export default function SelectedDepartment({
@@ -30,7 +30,7 @@ export default function SelectedDepartment({
     if (company) {
       const { data, error } = await supabase
         .from("positions")
-        .select("name, id")
+        .select("position_name, position_id")
         .eq("company_id", company.id)
         .eq("department_id", department.id);
 
@@ -38,6 +38,8 @@ export default function SelectedDepartment({
         console.log(error.message);
         return;
       }
+
+      console.log(data);
 
       setPositions(data);
       console.log({ newPositions: data });
@@ -107,15 +109,15 @@ export default function SelectedDepartment({
             positions.map((position) => {
               return (
                 <div
-                  key={position.name}
+                  key={position.position_name}
                   onClick={() => setSelectedPosition(position)}
                   className={`py-1 px-2 border w-fit rounded-lg  cursor-pointer  mx-1 text-darkText text-sm font-normal ${
-                    position.id === selectedPosition?.id
+                    position.position_id === selectedPosition?.position_id
                       ? "bg-darkText hover:bg-darkText-darker text-white"
                       : "hover:bg-gray-100"
                   }`}
                 >
-                  <h4>{position.name}</h4>
+                  <h4>{position.position_name}</h4>
                 </div>
               );
             })
@@ -135,8 +137,8 @@ export default function SelectedDepartment({
             />
             <DeletePosition
               company={company}
-              positionName={selectedPosition?.name}
-              positionId={selectedPosition?.id}
+              positionName={selectedPosition?.position_name}
+              positionId={selectedPosition?.position_id}
               setIsLoading={setIsLoading}
               setSelectedDepartment={setSelectedDepartment}
               department={department}

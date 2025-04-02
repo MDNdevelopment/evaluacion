@@ -55,6 +55,8 @@ export function EditEmployeeDialog({
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
 
   const onSubmit = handleSubmit(async (data: any) => {
+    console.log(employeeId);
+    console.log(data);
     const { data: updateData, error } = await supabase
       .from("users")
       .update({
@@ -63,14 +65,11 @@ export function EditEmployeeDialog({
         department_id: data.department_id,
         position_id: data.position_id,
       })
-      .eq("user_id", employeeId)
-      .select();
+      .eq("user_id", employeeId);
     if (error) {
       console.log(error.message);
       return;
     }
-
-    console.log(updateData);
 
     toast.success("Empleado actualizado correctamente", {
       position: "top-right",
