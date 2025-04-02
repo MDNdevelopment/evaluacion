@@ -57,7 +57,7 @@ export function EditEmployeeDialog({
   const onSubmit = handleSubmit(async (data: any) => {
     console.log(employeeId);
     console.log(data);
-    const { data: updateData, error } = await supabase
+    const { data: _updateData, error } = await supabase
       .from("users")
       .update({
         first_name: data.first_name,
