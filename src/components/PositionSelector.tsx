@@ -1,4 +1,3 @@
-import { Position } from "@/types";
 import PositionItem from "./PositionItem";
 import { useFormContext } from "react-hook-form";
 
@@ -6,21 +5,22 @@ export function PositionSelector({
   positions,
   markedPositions,
 }: {
-  positions: { [key: string]: Position[] };
+  positions: { [key: string]: any };
   markedPositions: number[];
 }) {
   const { getValues, setValue } = useFormContext();
 
   const handleSelectAllPositions = (departmentName: string) => {
-    console.log("clicked in department name");
     const positionsIds = positions[departmentName].map(
-      (position) => position.id
+      (position: any) => position.position_id
     );
 
     const currentPositions = getValues("positions") || [];
 
     if (
-      positionsIds.some((positionId) => currentPositions.includes(positionId))
+      positionsIds.some((positionId: any) =>
+        currentPositions.includes(positionId)
+      )
     ) {
       setValue(
         "positions",
@@ -48,10 +48,10 @@ export function PositionSelector({
               >
                 {departmentName}
               </h4>
-              {positions[departmentName].map((position: Position) => {
+              {positions[departmentName].map((position: any) => {
                 return (
                   <PositionItem
-                    key={`${departmentName}-${position.id}`}
+                    key={`${departmentName}-${position.position_id}`}
                     position={position}
                     markedPositions={markedPositions}
                   />

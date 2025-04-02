@@ -59,7 +59,6 @@ export function QuestionDialog({
       console.log(error.message);
       return;
     }
-    console.log(data);
     methods.setValue("question", data.text);
     setSavedText(data.text);
     const tagsArray = data.tags.map((tag: any) => {
@@ -71,13 +70,12 @@ export function QuestionDialog({
     const positionsArray = data.positions.map(
       (position: { position_id: number }) => position.position_id
     );
+
     setMarkedPositions(positionsArray);
     setSavedPositions(positionsArray);
   };
 
   useEffect(() => {
-    console.log("MOUNTING QUESTIONDIALOG", questionId);
-
     if (questionId && isOpen) {
       //The user is editing a question
       fetchQuestion();
@@ -160,8 +158,6 @@ export function QuestionDialog({
     const newTags = convertTags(data.tags);
 
     if (newText !== savedText) {
-      console.log("the text is different");
-      console.log({ questionId });
       //update the question's text
       const { error: textError } = await supabase
         .from("questions")
@@ -194,13 +190,11 @@ export function QuestionDialog({
           toast.error("Error al actualizar la pregunta - AP-03");
           return;
         }
-
-        console.log(data);
       });
 
       //add tags
       addTags.forEach(async (tag: string) => {
-        const { data, error } = await supabase.from("question_tags").insert({
+        const { error } = await supabase.from("question_tags").insert({
           tag: tag,
           question_id: questionId,
         });
@@ -210,8 +204,6 @@ export function QuestionDialog({
           toast.error("Error al actualizar la pregunta - AP-02");
           return;
         }
-
-        console.log(data);
       });
     }
 
@@ -220,11 +212,13 @@ export function QuestionDialog({
       JSON.stringify(markedPositions.sort((a, b) => a - b))
     ) {
       const removePositions = markedPositions.filter(
-        (position) => newPositions.indexOf(position) === -1
+        (position: any) => newPositions.indexOf(position) === -1
       );
       const addPositions = newPositions.filter(
-        (position: number) => markedPositions.indexOf(position) === -1
+        (position: any) => markedPositions.indexOf(position) === -1
       );
+
+      console.log({ removePositions, addPositions });
 
       //delete positions
       removePositions.forEach(async (position: number) => {
@@ -239,27 +233,20 @@ export function QuestionDialog({
           toast.error("Error al actualizar la pregunta - AP-05");
           return;
         }
-
-        console.log(data);
       });
 
       //add positions
-      addPositions.forEach(async (position: number) => {
-        console.log("Adding position", position);
-        const { data, error } = await supabase
-          .from("question_positions")
-          .insert({
-            position_id: position,
-            question_id: questionId,
-          });
+      addPositions.forEach(async (position: any) => {
+        const { error } = await supabase.from("question_positions").insert({
+          position_id: position,
+          question_id: questionId,
+        });
 
         if (error) {
           console.log(error.message);
           toast.error("Error al actualizar la pregunta - AP-06");
           return;
         }
-
-        console.log(data);
       });
     }
 

@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Company, Position } from "@/types";
+import { Company } from "@/types";
 import { supabase } from "@/services/supabaseClient";
 import QuestionsList from "./QuestionsList";
 
 export default function CompanyQuestions({ company }: { company: Company }) {
-  const [positions, setPositions] = useState<{ [key: string]: Position[] }>({});
+  const [positions, setPositions] = useState<{ [key: string]: any }>({});
 
   const fetchPositions = async () => {
     const { data, error } = await supabase
       .from("positions")
       .select(
-        "company_id, id, name, ...departments(departmentId:department_id,departmentName:department_name)"
+        "company_id, position_id, position_name, ...departments(departmentId:department_id,departmentName:department_name)"
       )
       .eq("company_id", company.id);
     if (error) {
@@ -18,7 +18,7 @@ export default function CompanyQuestions({ company }: { company: Company }) {
       return;
     }
     if (data && data.length > 0) {
-      const organizedPositions = data.reduce((acc: any, curr: Position) => {
+      const organizedPositions = data.reduce((acc: any, curr: any) => {
         const departmentName = curr.departmentName;
         if (!acc[departmentName]) {
           acc[departmentName] = [];
