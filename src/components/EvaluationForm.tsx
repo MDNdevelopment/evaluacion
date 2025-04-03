@@ -364,7 +364,12 @@ const EvaluationList = ({
                           disabled:checked:bg-gray-400"
                         />
 
-                        {responseLabels(index + 1)}
+                        {
+                          <>
+                            <span>{responseLabels(index + 1)}</span>
+                            <span>{index + 1}</span>
+                          </>
+                        }
                       </label>
                     </div>
                   );
