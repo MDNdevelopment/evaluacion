@@ -75,17 +75,17 @@ export default function EmployeeEvaluationsList({
                   <CardTitle>
                     <span className="text-darkText-lighter">
                       Evaluación{" "}
-                      {user && user.access_level > 1
-                        ? idColumn === "manager_id"
-                          ? "a "
-                          : "de "
-                        : "recibida"}
+                      {user &&
+                      user.access_level > 1 &&
+                      idColumn === "manager_id"
+                        ? "a "
+                        : "de "}
                       <span className="text-darkText font-bold">
-                        {user && user.access_level > 1
-                          ? idColumn === "manager_id"
-                            ? employeeName
-                            : evaluatorName
-                          : null}
+                        {user &&
+                        user.access_level > 1 &&
+                        idColumn === "manager_id"
+                          ? employeeName
+                          : evaluatorName}
                       </span>
                     </span>
                   </CardTitle>
@@ -100,7 +100,7 @@ export default function EmployeeEvaluationsList({
                     </p>
                     {user && user.access_level > 1 && (
                       <p>
-                        Posición:{" "}
+                        Cargo:{" "}
                         <span className="font-bold text-darkText">
                           {idColumn === "manager_id"
                             ? employeePosition

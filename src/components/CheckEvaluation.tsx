@@ -154,7 +154,7 @@ export const CheckEvaluation = ({
                 </Link>
 
                 <p className="text-gray-600">
-                  <strong>Posición:</strong> {employeeData.position}
+                  <strong>Cargo:</strong> {employeeData.position}
                 </p>
                 <p className="text-gray-600">
                   <strong>Departamento:</strong> {employeeData.department}

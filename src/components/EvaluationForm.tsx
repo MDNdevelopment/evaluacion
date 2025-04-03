@@ -317,7 +317,7 @@ export default function EvaluationForm({
           ) : (
             <div className="flex items-center justify-center p-10 bg-gray-100 rounded-md">
               <h3 className="scroll-m-20 text-md font-semibold text-gray-600">
-                No hay preguntas para esta posición
+                No hay preguntas para este cargo.
               </h3>
             </div>
           )}
