@@ -233,52 +233,62 @@ export default function EvaluationForm({
               </h3>
             )}
           </DialogHeader>
-          <FormProvider {...methods}>
-            <form
-              aria-disabled={disabledForm}
-              className="max-w-full w-full"
-              onSubmit={methods.handleSubmit(handleSubmit)}
-            >
-              <EvaluationList
-                evaluationId={evaluationId}
-                questions={questions}
-              />
-              <div>
-                <h3 className="font-bold mb-1">Comentario</h3>
-                <textarea
-                  className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-scroll"
-                  placeholder="Escribe un comentario..."
-                  disabled={!!evaluationId}
-                  {...methods.register("comment")}
+          {questions.length > 0 ? (
+            <FormProvider {...methods}>
+              <form
+                aria-disabled={disabledForm}
+                className="max-w-full w-full"
+                onSubmit={methods.handleSubmit(handleSubmit)}
+              >
+                <EvaluationList
+                  evaluationId={evaluationId}
+                  questions={questions}
                 />
-              </div>
-              <DialogFooter className="pt-2">
-                {!!evaluationId ? (
-                  <Button
-                    onClick={() => {
-                      handleDelete();
-                    }}
-                    variant={"destructive"}
-                    type="button"
-                  >
-                    Eliminar evaluación
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={
-                      Object.keys(methods.watch("responses")).length !==
-                        questions?.length || !!evaluationId
-                    }
-                    className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
-                    variant={"outline"}
-                    type="submit"
-                  >
-                    Enviar
-                  </Button>
-                )}
-              </DialogFooter>
-            </form>
-          </FormProvider>
+                <div>
+                  <h3 className="font-bold mb-1">Comentario</h3>
+                  <textarea
+                    className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-scroll"
+                    placeholder="Escribe un comentario..."
+                    disabled={!!evaluationId}
+                    {...methods.register("comment")}
+                  />
+                </div>
+                <DialogFooter className="pt-2">
+                  {!!evaluationId ? (
+                    <Button
+                      onClick={() => {
+                        handleDelete();
+                      }}
+                      variant={"destructive"}
+                      type="button"
+                    >
+                      Eliminar evaluación
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={
+                        Object.keys(methods.watch("responses")).length !==
+                          questions?.length ||
+                        !!evaluationId ||
+                        questions.length === 0
+                      }
+                      className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
+                      variant={"outline"}
+                      type="submit"
+                    >
+                      Enviar
+                    </Button>
+                  )}
+                </DialogFooter>
+              </form>
+            </FormProvider>
+          ) : (
+            <div className="flex items-center justify-center p-10 bg-gray-100 rounded-md">
+              <h3 className="scroll-m-20 text-md font-semibold text-gray-600">
+                No hay preguntas para esta posición
+              </h3>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
