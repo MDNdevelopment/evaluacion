@@ -4,11 +4,11 @@ export const formatScore = (score: number) => {
     case 1:
       return "Nunca";
     case 2:
-      return "Casi nunca";
+      return "Muy poco";
     case 3:
       return "A veces";
     case 4:
-      return "Casi siempre";
+      return "Muchas veces";
     case 5:
       return "Siempre";
     default:

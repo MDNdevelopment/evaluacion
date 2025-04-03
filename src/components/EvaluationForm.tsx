@@ -49,7 +49,7 @@ export default function EvaluationForm({
   const [evaluationData, setEvaluationData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  var commentCharacters = 250 - methods.watch("comment").length;
+  var commentCharacters = 250 - methods.watch("comment")?.length;
 
   const setAnswers = (
     retrievedAnswers: [{ question_id: number; response: number }]
@@ -256,19 +256,21 @@ export default function EvaluationForm({
                 <div>
                   <div className="flex flex-row items-center justify-start pt-5 ">
                     <h3 className="font-bold mb-1">Comentario</h3>
-                    <span
-                      className={`${
-                        commentCharacters > 80
-                          ? "text-neutral-400"
-                          : commentCharacters > 20
-                          ? "text-yellow-500"
-                          : commentCharacters > 0
-                          ? "text-red-500"
-                          : "text-red-700"
-                      } ml-2`}
-                    >
-                      {commentCharacters}/250
-                    </span>
+                    {!evaluationId && (
+                      <span
+                        className={`${
+                          commentCharacters > 80
+                            ? "text-neutral-400"
+                            : commentCharacters > 20
+                            ? "text-yellow-500"
+                            : commentCharacters > 0
+                            ? "text-red-500"
+                            : "text-red-700"
+                        } ml-2`}
+                      >
+                        {commentCharacters}/250
+                      </span>
+                    )}
                   </div>
                   <textarea
                     maxLength={250}

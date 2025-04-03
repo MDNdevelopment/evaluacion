@@ -330,24 +330,81 @@ export default function QuestionsList({
 
 function Tag({ text }: { text: string }) {
   return (
-    <div className="bg-gray-300 text-gray-800 text-center flex items-center justify-center text-[.75em] w-fit px-3 py-[0.1rem] rounded-sm mx-1">
+    <div
+      className={`${
+        text === "desactivada"
+          ? "bg-red-300 text-red-900"
+          : "bg-gray-300 text-gray-800"
+      } text-center flex items-center justify-center text-[.75em] w-fit px-3 py-[0.1rem] rounded-sm mx-1`}
+    >
       {text}
     </div>
   );
 }
 
 async function handleDeleteQuestion(questionId: number, callback: () => void) {
-  // delete question from the database
-  const response = await supabase
-    .from("questions")
-    .delete()
-    .eq("id", questionId);
-  if (response.error) {
-    console.log(response.error.message);
+  //Check if the question has been used in any evaluation
+  const { data, error: errorFetchQuestion } = await supabase
+    .from("evaluation_responses")
+    .select("*")
+    .eq("question_id", questionId);
+  if (errorFetchQuestion) {
+    console.log(errorFetchQuestion.message);
+    toast.error("Error al elminar la pregunta EL01", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
     return;
   }
 
-  console.log(response);
+  //If the question has been used in any evaluation, mark it as removed
+  if (data && data.length > 0) {
+    const response = await supabase
+      .from("questions")
+      .update({ removed: true })
+      .eq("id", questionId);
+    if (response.error) {
+      console.log(response.error.message);
+      toast.error("Error al elminar la pregunta EL02", {
+        position: "bottom-right",
+        autoClose: 1000,
+      });
+      return;
+    }
+
+    //Add a "deactivated" tag to the question
+    const { error: errorTag } = await supabase.from("question_tags").insert({
+      question_id: questionId,
+      tag: "desactivada",
+    });
+
+    if (errorTag) {
+      console.log(errorTag.message);
+      toast.error("Error al elminar la pregunta EL03", {
+        position: "bottom-right",
+        autoClose: 1000,
+      });
+      return;
+    }
+
+    //TODO: if this fails, the question should be re added to the database
+  } else {
+    // delete question from the database
+    const response = await supabase
+      .from("questions")
+      .delete()
+      .eq("id", questionId);
+    if (response.error) {
+      console.log(response.error.message);
+      toast.error("Error al elminar la pregunta EL03", {
+        position: "bottom-right",
+        autoClose: 1000,
+      });
+      return;
+    }
+
+    console.log(response);
+  }
 
   toast.success("Pregunta eliminada correctamente", {
     position: "bottom-right",
