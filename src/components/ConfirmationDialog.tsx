@@ -9,44 +9,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
 import { useState } from "react";
 
-export function DeletePosition({
-  positionName,
-  positionId,
-  setIsLoading,
-  setSelectedDepartment,
-  department,
+export function ConfirmationDialog({
+  triggerText,
+  title,
+  description,
+  confirmText,
+  handleSubmit,
 }: {
-  positionName: string | undefined;
-  positionId: number | undefined;
-  company: any;
-  setIsLoading: any;
-  setSelectedDepartment: any;
-  department: any;
+  triggerText: any;
+  title: string;
+  description: string;
+  confirmText: string;
+  handleSubmit: (extraData: any) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const handleSubmit = async () => {
-    // Delete the position
-    const responsePosition = await supabase
-      .from("positions")
-      .delete()
-      .eq("position_id", positionId);
 
-    if (responsePosition.error) {
-      console.log(responsePosition.error.message);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    setIsOpen(false);
-    setSelectedDepartment(department);
-
-    console.log("Position and unused categories deleted successfully.");
-  };
   return (
     <Dialog open={isOpen}>
       <DialogTrigger className="mr-3" asChild>
@@ -55,22 +35,18 @@ export function DeletePosition({
           onClick={() => setIsOpen(true)}
           variant="outline"
         >
-          Eliminar cargo
+          {triggerText}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden ">
         <div className="flex flex-row items-start ">
           <DialogHeader>
-            <DialogTitle className="mt-1">
-              Eliminar cargo: {positionName}
-            </DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que deseas eliminar este cargo?
-            </DialogDescription>
+            <DialogTitle className="mt-1">{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <DialogClose asChild={true}>
             <XIcon
-              className="flex flex-row justify-self-end cursor-pointer text-sm"
+              className="flex flex-row  absolute right-5 top-5 cursor-pointer text-sm"
               onClick={() => setIsOpen(false)}
             />
           </DialogClose>
@@ -82,7 +58,7 @@ export function DeletePosition({
             onClick={handleSubmit}
             type="submit"
           >
-            Eliminar
+            {confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -30,6 +30,7 @@ import { Input } from "@headlessui/react";
 import { FaLeftLong, FaRightLong } from "react-icons/fa6";
 import { QuestionDialog } from "./QuestionDialog";
 import { FaTrash } from "react-icons/fa";
+import { ConfirmationDialog } from "./ConfirmationDialog";
 
 export default function QuestionsList({
   company,
@@ -87,29 +88,6 @@ export default function QuestionsList({
       setCurrentPage(0);
     }
   }, [company, fetchingQuestions]);
-
-  const handleDeleteQuestion = async (questionId: number) => {
-    // delete question from the database
-    const response = await supabase
-      .from("questions")
-      .delete()
-      .eq("id", questionId);
-    if (response.error) {
-      console.log(response.error.message);
-      return;
-    }
-
-    console.log(response);
-
-    toast.success("Pregunta eliminada correctamente", {
-      position: "bottom-right",
-      autoClose: 1000,
-    });
-
-    setFetchingQuestions(true);
-
-    return;
-  };
 
   const handlePageDown = () => {
     if (currentPage === 0) {
@@ -200,13 +178,18 @@ export default function QuestionsList({
               positions={positions}
               questionId={row.original.id}
             />
-            <Button
-              onClick={() => handleDeleteQuestion(row.original.id)}
-              variant="ghost"
-              className="text-red-700 hover:text-red-800"
-            >
-              <FaTrash />
-            </Button>
+
+            <ConfirmationDialog
+              title="Eliminar pregunta"
+              description="¿Seguro que deseas eliminar la pregunta?"
+              confirmText="Eliminar"
+              handleSubmit={() => {
+                handleDeleteQuestion(row.original.id, () => {
+                  setFetchingQuestions(true);
+                });
+              }}
+              triggerText={<FaTrash />}
+            />
           </div>
         );
       },
@@ -351,4 +334,27 @@ function Tag({ text }: { text: string }) {
       {text}
     </div>
   );
+}
+
+async function handleDeleteQuestion(questionId: number, callback: () => void) {
+  // delete question from the database
+  const response = await supabase
+    .from("questions")
+    .delete()
+    .eq("id", questionId);
+  if (response.error) {
+    console.log(response.error.message);
+    return;
+  }
+
+  console.log(response);
+
+  toast.success("Pregunta eliminada correctamente", {
+    position: "bottom-right",
+    autoClose: 1000,
+  });
+
+  callback();
+
+  return;
 }

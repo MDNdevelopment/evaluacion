@@ -18,7 +18,7 @@ import { Company, Position } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
-import { FaPen } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 
 export function QuestionDialog({
   company,
@@ -305,11 +305,11 @@ export function QuestionDialog({
           </Button>
         ) : (
           <Button
+            className="text-sm font-light py-1 px-2 bg-gray-700 hover:bg-gray-800 text-white hover:text-white mt-3"
             onClick={() => setIsOpen(true)}
-            className="w-full p-2  text-darkText flex items-center justify-center"
-            variant="ghost"
+            variant="outline"
           >
-            <FaPen className="mr-2" />
+            {<FaPencilAlt />}
           </Button>
         )}
       </DialogTrigger>
