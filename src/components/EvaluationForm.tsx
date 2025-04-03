@@ -17,6 +17,7 @@ import formatDateForDisplay from "@/utils/formatDateForDisplay";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import { formatScore } from "@/utils/scoreUtils";
 
 export default function EvaluationForm({
   userId,
@@ -326,23 +327,7 @@ export default function EvaluationForm({
   );
 }
 
-const responseLabels = (response: number) => {
-  switch (response) {
-    case 1:
-      return "Nunca";
-    case 2:
-      return "Casi nunca";
-    case 3:
-      return "A veces";
-    case 4:
-      return "Casi siempre";
-    case 5:
-      return "Siempre";
-    default:
-      return "Error";
-  }
-};
-
+//TODO: MOve this component to its own file
 const EvaluationList = ({
   questions,
   evaluationId,
@@ -397,7 +382,7 @@ const EvaluationList = ({
 
                         {
                           <>
-                            <span>{responseLabels(index + 1)}</span>
+                            <span>{formatScore(index + 1)}</span>
                             <span>{index + 1}</span>
                           </>
                         }
