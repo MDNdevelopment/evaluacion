@@ -156,9 +156,11 @@ export function EmployeesTable() {
       header: "Evaluación",
       cell: ({ row }) => {
         if (
-          user &&
-          row.original.access_level > user.access_level &&
-          row.original.positions.position_name !== "CEO"
+          (user &&
+            row.original.access_level > user.access_level &&
+            row.original.positions.position_name !== "CEO") ||
+          row.original.user_id === user?.id ||
+          row.original.positions.position_id === user?.position_id
         ) {
           return (
             <Button

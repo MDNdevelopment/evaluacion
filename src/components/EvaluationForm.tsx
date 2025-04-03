@@ -16,6 +16,7 @@ import { XIcon } from "lucide-react";
 import formatDateForDisplay from "@/utils/formatDateForDisplay";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { toast } from "react-toastify";
+import Spinner from "./Spinner";
 
 export default function EvaluationForm({
   userId,
@@ -34,11 +35,6 @@ export default function EvaluationForm({
 }) {
   const [disabledForm, setDisabledForm] = useState(!!evaluationId);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const { firstDay, lastDay } = getPastMonthRange();
-  const [questions, setQuestions] = useState<any[] | []>([]);
-  const [evaluationData, setEvaluationData] = useState<any | null>(null);
-
   const methods = useForm({
     disabled: disabledForm,
     defaultValues: {
@@ -46,6 +42,14 @@ export default function EvaluationForm({
       comment: "",
     },
   });
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { firstDay, lastDay } = getPastMonthRange();
+  const [questions, setQuestions] = useState<any[] | []>([]);
+  const [evaluationData, setEvaluationData] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  var commentCharacters = 250 - methods.watch("comment").length;
 
   const setAnswers = (
     retrievedAnswers: [{ question_id: number; response: number }]
@@ -64,6 +68,7 @@ export default function EvaluationForm({
   };
 
   const getQuestions = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from("question_positions")
       .select("id:question_id, position_id, ...questions(text)")
@@ -77,9 +82,11 @@ export default function EvaluationForm({
       console.log(data);
       setQuestions(data);
     }
+    setIsLoading(false);
   };
 
   const getAnswers = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
@@ -102,6 +109,7 @@ export default function EvaluationForm({
     });
 
     methods.setValue("comment", data.comment[0]?.comment);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -233,6 +241,7 @@ export default function EvaluationForm({
               </h3>
             )}
           </DialogHeader>
+
           {questions.length > 0 ? (
             <FormProvider {...methods}>
               <form
@@ -245,12 +254,28 @@ export default function EvaluationForm({
                   questions={questions}
                 />
                 <div>
-                  <h3 className="font-bold mb-1">Comentario</h3>
+                  <div className="flex flex-row items-center justify-start pt-5 ">
+                    <h3 className="font-bold mb-1">Comentario</h3>
+                    <span
+                      className={`${
+                        commentCharacters > 80
+                          ? "text-neutral-400"
+                          : commentCharacters > 20
+                          ? "text-yellow-500"
+                          : commentCharacters > 0
+                          ? "text-red-500"
+                          : "text-red-700"
+                      } ml-2`}
+                    >
+                      {commentCharacters}/250
+                    </span>
+                  </div>
                   <textarea
+                    maxLength={250}
                     className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-scroll"
                     placeholder="Escribe un comentario..."
                     disabled={!!evaluationId}
-                    {...methods.register("comment")}
+                    {...methods.register("comment", { maxLength: 250 })}
                   />
                 </div>
                 <DialogFooter className="pt-2">
@@ -282,6 +307,10 @@ export default function EvaluationForm({
                 </DialogFooter>
               </form>
             </FormProvider>
+          ) : isLoading ? (
+            <div className="flex justify-center items-center">
+              <Spinner />
+            </div>
           ) : (
             <div className="flex items-center justify-center p-10 bg-gray-100 rounded-md">
               <h3 className="scroll-m-20 text-md font-semibold text-gray-600">

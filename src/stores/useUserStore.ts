@@ -7,7 +7,7 @@ export interface User {
   department_name: string;
   department_id: number;
   avatar_url?: string;
-  position_id: string;
+  position_id: number;
   position_name: string;
   access_level: number;
   company_id: string;
