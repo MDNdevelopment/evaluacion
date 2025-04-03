@@ -155,7 +155,11 @@ export function EmployeesTable() {
       id: "evaluation",
       header: "Evaluación",
       cell: ({ row }) => {
-        if (user && row.original.access_level > user.access_level) {
+        if (
+          user &&
+          row.original.access_level > user.access_level &&
+          row.original.positions.position_name !== "CEO"
+        ) {
           return (
             <Button
               className="bg-white text-darkText border cursor-not-allowed"
@@ -189,7 +193,11 @@ export function EmployeesTable() {
               <p className="text-white">Evaluado</p>
             </div>
           );
-        } else if (user && row.original.access_level > user.access_level) {
+        } else if (
+          user &&
+          row.original.access_level > user.access_level &&
+          row.original.positions.position_name !== "CEO"
+        ) {
           return (
             <div className="bg-[#f04444cd] flex justify-center items-center gap-2 p-1 rounded-md">
               <p className="text-[#741313]">No disponible</p>

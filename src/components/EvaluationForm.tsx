@@ -210,7 +210,7 @@ export default function EvaluationForm({
             {evaluationId ? "Ver evaluación" : "Evaluar"}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[725px] [&>button]:hidden">
+        <DialogContent className="sm:max-w-[725px] [&>button]:hidden ">
           <DialogClose asChild={true}>
             <XIcon
               className="absolute right-5 top-5  flex flex-row justify-self-end cursor-pointer"
@@ -317,7 +317,7 @@ const EvaluationList = ({
     console.log(watch("responses"));
   };
   return (
-    <div className="overflow-y-scroll h-[600px]">
+    <div className="overflow-y-scroll md:max-h-[200px] lg:max-h-[300px] xl:max-h-[350px] xxl:max-h-[600px]">
       {questions &&
         questions.map((question) => {
           console.log(question);
