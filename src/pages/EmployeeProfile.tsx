@@ -119,19 +119,21 @@ export default function EmployeeProfile() {
             response: response.response,
             evaluationId: curr.id,
           });
-
-          //Divide the totalScore by the number of responses to get the average score for that specific question
-
-          agg[curr.period].questions.questionsData[questionIndex].totalScore =
-            agg[curr.period].questions.questionsData[questionIndex].totalScore /
-            agg[curr.period].questions.questionsData[questionIndex]
-              .totalResponses;
         });
 
         return agg;
       },
       {}
     );
+
+    //Calculate the total score for each question
+    Object.keys(groupedEvaluationsByDate).forEach((key) => {
+      groupedEvaluationsByDate[key].questions.questionsData.forEach(
+        (question: any) => {
+          question.totalScore = question.totalScore / question.totalResponses;
+        }
+      );
+    });
 
     //Calculate the total score for each period
     Object.keys(groupedEvaluationsByDate).forEach((key) => {
@@ -353,6 +355,8 @@ const Promedios = ({
       }
 
       const questionsData = periodData.questions.questionsData;
+
+      console.log({ questionsData1: questionsData });
       questionsData.forEach(
         (question: {
           text: string;
@@ -381,6 +385,8 @@ const Promedios = ({
 
       return acc;
     }, {});
+
+    console.log({ avg });
 
     Object.keys(avg).forEach((question: any) => {
       avg[question].totalScore =
