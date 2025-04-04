@@ -47,6 +47,7 @@ export function EditEmployeeDialog({
       department_name: "",
       department_id: 0,
       position_id: 0,
+      access_level: 1,
     },
   });
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -64,6 +65,7 @@ export function EditEmployeeDialog({
         last_name: data.last_name,
         department_id: data.department_id,
         position_id: data.position_id,
+        access_level: data.access_level,
       })
       .eq("user_id", employeeId);
     if (error) {
@@ -96,6 +98,7 @@ export function EditEmployeeDialog({
       setValue("email", data.email);
       setValue("department_id", data.department_id);
       setValue("department_name", data.departments.department_name);
+      setValue("access_level", data.access_level);
       setSelectedDepartment({
         department_id: data.department_id,
         department_name: data.name,
@@ -238,6 +241,27 @@ export function EditEmployeeDialog({
                   {position.position_name}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="flex flex-row items-center gap-4">
+            <Label htmlFor="username" className="text-right w-2/4">
+              Nivel de acceso
+            </Label>
+            <select
+              {...register("access_level")}
+              className="border p-1 rounded-md shadow-sm w-full "
+            >
+              {[...Array(4)].map((_, accessLevel) => {
+                const accessLevelValue = accessLevel + 1;
+                return (
+                  <option
+                    key={`access_level-${accessLevel}`}
+                    value={accessLevelValue}
+                  >
+                    {accessLevelValue}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <DialogFooter>

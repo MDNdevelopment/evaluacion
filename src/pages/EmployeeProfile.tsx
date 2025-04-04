@@ -85,9 +85,6 @@ export default function EmployeeProfile() {
         agg[curr.period].totalEvaluations += 1;
         agg[curr.period].totalScore += curr.total_score;
 
-        agg[curr.period].totalScore =
-          agg[curr.period].totalScore / agg[curr.period].totalEvaluations;
-
         curr.evaluation_responses.forEach((response: any) => {
           agg[curr.period].questions.totalQuestions += 1;
           if (
@@ -136,12 +133,23 @@ export default function EmployeeProfile() {
       {}
     );
 
+    //Calculate the total score for each period
+    Object.keys(groupedEvaluationsByDate).forEach((key) => {
+      groupedEvaluationsByDate[key].totalScore =
+        groupedEvaluationsByDate[key].totalScore /
+        groupedEvaluationsByDate[key].totalEvaluations;
+    });
+
+    console.log({ groupedEvaluationsByDate });
+
     //Calculate the total average of all the evaluations
     const totalScoreAllTime =
       Object.keys(groupedEvaluationsByDate).reduce((agg: any, curr: any) => {
         agg += groupedEvaluationsByDate[curr].totalScore;
         return agg;
       }, 0) / Object.keys(groupedEvaluationsByDate).length;
+
+    console.log({ totalScoreAllTime });
 
     const chartData: any[] = [];
     //Set the chartData
