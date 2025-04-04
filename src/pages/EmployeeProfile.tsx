@@ -142,16 +142,12 @@ export default function EmployeeProfile() {
         groupedEvaluationsByDate[key].totalEvaluations;
     });
 
-    console.log({ groupedEvaluationsByDate });
-
     //Calculate the total average of all the evaluations
     const totalScoreAllTime =
       Object.keys(groupedEvaluationsByDate).reduce((agg: any, curr: any) => {
         agg += groupedEvaluationsByDate[curr].totalScore;
         return agg;
       }, 0) / Object.keys(groupedEvaluationsByDate).length;
-
-    console.log({ totalScoreAllTime });
 
     const chartData: any[] = [];
     //Set the chartData
@@ -190,14 +186,10 @@ export default function EmployeeProfile() {
       setEvaluationsData(groupedEvaluationsByDate);
     }
 
-    console.log(groupedEvaluationsByDate);
-    console.log(firstDay);
-
     if (Object.keys(groupedEvaluationsByDate).includes(firstDay)) {
       setPastMonthData(groupedEvaluationsByDate[firstDay]);
     }
 
-    console.log({ lastMonth: groupedEvaluationsByDate[firstDay] });
     //Set the states
     setTotalAverage(totalScoreAllTime);
     setEvaluationsChart(chartData);
@@ -339,7 +331,6 @@ const Promedios = ({
   current?: any;
   historic?: any;
 }) => {
-  console.log({ historic, current });
   const [answersAvg, setAnswersAvg] = useState<any>([]);
 
   const calculateHistoricAvg = (questions: any) => {
@@ -356,7 +347,6 @@ const Promedios = ({
 
       const questionsData = periodData.questions.questionsData;
 
-      console.log({ questionsData1: questionsData });
       questionsData.forEach(
         (question: {
           text: string;
@@ -385,8 +375,6 @@ const Promedios = ({
 
       return acc;
     }, {});
-
-    console.log({ avg });
 
     Object.keys(avg).forEach((question: any) => {
       avg[question].totalScore =

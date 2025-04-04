@@ -19,6 +19,7 @@ export default function EmployeeEvaluationsList({
   employeeId,
   evaluatorId,
 }: EmployeeEvaluationsListProps) {
+  console.log({ employeeId, evaluatorId });
   const user = useUserStore((state) => state.user);
   const [userEvaluations, setUserEvaluations] = useState<any[] | null>(null);
   const { firstDay, lastDay } = getPastMonthRange();
@@ -47,7 +48,7 @@ export default function EmployeeEvaluationsList({
     if (user) {
       getEvaluationsMadeByUser();
     }
-  }, [evaluatorId, employeeId]);
+  }, [evaluatorId, employeeId, user]);
   return (
     <>
       <div
