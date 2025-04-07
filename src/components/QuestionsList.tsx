@@ -31,6 +31,7 @@ import { FaLeftLong, FaRightLong } from "react-icons/fa6";
 import { QuestionDialog } from "./QuestionDialog";
 import { FaTrash } from "react-icons/fa";
 import { ConfirmationDialog } from "./ConfirmationDialog";
+import { QuestionsFilter } from "./QuestionsFilter";
 
 export default function QuestionsList({
   company,
@@ -47,8 +48,10 @@ export default function QuestionsList({
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [validQuestions, setValidQuestions] = useState<Question[]>([]);
 
   const [fetchingQuestions, setFetchingQuestions] = useState(true);
+  const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
 
   const fetchQuestions = async () => {
     console.log("fetching questions");
@@ -73,11 +76,48 @@ export default function QuestionsList({
 
       console.log(sortedQuestions);
       setQuestions(sortedQuestions);
-      setDisplayedQuestions(data.slice(0, 10));
+      setValidQuestions(sortedQuestions);
+      setDisplayedQuestions(sortedQuestions.slice(0, 10));
       return;
     }
     setQuestions([]);
     setDisplayedQuestions([]);
+  };
+
+  const handlePositionClick = (positionId: number) => {
+    let newPositions = [];
+    if (selectedPositions.includes(positionId)) {
+      newPositions = selectedPositions.filter((id) => id !== positionId);
+    } else {
+      newPositions = [...selectedPositions, positionId];
+    }
+
+    const filteredQuestions = questions.reduce((acc: any, curr: any) => {
+      curr.positions.map((position: any) => {
+        if (newPositions.includes(position.position_id)) {
+          if (!acc.includes(curr)) {
+            acc.push(curr);
+          }
+        }
+      });
+      return acc;
+    }, []);
+
+    console.log({ filteredQuestions });
+    setSelectedPositions(newPositions);
+
+    if (filteredQuestions.length === 0) {
+      setValidQuestions(questions);
+      setCurrentPage(0);
+      setDisplayedQuestions(questions.slice(0, 10));
+      return;
+    }
+
+    console.log({ filteredQuestions });
+    console.log({ sliced: filteredQuestions.slice(0, 10) });
+    setValidQuestions(filteredQuestions);
+    setCurrentPage(0);
+    setDisplayedQuestions(filteredQuestions.slice(0, 10));
   };
 
   useEffect(() => {
@@ -97,20 +137,20 @@ export default function QuestionsList({
     const start = newPage * 10;
     const end = start + 9;
     console.log({ start, end });
-    setDisplayedQuestions(questions.slice(start, end));
+    setDisplayedQuestions(validQuestions.slice(start, end));
     console.log(questions.slice(start, end));
     setCurrentPage(newPage);
   };
 
   const handlePageUp = () => {
-    if (currentPage === Math.ceil(questions.length / 10) - 1) {
+    if (currentPage === Math.ceil(validQuestions.length / 10) - 1) {
       return;
     }
     const newPage = currentPage + 1;
     const start = newPage * 10;
     const end = start + 9;
     console.log({ start, end });
-    setDisplayedQuestions(questions.slice(start, end));
+    setDisplayedQuestions(validQuestions.slice(start, end));
     console.log(questions.slice(start, end));
     setCurrentPage(newPage);
   };
@@ -223,20 +263,26 @@ export default function QuestionsList({
   });
 
   return (
-    <>
+    <div className="flex flex-col">
       <QuestionDialog
         company={company}
         setFetchingQuestions={setFetchingQuestions}
         positions={positions}
         questionId={null}
       />
-      <div className="max-w-[1200px] mx-auto">
+      <QuestionsFilter
+        departments={positions}
+        handlePositionClick={handlePositionClick}
+        selectedPositions={selectedPositions}
+      />
+      <div className="max-w-[1200px] mx-auto w-full">
+        {JSON.stringify(selectedPositions)}
         <div className="flex flex-row justify-between items-end py-4 ">
           <Input
             placeholder="Buscar..."
             onChange={(event) => {
               setDisplayedQuestions(
-                questions.filter((question) =>
+                validQuestions.filter((question) =>
                   question.text
                     .toLowerCase()
                     .includes(event.target.value.toLowerCase())
@@ -266,7 +312,8 @@ export default function QuestionsList({
               <FaRightLong />
             </Button>
             <p>
-              Página {currentPage + 1} de {Math.ceil(questions.length / 10)}
+              Página {currentPage + 1} de{" "}
+              {Math.ceil(validQuestions.length / 10)}
             </p>
           </div>
         </div>
@@ -324,7 +371,7 @@ export default function QuestionsList({
         </div>
         <div className="flex items-center justify-end space-x-2 py-4"></div>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -298,7 +298,7 @@ export function QuestionDialog({
         {!questionId ? (
           <Button
             variant="outline"
-            className="cursor-pointer"
+            className="cursor-pointer w-fit"
             onClick={() => setIsOpen(true)}
           >
             Agregar pregunta

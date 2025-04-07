@@ -2,7 +2,6 @@ import { supabase } from "@/services/supabaseClient";
 import { useUserStore } from "@/stores";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import { useEffect, useState } from "react";
-import { CheckEvaluation } from "./CheckEvaluation";
 import {
   Card,
   CardContent,
@@ -10,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { CheckEvaluationDialog } from "./CheckEvaluationDialog";
 
 interface EmployeeEvaluationsListProps {
   employeeId?: string | undefined;
@@ -115,7 +115,7 @@ export default function EmployeeEvaluationsList({
                   <p className="text-3xl text-darkText  font-black">
                     {evaluation.total_score.toFixed(2)}
                   </p>
-                  <CheckEvaluation
+                  <CheckEvaluationDialog
                     setIsLoadingTable={null}
                     evaluationId={evaluation.id}
                     employeeData={{

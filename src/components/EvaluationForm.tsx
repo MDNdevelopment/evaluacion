@@ -50,7 +50,7 @@ export default function EvaluationForm({
   const [evaluationData, setEvaluationData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  var commentCharacters = 250 - methods.watch("comment")?.length;
+  var commentCharacters = 400 - methods.watch("comment")?.length;
 
   const setAnswers = (
     retrievedAnswers: [{ question_id: number; response: number }]
@@ -123,8 +123,7 @@ export default function EvaluationForm({
   }, [isOpen]);
 
   const handleSubmit = async (data: any) => {
-    console.log(data);
-    console.log(userId);
+    setIsLoading(true);
 
     const totalScore: number =
       ((Object.values(data.responses) as number[]).reduce(
@@ -185,6 +184,7 @@ export default function EvaluationForm({
     });
     setIsOpen(false);
     setTableIsLoading(true);
+    setIsLoading(false);
   };
 
   const handleDelete = async () => {
@@ -269,16 +269,16 @@ export default function EvaluationForm({
                             : "text-red-700"
                         } ml-2`}
                       >
-                        {commentCharacters}/250
+                        {commentCharacters}/400
                       </span>
                     )}
                   </div>
                   <textarea
-                    maxLength={250}
+                    maxLength={400}
                     className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-scroll"
                     placeholder="Escribe un comentario..."
                     disabled={!!evaluationId}
-                    {...methods.register("comment", { maxLength: 250 })}
+                    {...methods.register("comment", { maxLength: 400 })}
                   />
                 </div>
                 <DialogFooter className="pt-2">
@@ -298,7 +298,8 @@ export default function EvaluationForm({
                         Object.keys(methods.watch("responses")).length !==
                           questions?.length ||
                         !!evaluationId ||
-                        questions.length === 0
+                        questions.length === 0 ||
+                        isLoading
                       }
                       className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
                       variant={"outline"}
