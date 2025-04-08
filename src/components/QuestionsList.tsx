@@ -49,6 +49,7 @@ export default function QuestionsList({
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [validQuestions, setValidQuestions] = useState<Question[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const [fetchingQuestions, setFetchingQuestions] = useState(true);
   const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
@@ -77,6 +78,7 @@ export default function QuestionsList({
       console.log(sortedQuestions);
       setQuestions(sortedQuestions);
       setValidQuestions(sortedQuestions);
+      setTotalPages(Math.ceil(sortedQuestions.length / 10));
       setDisplayedQuestions(sortedQuestions.slice(0, 10));
       return;
     }
@@ -108,6 +110,7 @@ export default function QuestionsList({
 
     if (filteredQuestions.length === 0) {
       setValidQuestions(questions);
+      setTotalPages(Math.ceil(questions.length / 10));
       setCurrentPage(0);
       setDisplayedQuestions(questions.slice(0, 10));
       return;
@@ -116,6 +119,7 @@ export default function QuestionsList({
     console.log({ filteredQuestions });
     console.log({ sliced: filteredQuestions.slice(0, 10) });
     setValidQuestions(filteredQuestions);
+    setTotalPages(Math.ceil(filteredQuestions.length / 10));
     setCurrentPage(0);
     setDisplayedQuestions(filteredQuestions.slice(0, 10));
   };
@@ -143,7 +147,7 @@ export default function QuestionsList({
   };
 
   const handlePageUp = () => {
-    if (currentPage === Math.ceil(validQuestions.length / 10) - 1) {
+    if (currentPage === totalPages - 1) {
       return;
     }
     const newPage = currentPage + 1;
@@ -276,18 +280,24 @@ export default function QuestionsList({
         selectedPositions={selectedPositions}
       />
       <div className="max-w-[1200px] mx-auto w-full">
-        {JSON.stringify(selectedPositions)}
         <div className="flex flex-row justify-between items-end py-4 ">
           <Input
             placeholder="Buscar..."
             onChange={(event) => {
-              setDisplayedQuestions(
-                validQuestions.filter((question) =>
-                  question.text
-                    .toLowerCase()
-                    .includes(event.target.value.toLowerCase())
-                )
+              if (event.target.value === "") {
+                setDisplayedQuestions(validQuestions.slice(0, 10));
+                setTotalPages(Math.ceil(validQuestions.length / 10));
+                setCurrentPage(0);
+                return table.setGlobalFilter(event.target.value);
+              }
+              const searchedQuestions = validQuestions.filter((question) =>
+                question.text
+                  .toLowerCase()
+                  .includes(event.target.value.toLowerCase())
               );
+              setDisplayedQuestions(searchedQuestions);
+              setTotalPages(Math.ceil(searchedQuestions.length / 10));
+              setCurrentPage(0);
               return table.setGlobalFilter(event.target.value);
             }}
             className="max-w-sm border border-gray-300 rounded-md px-2 py-1"
@@ -312,8 +322,7 @@ export default function QuestionsList({
               <FaRightLong />
             </Button>
             <p>
-              Página {currentPage + 1} de{" "}
-              {Math.ceil(validQuestions.length / 10)}
+              Página {currentPage + 1} de {totalPages}
             </p>
           </div>
         </div>

@@ -22,7 +22,7 @@ export const QuestionsFilter = ({
     }
   };
 
-  const positionsList =
+  var positionsList =
     Object.keys(departments).reduce((acc: any, curr: any) => {
       const department = departments[curr];
       // const departmentName = curr;
@@ -33,10 +33,18 @@ export const QuestionsFilter = ({
       return acc;
     }, []) || [];
 
-  console.log(positionsList);
+  positionsList = positionsList.sort((a: any, b: any) =>
+    a.name.localeCompare(b.name)
+  );
+  console.log({ positionsList });
   return (
     <div>
-      <Button variant={"secondary"} onClick={handleOpenerClick}>
+      <Button
+        className={`bg-white  shadow-sm mt-3 border-x-2 border-t-2  rounded-none rounded-tl-md rounded-tr-md  hover:bg-gray-200 text-gray-800 px-4 py-2 text-sm ${
+          !isMenuOpen && "rounded-br-md rounded-bl-md border-b-2"
+        }`}
+        onClick={handleOpenerClick}
+      >
         Cargos{" "}
         <FaAngleUp
           className={`${isMenuOpen && "-scale-100"} transition-all ease-linear`}
