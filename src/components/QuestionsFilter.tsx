@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { FaAngleUp } from "react-icons/fa";
 
 export const QuestionsFilter = ({
   departments,
@@ -25,7 +25,7 @@ export const QuestionsFilter = ({
   const positionsList =
     Object.keys(departments).reduce((acc: any, curr: any) => {
       const department = departments[curr];
-      const departmentName = curr;
+      // const departmentName = curr;
       department.map((position: any) =>
         acc.push({ id: position.position_id, name: position.position_name })
       );
