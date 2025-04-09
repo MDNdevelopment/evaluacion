@@ -174,6 +174,7 @@ export function EmployeesTable() {
         return (
           <>
             <EvaluationForm
+              userAccessLevel={user?.access_level || null}
               userId={user?.id || ""}
               employeeId={row.original.user_id}
               employeePosition={row.original.positions.position_id.toString()}

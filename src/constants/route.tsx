@@ -14,7 +14,9 @@ export const Routes = [
     path: "/",
     element: (
       <PrivateRoute>
-        <Dashboard />
+        <AccessRoute access_level={2}>
+          <Dashboard />
+        </AccessRoute>
       </PrivateRoute>
     ),
   },
@@ -48,7 +50,9 @@ export const Routes = [
     path: "/empleados",
     element: (
       <PrivateRoute>
-        <PrototypeForm />
+        <AccessRoute access_level={2}>
+          <PrototypeForm />
+        </AccessRoute>
       </PrivateRoute>
     ),
   },

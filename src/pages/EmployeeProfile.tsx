@@ -223,7 +223,7 @@ export default function EmployeeProfile() {
               {employeeData.positions.position_name}
             </h4>
           </div>
-          <div className=" mx-auto pb-5 lg:pb-0">
+          <div className=" mx-auto pb-5 lg:pb-0 mt-10 lg:mt-0">
             <div className=" min-h-[7rem] flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
               <div
                 className={`${
@@ -292,7 +292,7 @@ export default function EmployeeProfile() {
       </div>
 
       {evaluationsData && (
-        <div className="flex flex-row">
+        <div className="flex flex-col lg:flex-row">
           <Promedios current={pastMonthData} />
           <Promedios historic={evaluationsData} />
         </div>
@@ -406,7 +406,7 @@ const Promedios = ({
   }, [historic, current]);
 
   return (
-    <Card className="mx-3 w-3/6 max-h-[600px] overflow-y-scroll mt-10">
+    <Card className="mx-0 lg:mx-3 w-full lg:w-3/6 max-h-[600px] overflow-y-scroll mt-10 ">
       <CardHeader>
         <CardTitle>
           Promedio de preguntas{" "}

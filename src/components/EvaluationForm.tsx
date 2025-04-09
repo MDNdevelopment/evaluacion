@@ -20,6 +20,7 @@ import Spinner from "./Spinner";
 import { formatScore } from "@/utils/scoreUtils";
 
 export default function EvaluationForm({
+  userAccessLevel,
   userId,
   employeeId,
   employeePosition,
@@ -27,6 +28,7 @@ export default function EvaluationForm({
   setTableIsLoading,
   evaluationId,
 }: {
+  userAccessLevel: number | null;
   userId: string;
   employeeId: string;
   employeePosition: string | undefined;
@@ -124,6 +126,14 @@ export default function EvaluationForm({
 
   const handleSubmit = async (data: any) => {
     setIsLoading(true);
+    if (userAccessLevel === 1) {
+      toast.error("No tienes permisos para evaluar.", {
+        position: "bottom-right",
+        autoClose: 1000,
+      });
+      setIsLoading(false);
+      return;
+    }
 
     const totalScore: number =
       ((Object.values(data.responses) as number[]).reduce(
