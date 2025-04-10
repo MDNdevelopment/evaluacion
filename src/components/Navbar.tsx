@@ -167,6 +167,7 @@ export default function Navbar() {
                   ) {
                     return (
                       <Link
+                        onClick={() => close()}
                         key={item.name}
                         className={
                           item.current
