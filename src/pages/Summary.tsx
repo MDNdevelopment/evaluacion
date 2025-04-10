@@ -1,97 +1,97 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
-import { FaAngleDown, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 export default function Summary() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<any>(null);
   const navigate = useNavigate();
 
-  const [evaluationsDirection, setEvaluationsDirection] =
-    useState<boolean>(false);
-
-  const [averagesDirection, setAveragesDirection] = useState<boolean>(false);
-  const [departmentsDirection, setDepartmentsDirection] =
-    useState<boolean>(false);
-
-  const sortEvaluations = () => {
-    data.sort(function (x: any, y: any) {
-      if (x.evaluation_count < y.evaluation_count) {
-        if (evaluationsDirection) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      if (x.evaluation_count > y.evaluation_count) {
-        if (evaluationsDirection) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-
-      return 0;
-    });
-    setEvaluationsDirection((state) => !state);
-  };
-
-  const sortAverages = () => {
-    data.sort(function (x: any, y: any) {
-      if (x.average_total_rate < y.average_total_rate) {
-        if (averagesDirection) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      if (x.average_total_rate > y.average_total_rate) {
-        if (averagesDirection) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-
-      return 0;
-    });
-    setAveragesDirection((state) => !state);
-  };
-  const sortDepartments = () => {
-    data.sort(function (x: any, y: any) {
-      if (x.department_name < y.department_name) {
-        if (departmentsDirection) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      if (x.department_name > y.department_name) {
-        if (departmentsDirection) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-      return 0;
-    });
-    setDepartmentsDirection((state) => !state);
-  };
   const { register, handleSubmit, watch } = useForm();
+
+  const columns: ColumnDef<any>[] = [
+    {
+      accessorKey: "first_name",
+      header: "Nombre",
+      enableSorting: true,
+    },
+    {
+      accessorKey: "last_name",
+      header: "Apellido",
+      enableSorting: true,
+    },
+    {
+      accessorKey: "position_name",
+      header: "Cargo",
+      enableSorting: true,
+    },
+    {
+      accessorKey: "department_name",
+      header: "Departamento",
+      enableSorting: true,
+    },
+    {
+      accessorKey: "total_score",
+      header: "Total",
+      enableSorting: true,
+    },
+    {
+      accessorKey: "evaluation_count",
+      header: "Evaluaciones",
+      enableSorting: true,
+    },
+    {
+      id: "actions",
+      header: "Acciones",
+      cell: ({ row }) => {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  //take user to the employee profile
+                  navigate(`/empleado/${row.original.user_id}`, {
+                    replace: true,
+                  });
+                }}
+                className="cursor-pointer"
+              >
+                Ver empleado
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
 
   const onSubmit = handleSubmit(async (data: any) => {
     setIsLoading(true);
     const periodDate = `${data.year}-${String(data.month).padStart(2, "0")}-01`;
-    const { data: periodData, error } = await supabase.rpc(
-      "employee_evaluation_summary_for_period",
-      { start_date_param: periodDate }
-    );
+    const { data: periodData, error } = await supabase.rpc("summary", {
+      period_param: periodDate,
+    });
 
     if (error) {
       console.error("Error fetching evaluation summary:", error);
@@ -103,32 +103,15 @@ export default function Summary() {
       setIsLoading(false);
     }
 
-    periodData.sort(function (x: any, y: any) {
-      if (x.department_name < y.department_name) {
-        if (departmentsDirection) {
-          return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      if (x.department_name > y.department_name) {
-        if (departmentsDirection) {
-          return 1;
-        } else {
-          return -1;
-        }
-      }
-      return 0;
-    });
     setData(periodData);
-    console.log(periodData);
+
     setIsLoading(false);
   });
 
   useEffect(() => {
     onSubmit();
   }, [watch("month"), watch("year")]);
+
   return (
     <div className="max-w-[1200px] mx-auto p-10 bg-gray-100 mt-10 shadow-md rounded-lg">
       <h1 className="text-primary text-4xl uppercase font-black">
@@ -167,7 +150,7 @@ export default function Summary() {
         </select>
       </form>
 
-      <div className="overflow-x-auto">
+      {/* <div className="overflow-x-auto">
         <table className="overflow-x-auto mt-5 w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr className="">
@@ -267,19 +250,17 @@ export default function Summary() {
             </tbody>
           )}
         </table>
-      </div>
+      </div> */}
 
-      {isLoading && (
+      {isLoading ? (
         <div>
-          <div className="bg-white flex justify-center items-center w-full py-5">
+          <div className="bg-white flex justify-center items-center w-full py-5 mt-2">
             <Spinner />
           </div>
         </div>
-      )}
-
-      {!isLoading && data && data.length === 0 && (
-        <div className="bg-white flex justify-center items-center w-full py-5">
-          <p>No se encontraron resultados</p>
+      ) : (
+        <div className="mt-5 rounded-md  overflow-hidden">
+          <DataTable columns={columns} data={data} />
         </div>
       )}
     </div>

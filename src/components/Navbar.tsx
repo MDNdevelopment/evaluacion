@@ -23,11 +23,25 @@ export default function Navbar() {
   };
 
   const navigation = [
-    // { name: "Dashboard", href: "/dashboard", current: false },
-    // { name: "Empleados", href: "/empleados", current: false },
-    // { name: "Resumen", href: "/resumen", current: false },
+    { name: "Dashboard", href: "/dashboard", current: false, accessLevel: 2 },
+
+    { name: "Evaluar", href: "/empleados", current: false, accessLevel: 2 },
+    { name: "Resumen", href: "/resumen", current: false, accessLevel: 2 },
+    {
+      name: "Agregar empleado",
+      href: "/dashboard/nuevo",
+      current: false,
+      accessLevel: 2,
+      role: "admin",
+    },
     { name: "Mi perfil", href: `/empleado/${user?.id}`, current: false },
-    // { name: "Organización", href: "/company", current: false },
+    {
+      name: "Organización",
+      href: "/company",
+      current: false,
+      accessLevel: 2,
+      role: "admin",
+    },
   ];
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -59,60 +73,26 @@ export default function Navbar() {
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
-                  {user && user.access_level >= 2 && (
-                    <>
-                      <Link
-                        className={
-                          "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                        }
-                        to={"/dashboard"}
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        className={
-                          "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                        }
-                        to={"/empleados"}
-                      >
-                        Empleados
-                      </Link>
-
-                      <Link
-                        className={
-                          "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                        }
-                        to={`/resumen`}
-                      >
-                        Resumen
-                      </Link>
-                    </>
-                  )}
-                  {user && user.role === "admin" && (
-                    <Link
-                      to={"/dashboard/nuevo"}
-                      className="text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    >
-                      Agregar empleado
-                    </Link>
-                  )}
-                  <Link
-                    className={
-                      "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    }
-                    to={`/empleado/${user?.id}`}
-                  >
-                    Mi perfil
-                  </Link>
-
-                  <Link
-                    className={
-                      "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    }
-                    to={`/company`}
-                  >
-                    Organización
-                  </Link>
+                  {user &&
+                    navigation.map((item) => {
+                      if (
+                        (user.access_level >= (item?.accessLevel ?? 1) &&
+                          user.role === (item.role ?? "employee")) ||
+                        user.role === "admin"
+                      ) {
+                        return (
+                          <Link
+                            key={item.name}
+                            className={
+                              "text-gray-300 cursor-pointer hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                            }
+                            to={item.href}
+                          >
+                            {item.name}
+                          </Link>
+                        );
+                      }
+                    })}
                 </div>
               </div>
             </div>
