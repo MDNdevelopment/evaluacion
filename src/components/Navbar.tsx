@@ -158,22 +158,28 @@ export default function Navbar() {
         >
           {({ close }) => (
             <div className="space-y-1 px-2 pb-3 pt-2">
-              {navigation.map((item) => (
-                <Link
-                  onClick={() => {
-                    close();
-                  }}
-                  key={item.name}
-                  to={item.href}
-                  className={
-                    item.current
-                      ? "bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              {user &&
+                navigation.map((item) => {
+                  if (
+                    (user.access_level >= item.accessLevel &&
+                      user.role === (item?.role ?? "employee")) ||
+                    user.role === "admin"
+                  ) {
+                    return (
+                      <Link
+                        key={item.name}
+                        className={
+                          item.current
+                            ? "bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                        }
+                        to={item.href}
+                      >
+                        {item.name}
+                      </Link>
+                    );
                   }
-                >
-                  {item.name}
-                </Link>
-              ))}
+                })}
             </div>
           )}
         </DisclosurePanel>
