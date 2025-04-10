@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import Spinner from "./Spinner";
 import { useState } from "react";
+import { FaAngleDown, FaAngleRight, FaAngleUp } from "react-icons/fa";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,21 +67,25 @@ export function DataTable<TData, TValue>({
                         : undefined
                     }
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    {header.column.getCanSort() && (
-                      <span className="ml-2">
-                        {header.column.getIsSorted() === "asc"
-                          ? " 🔼"
-                          : header.column.getIsSorted() === "desc"
-                          ? "🔽"
-                          : "➡️"}
-                      </span>
-                    )}
+                    <span className="flex flex-row items-center">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      {header.column.getCanSort() && (
+                        <span className="ml-2">
+                          {header.column.getIsSorted() === "asc" ? (
+                            <FaAngleUp className="inline" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <FaAngleDown />
+                          ) : (
+                            <FaAngleRight />
+                          )}
+                        </span>
+                      )}
+                    </span>
                   </TableHead>
                 );
               })}
