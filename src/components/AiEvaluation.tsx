@@ -70,7 +70,7 @@ export default function AiEvaluation({ evaluations }: any) {
       throw new Error("No response text");
     } catch (error: any) {
       if (error.message) {
-        setAiError(error.message);
+        setAiError(JSON.stringify(error));
       }
 
       console.log({ error });
@@ -121,7 +121,9 @@ export default function AiEvaluation({ evaluations }: any) {
       ) : (
         <div className=" flex flex-col items-center justify-center">
           Ocurrió un error al generar el análisis...
-          <div className="overflow-x-auto w-full">{aiError}</div>
+          <div className="overflow-x-auto w-full">
+            (Actualmente no disponible desde un iphone)
+          </div>
         </div>
       )}
     </div>
