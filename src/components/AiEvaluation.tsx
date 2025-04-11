@@ -38,6 +38,7 @@ export default function AiEvaluation({ evaluations }: any) {
   const ai = new GoogleGenAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
   });
+  const [aiError, setAiError] = useState<any>(null);
 
   async function main() {
     try {
@@ -67,9 +68,14 @@ export default function AiEvaluation({ evaluations }: any) {
         return;
       }
       throw new Error("No response text");
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message) {
+        setAiError(error.message);
+      }
+
       console.log({ error });
       setAiResponse(null);
+
       setIsLoading(false);
     }
   }
@@ -113,8 +119,9 @@ export default function AiEvaluation({ evaluations }: any) {
           ))}
         </div>
       ) : (
-        <div className=" flex items-center justify-center">
+        <div className=" flex flex-col items-center justify-center">
           Ocurrió un error al generar el análisis...
+          <div className="overflow-x-auto w-full">{aiError}</div>
         </div>
       )}
     </div>
