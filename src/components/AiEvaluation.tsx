@@ -38,7 +38,7 @@ export default function AiEvaluation({ evaluations }: any) {
   const ai = new GoogleGenAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
   });
-  const [aiError, setAiError] = useState<any>(null);
+  const [_aiError, setAiError] = useState<any>(null);
 
   async function main() {
     try {
