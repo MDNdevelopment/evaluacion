@@ -92,7 +92,7 @@ export default function AiEvaluation({ evaluations }: any) {
           </div>
         </div>
       ) : aiResponse ? (
-        <>
+        <div className="max-h-[400px] overflow-y-auto">
           <div>
             <h3 className="text-xl font-bold">Resumen</h3>
             <p>{aiResponse.summary}</p>
@@ -111,7 +111,7 @@ export default function AiEvaluation({ evaluations }: any) {
               </ul>
             </div>
           ))}
-        </>
+        </div>
       ) : (
         <div className=" flex items-center justify-center">
           Ocurrió un error al generar el análisis...
