@@ -114,7 +114,7 @@ export const CheckEvaluationDialog = ({
             </div>
           </DialogHeader>
 
-          <div className="categories-section h-full  overflow-y-scroll ">
+          <div className="categories-section h-full  overflow-y-auto ">
             {retrievedAnswers ? (
               <>
                 {retrievedAnswers.evaluation_responses.map((response: any) => {

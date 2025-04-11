@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import getPastMonthRange from "@/utils/getPastMonthRange";
+import AiEvaluation from "@/components/AiEvaluation";
 
 export default function EmployeeProfile() {
   const { id } = useParams();
@@ -59,7 +60,7 @@ export default function EmployeeProfile() {
     const { data: evaluations, error: evaluationsError } = await supabase
       .from("evaluation_sessions")
       .select(
-        "id, total_score, period, evaluation_responses(*, questionData:questions(text)) "
+        "id, total_score, period, evaluation_responses(*, questionData:questions(text)), evaluation_comments(*) "
       )
       .eq("employee_id", id);
 
@@ -67,6 +68,8 @@ export default function EmployeeProfile() {
       console.log(evaluationsError.message);
       return;
     }
+
+    console.log({ evaluations });
 
     //Group evaluations by period
     const groupedEvaluationsByDate = evaluations?.reduce(
@@ -79,11 +82,17 @@ export default function EmployeeProfile() {
               totalQuestions: 0,
               questionsData: [],
             },
+            comments: [],
           };
         }
 
         agg[curr.period].totalEvaluations += 1;
         agg[curr.period].totalScore += curr.total_score;
+
+        //If the comment exists, add it to that period
+        if (curr.evaluation_comments[0].comment.length > 0) {
+          agg[curr.period].comments.push(curr.evaluation_comments[0].comment);
+        }
 
         curr.evaluation_responses.forEach((response: any) => {
           agg[curr.period].questions.totalQuestions += 1;
@@ -291,6 +300,8 @@ export default function EmployeeProfile() {
         </div>
       </div>
 
+      <AiEvaluation evaluations={evaluationsData} />
+
       {evaluationsData && (
         <div className="flex flex-col lg:flex-row">
           <Promedios current={pastMonthData} />
@@ -406,7 +417,7 @@ const Promedios = ({
   }, [historic, current]);
 
   return (
-    <Card className="mx-0 lg:mx-3 w-full lg:w-3/6 max-h-[600px] overflow-y-scroll mt-10 ">
+    <Card className="mx-0 lg:mx-3 w-full lg:w-3/6 max-h-[600px] overflow-y-auto mt-10 ">
       <CardHeader>
         <CardTitle>
           Promedio de preguntas{" "}
