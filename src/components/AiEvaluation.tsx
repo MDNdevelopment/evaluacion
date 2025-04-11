@@ -43,7 +43,7 @@ export default function AiEvaluation({ evaluations }: any) {
   async function main() {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         contents:
           "I need you to give me an analysis on the employee performance based on his evaluations " +
           JSON.stringify(evaluations),
