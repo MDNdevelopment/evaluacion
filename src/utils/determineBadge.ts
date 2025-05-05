@@ -13,11 +13,8 @@ export const determineBadge = (
   }
 
   if (
-    (userAccessLevel === 2 && employeeAccessLevel === 3) ||
-    (userAccessLevel === 2 &&
-      employeeAccessLevel === 4 &&
-      userAccessLevel === 2 &&
-      employeeId !== "2d50a4e5-35db-4be5-b27a-a24d1282ce82")
+    userAccessLevel === 2 &&
+    employeeId !== "2d50a4e5-35db-4be5-b27a-a24d1282ce82"
   ) {
     return { type: "danger", text: "No disponible" };
   }

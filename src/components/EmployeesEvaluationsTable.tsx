@@ -198,7 +198,7 @@ export function EmployeesTable() {
           );
         } else if (
           user &&
-          row.original.access_level > user.access_level &&
+          user.access_level < 1 &&
           row.original.positions.position_name !== "CEO"
         ) {
           return (
