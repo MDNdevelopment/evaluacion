@@ -157,7 +157,7 @@ export function EmployeesTable() {
       cell: ({ row }) => {
         if (
           (user &&
-            row.original.access_level > user.access_level &&
+            user.access_level === 1 &&
             row.original.positions.position_name !== "CEO") ||
           row.original.user_id === user?.id ||
           row.original.positions.position_id === user?.position_id
