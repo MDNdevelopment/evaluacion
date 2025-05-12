@@ -13,7 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -65,11 +65,35 @@ export function EmployeesTable() {
   const [isLoading, setIsLoading] = useState(false);
   const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const toggleHandler = (column: any) => {
+    const columnName = column.id;
+    console.log({ columnName });
+    const isSortedAsc = column.getIsSorted() === "asc";
+    // Create a new URLSearchParams object
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    // Set the new sorting parameter
+    newSearchParams.set("column", columnName);
+    newSearchParams.set("order", isSortedAsc ? "desc" : "asc");
+
+    // Replace the current search params with the new one
+    setSearchParams(newSearchParams);
+
+    return column.toggleSorting(isSortedAsc);
+  };
 
   useEffect(() => {
     getEmployees();
     setEvaluation(null);
     console.log("EmployeesTable Rendered");
+
+    const columnName = searchParams.get("column");
+    const order = searchParams.get("order");
+    if (columnName && order) {
+      setSorting([{ id: columnName, desc: order === "desc" }]);
+    }
   }, [company, isLoading]);
 
   const columns: ColumnDef<Employee>[] = [
@@ -79,7 +103,9 @@ export function EmployeesTable() {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            onClick={() => {
+              toggleHandler(column);
+            }}
           >
             Nombre
             <ArrowUpDown />
@@ -96,7 +122,9 @@ export function EmployeesTable() {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            onClick={() => {
+              toggleHandler(column);
+            }}
           >
             Apellido
             <ArrowUpDown />
@@ -113,7 +141,9 @@ export function EmployeesTable() {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            onClick={() => {
+              toggleHandler(column);
+            }}
           >
             Departamento
             <ArrowUpDown />
@@ -150,7 +180,27 @@ export function EmployeesTable() {
         return <div>{row.original.positions.position_name}</div>;
       },
     },
-
+    {
+      accessorKey: "evaluation_count",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              toggleHandler(column);
+            }}
+          >
+            Evaluaciones hechas
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize  text-center">
+          {row.getValue("evaluation_count")}/{employees.length - 1}
+        </div>
+      ),
+    },
     {
       id: "evaluation",
       header: "Evaluación",
@@ -232,9 +282,7 @@ export function EmployeesTable() {
               <DropdownMenuItem
                 onClick={() => {
                   //take user to the employee profile
-                  navigate(`/empleado/${row.original.user_id}`, {
-                    replace: true,
-                  });
+                  navigate(`/empleado/${row.original.user_id}`, {});
                 }}
                 className="cursor-pointer"
               >
@@ -259,11 +307,14 @@ export function EmployeesTable() {
           company_id,
           access_level,
           departments(department_name, department_id),
-          positions(position_name, position_id)
-        `
+          positions(position_name, position_id),
+         evaluation_count: evaluation_sessions!manager_id(count)
+    `
         )
-        .eq("company_id", company.id);
+        .eq("company_id", company.id)
+        .eq("evaluation_sessions.period", firstDay);
 
+      console.log({ data });
       if (error) {
         console.log(error.message);
         return;
@@ -289,6 +340,7 @@ export function EmployeesTable() {
         return {
           ...employee,
           evaluation,
+          evaluation_count: employee.evaluation_count[0].count || 0,
         };
       });
 
@@ -349,7 +401,7 @@ export function EmployeesTable() {
   });
 
   return (
-    <div className="max-w-[1200px] mx-auto">
+    <div className="max-w-[1200px] mx-auto ">
       <div className="flex items-center py-4">
         <Input
           placeholder="Buscar..."
@@ -386,7 +438,7 @@ export function EmployeesTable() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border  overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
