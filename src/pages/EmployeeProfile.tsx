@@ -20,6 +20,17 @@ import {
 } from "@/components/ui/card";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import AiEvaluation from "@/components/AiEvaluation";
+import { FaFileAlt } from "react-icons/fa";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Dialog } from "@/components/ui/dialog";
+import EmployeeFile from "@/components/EmployeeFile";
+import formatDateForDisplay from "@/utils/formatDateForDisplay";
+import dateDifference from "@/utils/dateDifference";
 
 export default function EmployeeProfile() {
   const { id } = useParams();
@@ -28,6 +39,7 @@ export default function EmployeeProfile() {
   const [pastMonthData, setPastMonthData] = useState<any>(null);
   const [evaluationsChart, setEvaluationsChart] = useState<any>([]);
   const [totalAverage, setTotalAverage] = useState<number | null>(null);
+  const [isFileOpen, setIsFileOpen] = useState(false);
   const user = useUserStore((state) => state.user);
   const [isLoading, setIsLoading] = useState(true);
   const { firstDay } = getPastMonthRange();
@@ -220,17 +232,70 @@ export default function EmployeeProfile() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto p-5 lg:p-10 bg-[#f7f7f7] lg:mt-10 shadow-md rounded-lg">
+    <div className="max-w-[1200px] mx-auto p-5 lg:p-10 bg-neutral-100 lg:mt-10 shadow-md rounded-lg">
       <div className="flex lg:flex-row flex-col">
         <div className="w-full lg:w-2/5  lg:pr-5 flex flex-col justify-between items-center lg:items-start ">
-          <div className=" w-full">
-            <h1 className="text-darkText text-5xl uppercase font-black">
-              {employeeData.first_name} <br /> {employeeData.last_name}
-            </h1>
-            <h4 className="text-gray-800">
-              {employeeData.departments.department_name} -{" "}
-              {employeeData.positions.position_name}
-            </h4>
+          <div className=" w-full  flex flex-row justify-between items-center">
+            <div>
+              <h1 className="text-darkText text-5xl uppercase font-black">
+                {employeeData.first_name} <br /> {employeeData.last_name}
+              </h1>
+              <h4 className="text-gray-800">
+                {employeeData.departments.department_name} -{" "}
+                {employeeData.positions.position_name}
+              </h4>
+            </div>
+            <div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <EmployeeFile
+                      isFileOpen={isFileOpen}
+                      setIsFileOpen={setIsFileOpen}
+                      employeeData={{
+                        name: {
+                          title: "Nombre",
+                          data: `${employeeData.first_name} ${employeeData.last_name}`,
+                        },
+                        position: {
+                          title: "Cargo",
+                          data: employeeData.positions.position_name,
+                        },
+                        department: {
+                          title: "Departamento",
+                          data: employeeData.departments.department_name,
+                        },
+                        email: { title: "Email", data: employeeData.email },
+                        phone: {
+                          title: "Teléfono",
+                          data: employeeData.phone_number || "N/A",
+                        },
+                        birthdate: {
+                          title: "Fecha de Nacimiento",
+                          data: employeeData.birth_date
+                            ? formatDateForDisplay(employeeData.birth_date)
+                            : "N/A",
+                        },
+                        hireDate: {
+                          title: "Fecha de Ingreso",
+                          data: employeeData.hire_date
+                            ? formatDateForDisplay(employeeData.hire_date)
+                            : "N/A",
+                          difference: employeeData.hire_date
+                            ? dateDifference(employeeData.hire_date, new Date())
+                            : "",
+                        },
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-white border border-neutral-200">
+                    <p className="text-sm text-gray-700">
+                      Ver ficha de empleado
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           <div className=" mx-auto pb-5 lg:pb-0 mt-10 lg:mt-0">
             <div className=" min-h-[7rem] flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
