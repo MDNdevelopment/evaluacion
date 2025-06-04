@@ -8,11 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FaPencil } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
@@ -33,11 +31,15 @@ export function EditEmployeeDialog({
   departments,
   positions,
   fetchEmployees,
+  isEditEmployeeDialogOpen,
+  setIsEditEmployeeDialogOpen,
 }: {
-  employeeId: string;
+  employeeId: string | null;
   departments: Department[];
   positions: Position[];
   fetchEmployees: () => void;
+  isEditEmployeeDialogOpen: boolean;
+  setIsEditEmployeeDialogOpen: (val: boolean) => void;
 }) {
   const { register, setValue, handleSubmit } = useForm({
     defaultValues: {
@@ -50,7 +52,6 @@ export function EditEmployeeDialog({
       access_level: 1,
     },
   });
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [_selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
@@ -78,7 +79,7 @@ export function EditEmployeeDialog({
       autoClose: 2000,
     });
 
-    setIsDialogOpen(false);
+    setIsEditEmployeeDialogOpen(false);
     fetchEmployees();
   });
   const getEmployeeData = async (id: string) => {
@@ -127,33 +128,20 @@ export function EditEmployeeDialog({
     );
     setValue("position_id", data[0]?.id || 0);
   };
-  //   const handleEditEmployee = async (id: string) => {
-  //     return;
-  //   };
-
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
-  };
-
-  //   const handleCloseDialog = () => {
-  //     setIsDialogOpen(false);
-  //   };
 
   useEffect(() => {
     if (!employeeId) return;
-    if (isDialogOpen) {
+    if (isEditEmployeeDialogOpen) {
       getEmployeeData(employeeId);
     }
-  }, [employeeId, isDialogOpen]);
+  }, [employeeId, isEditEmployeeDialogOpen]);
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger onClick={handleOpenDialog} asChild>
-        <Button variant="outline" className="text-gray-800 hover:text-gray-900">
-          <FaPencil size={18} />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog
+      open={isEditEmployeeDialogOpen}
+      onOpenChange={setIsEditEmployeeDialogOpen}
+    >
+      <DialogContent className="sm:max-w-[625px] ">
         <DialogHeader>
           <DialogTitle>Editar empleado</DialogTitle>
           <DialogDescription>
@@ -161,7 +149,7 @@ export function EditEmployeeDialog({
             información sea correcta antes de guardar.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4 py-4">
+        <form onSubmit={onSubmit} className="flex flex-col gap-y-3 py-4">
           <div className="flex flex-row items-center gap-4">
             <Label htmlFor="first_name" className="text-right w-2/4">
               Nombre
@@ -217,7 +205,7 @@ export function EditEmployeeDialog({
               className="border p-1 rounded-md shadow-sm w-full "
             >
               {departments &&
-                isDialogOpen &&
+                isEditEmployeeDialogOpen &&
                 departments.map((department) => (
                   <option
                     key={`${department.department_id}-`}
@@ -264,6 +252,7 @@ export function EditEmployeeDialog({
               })}
             </select>
           </div>
+
           <DialogFooter>
             <Button type="submit">Guardar</Button>
           </DialogFooter>

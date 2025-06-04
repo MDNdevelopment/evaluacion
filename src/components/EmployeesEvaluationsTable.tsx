@@ -51,6 +51,7 @@ export type Employee = {
   user_id: string;
   evaluation: any;
   access_level: number;
+  vacations: { status: string; end_date: Date; start_date: Date }[];
 };
 
 export function EmployeesTable() {
@@ -66,6 +67,31 @@ export function EmployeesTable() {
   const setEvaluation = useEvaluationCheckStore((state) => state.setEvaluation);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const checkVacationOngoing = (row: any) => {
+    let vacationOngoing = false;
+    const vacationsArray = [...row.original.vacations].sort(
+      (a, b) => new Date(b.end_date).valueOf() - new Date(a.end_date).valueOf()
+    );
+
+    const currentMonth = new Date().getMonth() + 1;
+    let startDate = null;
+    let endDate = null;
+    if (vacationsArray.length > 0) {
+      startDate = new Date(vacationsArray[0]?.start_date);
+      endDate = new Date(vacationsArray?.[0]?.end_date);
+      let startDateMonth = startDate.getMonth() + 1;
+      let endDateMonth = endDate.getMonth() + 1;
+
+      if (
+        (startDateMonth === currentMonth - 1 && startDate.getDate() <= 15) ||
+        (endDateMonth === currentMonth - 1 && endDate.getDate() >= 15)
+      ) {
+        vacationOngoing = true;
+      }
+    }
+    return vacationOngoing;
+  };
 
   const toggleHandler = (column: any) => {
     const columnName = column.id;
@@ -205,18 +231,22 @@ export function EmployeesTable() {
       id: "evaluation",
       header: "Evaluación",
       cell: ({ row }) => {
+        let vacationOngoing = checkVacationOngoing(row);
+
         if (
           (user &&
             user.access_level === 1 &&
             row.original.positions.position_name !== "CEO") ||
           row.original.user_id === user?.id ||
-          row.original.positions.position_id === user?.position_id
+          row.original.positions.position_id === user?.position_id ||
+          vacationOngoing
         ) {
           return (
             <Button
               className="bg-white text-darkText border cursor-not-allowed"
               disabled
             >
+              {vacationOngoing}
               Evaluar
             </Button>
           );
@@ -240,7 +270,13 @@ export function EmployeesTable() {
       id: "status",
       header: "Estado",
       cell({ row }) {
-        if (row.original.evaluation) {
+        if (checkVacationOngoing(row)) {
+          return (
+            <div className="bg-[#9d44f0cd] flex justify-center items-center gap-2 p-1 rounded-md">
+              <p className="text-[#ffffff] text-center">Vacaciones</p>
+            </div>
+          );
+        } else if (row.original.evaluation) {
           return (
             <div className="bg-[#3195369f] flex justify-center items-center gap-2 p-1 rounded-md">
               <p className="text-white">Evaluado</p>
@@ -308,7 +344,8 @@ export function EmployeesTable() {
           access_level,
           departments(department_name, department_id),
           positions(position_name, position_id),
-         evaluation_count: evaluation_sessions!manager_id(count)
+         evaluation_count: evaluation_sessions!manager_id(count),
+         vacations(start_date, end_date, status)
     `
         )
         .eq("company_id", company.id)

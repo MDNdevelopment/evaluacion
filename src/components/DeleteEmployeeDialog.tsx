@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,35 +6,28 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { FaTrash } from "react-icons/fa";
-
 export const DeleteEmployeeDialog = ({
   employeeName,
   employeeId,
   handleDeleteEmployee,
+  isDeleteEmployeeDialogOpen,
+  setIsDeleteEmployeeDialogOpen,
 }: {
   employeeName: string;
-  employeeId: string;
+  employeeId: string | null;
   handleDeleteEmployee: (id: string) => void;
+  isDeleteEmployeeDialogOpen: boolean;
+  setIsDeleteEmployeeDialogOpen: (val: boolean) => void;
 }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-
-  const handleOpenDialog = () => {
-    setIsDialogOpen(true);
-  };
-
   const handleCloseDialog = () => {
-    setIsDialogOpen(false);
+    setIsDeleteEmployeeDialogOpen(false);
   };
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger onClick={handleOpenDialog} asChild>
-        <Button variant="outline" className="text-red-700 hover:text-red-800">
-          <FaTrash size={18} />
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={isDeleteEmployeeDialogOpen}
+      onOpenChange={setIsDeleteEmployeeDialogOpen}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Eliminar empleado</DialogTitle>
@@ -48,10 +40,12 @@ export const DeleteEmployeeDialog = ({
         <DialogFooter>
           <Button
             onClick={async () => {
+              if (!employeeId) return;
               await handleDeleteEmployee(employeeId);
               handleCloseDialog();
             }}
             type="button"
+            className="bg-red-600 hover:bg-red-700"
           >
             Eliminar
           </Button>

@@ -20,14 +20,12 @@ import {
 } from "@/components/ui/card";
 import getPastMonthRange from "@/utils/getPastMonthRange";
 import AiEvaluation from "@/components/AiEvaluation";
-import { FaFileAlt } from "react-icons/fa";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Dialog } from "@/components/ui/dialog";
 import EmployeeFile from "@/components/EmployeeFile";
 import formatDateForDisplay from "@/utils/formatDateForDisplay";
 import dateDifference from "@/utils/dateDifference";
@@ -211,6 +209,7 @@ export default function EmployeeProfile() {
       setPastMonthData(groupedEvaluationsByDate[firstDay]);
     }
 
+    console.log({ chartData });
     //Set the states
     setTotalAverage(totalScoreAllTime);
     setEvaluationsChart(chartData);
@@ -284,6 +283,10 @@ export default function EmployeeProfile() {
                           difference: employeeData.hire_date
                             ? dateDifference(employeeData.hire_date, new Date())
                             : "",
+                        },
+                        vacations: {
+                          title: "Próximas vacaciones",
+                          data: `${employeeData.vacation_start} - ${employeeData.vacation_end}`,
                         },
                       }}
                     />
@@ -465,6 +468,7 @@ const Promedios = ({
     Object.keys(avg).forEach((question: any) => {
       avgArray.push(avg[question]);
     });
+    avgArray.sort((a, b) => a.text.localeCompare(b.text));
 
     setAnswersAvg(avgArray);
   };
