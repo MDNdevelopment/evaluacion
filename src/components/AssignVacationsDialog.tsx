@@ -157,14 +157,18 @@ export default function AssignVacationsDialog({
     setUploadingData(false);
   };
 
-  const handleResetVacations = async (e: any) => {
+  const handleResetVacations = async (
+    e: any,
+    foundVacationId: number | null
+  ) => {
     e.preventDefault();
+    console.log(e);
     if (!employeeId) return;
     const response = await supabase
       .from("vacations")
       .delete()
       .eq("user_id", employeeId)
-      .eq("status", "programmed");
+      .eq("id", foundVacationId);
     if (response.error) {
       console.error("Error resetting vacations:", response.error.message);
       toast.error("Error al restablecer las vacaciones", {
@@ -229,7 +233,7 @@ export default function AssignVacationsDialog({
                 </Button>
                 <Button
                   disabled={!isVacationSet}
-                  onClick={(e) => handleResetVacations(e)}
+                  onClick={(e) => handleResetVacations(e, foundVacationId)}
                   variant={"outline"}
                 >
                   Restablecer

@@ -284,10 +284,6 @@ export default function EmployeeProfile() {
                             ? dateDifference(employeeData.hire_date, new Date())
                             : "",
                         },
-                        vacations: {
-                          title: "Próximas vacaciones",
-                          data: `${employeeData.vacation_start} - ${employeeData.vacation_end}`,
-                        },
                       }}
                     />
                   </TooltipTrigger>

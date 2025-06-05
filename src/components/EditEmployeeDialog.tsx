@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
+import SingleDatePicker from "./SingleDatePicker";
 
 interface Department {
   department_name: string;
@@ -41,15 +42,21 @@ export function EditEmployeeDialog({
   isEditEmployeeDialogOpen: boolean;
   setIsEditEmployeeDialogOpen: (val: boolean) => void;
 }) {
+  const [birthDate, setBirthDate] = useState<null | Date>(null);
+  const [sendingData, setSendingData] = useState<boolean>(false);
+  const [hireDate, setHireDate] = useState<null | Date>(null);
   const { register, setValue, handleSubmit } = useForm({
     defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
+      phone_number: "",
       department_name: "",
       department_id: 0,
       position_id: 0,
       access_level: 1,
+      birth_date: "",
+      hire_date: "",
     },
   });
   const [_selectedDepartment, setSelectedDepartment] =
@@ -57,6 +64,7 @@ export function EditEmployeeDialog({
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
 
   const onSubmit = handleSubmit(async (data: any) => {
+    setSendingData(true);
     console.log(employeeId);
     console.log(data);
     const { data: _updateData, error } = await supabase
@@ -67,10 +75,18 @@ export function EditEmployeeDialog({
         department_id: data.department_id,
         position_id: data.position_id,
         access_level: data.access_level,
+        phone_number: data.phone_number,
+        birth_date: data.birth_date,
+        hire_date: data.hire_date,
       })
       .eq("user_id", employeeId);
     if (error) {
       console.log(error.message);
+      setSendingData(false);
+      toast.error("Error al actualizar el empleado", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
       return;
     }
 
@@ -97,9 +113,15 @@ export function EditEmployeeDialog({
       setValue("first_name", data.first_name);
       setValue("last_name", data.last_name);
       setValue("email", data.email);
+      setValue("phone_number", data.phone_number);
       setValue("department_id", data.department_id);
       setValue("department_name", data.departments.department_name);
       setValue("access_level", data.access_level);
+      setValue("birth_date", data.birth_date);
+      setValue("hire_date", data.hire_date);
+
+      setBirthDate(data.birth_date);
+      setHireDate(data.hire_date);
       setSelectedDepartment({
         department_id: data.department_id,
         department_name: data.name,
@@ -182,6 +204,50 @@ export function EditEmployeeDialog({
             />
           </div>
           <div className="flex flex-row items-center gap-4">
+            <Label htmlFor="phone_number" className="text-right w-2/4">
+              Teléfono
+            </Label>
+            <Input
+              id="phone_number"
+              {...register("phone_number")}
+              className="col-span-3"
+            />
+          </div>
+          <div className="flex flex-row items-center gap-4">
+            <Label htmlFor="birth_date" className="text-right w-2/4">
+              Fecha de nacimiento
+            </Label>
+            <div className="w-full">
+              <SingleDatePicker
+                identifier="birth_date"
+                setValue={setValue}
+                date={
+                  typeof birthDate === "string"
+                    ? parseLocalDate(birthDate) ?? new Date()
+                    : birthDate || new Date()
+                }
+                setDate={setBirthDate}
+              />
+            </div>
+          </div>
+          <div className="flex flex-row items-center gap-4">
+            <Label htmlFor="hire_date" className="text-right w-2/4">
+              Fecha de ingreso
+            </Label>
+            <div className="w-full">
+              <SingleDatePicker
+                identifier="hire_date"
+                setValue={setValue}
+                date={
+                  typeof hireDate === "string"
+                    ? parseLocalDate(hireDate) ?? new Date()
+                    : hireDate || new Date()
+                }
+                setDate={setHireDate}
+              />
+            </div>
+          </div>
+          <div className="flex flex-row items-center gap-4">
             <Label htmlFor="department_id" className="text-right w-2/4">
               Departamento
             </Label>
@@ -254,10 +320,18 @@ export function EditEmployeeDialog({
           </div>
 
           <DialogFooter>
-            <Button type="submit">Guardar</Button>
+            <Button disabled={sendingData} type="submit">
+              Guardar
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
+}
+
+function parseLocalDate(str: string) {
+  if (!str) return undefined;
+  const [year, month, day] = str.split("-");
+  return new Date(Number(year), Number(month) - 1, Number(day));
 }

@@ -68,10 +68,16 @@ export function EmployeesTable() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const checkVacationOngoing = (row: any) => {
+  const loggedUser = employees.find((e) => e.user_id === user?.id);
+  console.log({ userVAcations: loggedUser?.vacations });
+
+  const checkVacationOngoing = (vacations: any) => {
     let vacationOngoing = false;
-    const vacationsArray = [...row.original.vacations].sort(
-      (a, b) => new Date(b.end_date).valueOf() - new Date(a.end_date).valueOf()
+
+    //Sort the vacationsArray which contains all the vacations records for a specific employee, so that the most recent vacation is on the first position of the array
+    const vacationsArray = vacations.sort(
+      (a: any, b: any) =>
+        new Date(b.end_date).valueOf() - new Date(a.end_date).valueOf()
     );
 
     const currentMonth = new Date().getMonth() + 1;
@@ -83,6 +89,7 @@ export function EmployeesTable() {
       let startDateMonth = startDate.getMonth() + 1;
       let endDateMonth = endDate.getMonth() + 1;
 
+      //If the vacations started before the 15th day of that month or ended after the 15th day of that month, that user won't be evaluated
       if (
         (startDateMonth === currentMonth - 1 && startDate.getDate() <= 15) ||
         (endDateMonth === currentMonth - 1 && endDate.getDate() >= 15)
@@ -231,7 +238,7 @@ export function EmployeesTable() {
       id: "evaluation",
       header: "Evaluación",
       cell: ({ row }) => {
-        let vacationOngoing = checkVacationOngoing(row);
+        let vacationOngoing = checkVacationOngoing(row.original.vacations);
 
         if (
           (user &&
@@ -239,7 +246,8 @@ export function EmployeesTable() {
             row.original.positions.position_name !== "CEO") ||
           row.original.user_id === user?.id ||
           row.original.positions.position_id === user?.position_id ||
-          vacationOngoing
+          vacationOngoing ||
+          checkVacationOngoing(loggedUser?.vacations)
         ) {
           return (
             <Button
@@ -270,7 +278,7 @@ export function EmployeesTable() {
       id: "status",
       header: "Estado",
       cell({ row }) {
-        if (checkVacationOngoing(row)) {
+        if (checkVacationOngoing(row.original.vacations)) {
           return (
             <div className="bg-[#9d44f0cd] flex justify-center items-center gap-2 p-1 rounded-md">
               <p className="text-[#ffffff] text-center">Vacaciones</p>
