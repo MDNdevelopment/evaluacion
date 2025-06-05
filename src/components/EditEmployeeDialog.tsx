@@ -152,6 +152,7 @@ export function EditEmployeeDialog({
   };
 
   useEffect(() => {
+    setSendingData(false);
     if (!employeeId) return;
     if (isEditEmployeeDialogOpen) {
       getEmployeeData(employeeId);
