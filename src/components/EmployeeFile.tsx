@@ -31,7 +31,7 @@ export default function EmployeeFile({
   return (
     <Dialog open={isFileOpen} onOpenChange={setIsFileOpen}>
       <DialogTrigger onClick={() => {}} asChild>
-        <button className="group rounded-lg bg-white hover:bg-neutral-100 border  p-2 transition-all ease-linear w-full shadow-sm border-[#00000018]  flex flex-row items-center justify-center gap-2">
+        <button className="group rounded-lg bg-white hover:bg-neutral-100 border  p-2 transition-all ease-linear w-3/5 mx-auto lg:w-full shadow-sm border-[#00000018]  flex flex-row items-center justify-center gap-2">
           Información
         </button>
       </DialogTrigger>

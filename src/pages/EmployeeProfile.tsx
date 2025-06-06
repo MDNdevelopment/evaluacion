@@ -224,25 +224,26 @@ export default function EmployeeProfile() {
       <div className="flex lg:flex-row flex-col">
         <div className="w-full lg:w-2/5  lg:pr-5 flex flex-col justify-between items-center lg:items-start ">
           <div className=" w-full  flex flex-row justify-between items-center relative">
-            <div className="flex flex-row  justify-start  w-full gap-5">
-              <div className="flex-0 w-2/5 h-36 ">
-                {" "}
-                <img
-                  alt=""
-                  src={
-                    employeeData.avatar_url ||
-                    "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
-                  }
-                  className="h-36 w-36 rounded-full object-cover"
-                />
+            <div className="flex flex-col lg:flex-row  items-center  w-full gap-5">
+              <div className="shrink-0 flex-2 lg:w-2/6 h-36 mt-5 lg:mt-0 object-cover aspect-square ">
+                <div className=" h-32 w-32 rounded-full overflow-hidden">
+                  <img
+                    alt=""
+                    src={
+                      employeeData.avatar_url ||
+                      "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
+                    }
+                    className="h-32 w-32  object-cover mx-auto aspect-square"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col w-3/5 ">
-                <h1 className="text-darkText text-3xl uppercase font-black">
+              <div className="flex flex-1 flex-col lg:w-4/6 ">
+                <h1 className="text-center lg:text-left text-darkText text-3xl uppercase font-black">
                   {employeeData.first_name} <br /> {employeeData.last_name}
                 </h1>
 
-                <h4 className="text-gray-800 text-md">
+                <h4 className="text-gray-800 text-md text-center lg:text-left">
                   {employeeData.departments.department_name} -{" "}
                   {employeeData.positions.position_name}
                 </h4>
@@ -289,7 +290,7 @@ export default function EmployeeProfile() {
               </div>
             </div>
           </div>
-          <div className=" mx-auto pt-8 pb-5 lg:pb-0 mt-10 lg:mt-0">
+          <div className=" mx-auto pt-8 pb-5 lg:pb-0 mt-10 lg:mt-0  w-full">
             <div className=" min-h-[7rem] flex flex-row bg-white shadow-sm border rounded-lg overflow-hidden">
               <div
                 className={`${
@@ -351,7 +352,7 @@ export default function EmployeeProfile() {
           </div>
         </div>
 
-        <div className="lg:w-3/4 w-full ">
+        <div className="lg:w-3/5 w-full ">
           {" "}
           {<EvaluationsGraphic evaluationsArray={evaluationsChart} />}
         </div>

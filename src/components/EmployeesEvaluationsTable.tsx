@@ -136,13 +136,15 @@ export function EmployeesTable() {
       cell: ({ row }) => {
         console.log(row.original.avatar_url);
         return (
-          <img
-            className="rounded-full h-12 w-12 object-cover"
-            src={
-              row.original.avatar_url ||
-              "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
-            }
-          />
+          <div className="h-12 w-12 overflow-hidden">
+            <img
+              className="rounded-full h-12 w-12 object-cover"
+              src={
+                row.original.avatar_url ||
+                "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
+              }
+            />
+          </div>
         );
       },
     },
