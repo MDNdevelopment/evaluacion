@@ -72,7 +72,7 @@ export default function TopRated() {
     const { data, error } = await supabase
       .from("evaluation_sessions")
       .select(
-        "total_score:total_score.avg(), evaluations_count:total_score.count(), ...users!evaluation_sessions_employee_id_fkey(*, ...departments(department_name))"
+        "total_score:total_score.avg(), evaluations_count:total_score.count(), ...users!evaluation_sessions_employee_id_fkey(*, ...departments(department_name), ...positions(position_name))"
       )
       .eq("period", firstDay);
 
@@ -81,7 +81,6 @@ export default function TopRated() {
       return;
     }
 
-    console.log(data);
     const avgPerDepartment = data.reduce((acc: any, curr: any) => {
       const departmentName = curr.department_name;
 
@@ -108,13 +107,12 @@ export default function TopRated() {
         curr.total_score > acc[departmentName].totalScore &&
         curr.access_level < 3
       ) {
-        console.log(`${curr.first_name} is here`);
         acc[departmentName].totalScore = curr.total_score;
         acc[
           departmentName
         ].employeeName = `${curr.first_name} ${curr.last_name}`;
         acc[departmentName].employeeId = curr.user_id;
-        acc[departmentName].position = curr.position;
+        acc[departmentName].position = curr.position_name;
         acc[departmentName].accessLevel = curr.access_level;
         acc[departmentName].departmentName = curr.department_name;
         acc[departmentName].evaluationsCount = curr.evaluations_count;
