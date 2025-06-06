@@ -70,14 +70,14 @@ export default function Navbar() {
               </DisclosureButton>
             </div>
             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-              <div className="flex flex-shrink-0 items-center">
-                <div className="h-8 w-8 overflow-hidden">
+              < className="flex flex-shrink-0 items-center">
+                
                   <img
                     alt="Your Company"
                     src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
-                    className="h-8 w-auto"
+                    className="h-8 w-8 object"
                   />
-                </div>
+              
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
@@ -120,14 +120,17 @@ export default function Navbar() {
                   <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
+                    <div className="h-8 w-8 overflow-hidden rounded-full">
                     <img
                       alt=""
                       src={
                         user?.avatar_url ||
                         "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
                       }
-                      className="h-8 w-8 rounded-full"
+                      className="h-8 w-8 object-cover"
                     />
+                    </div>
+                    
                   </MenuButton>
                 </div>
                 <MenuItems
