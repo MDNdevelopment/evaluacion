@@ -8,6 +8,7 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
 import { toast } from "react-toastify";
+import { Button } from "./ui/button";
 
 type Inputs = {
   password1: string;
@@ -51,12 +52,12 @@ export default function ResetPasswordModal() {
   };
   return (
     <>
-      <button
-        className="bg-primary text-white rounded-lg px-5 py-1 hover:bg-primary-dark"
+      <Button
+        className="bg-primary w-fit text-black rounded-lg px-5 py-1 bg-white border border-neutral-200 hover:bg-neutral-100 shadow-sm"
         onClick={() => setOpen(true)}
       >
         Cambiar
-      </button>
+      </Button>
 
       <Dialog
         open={open}

@@ -61,7 +61,7 @@ export const EvaluationsGraphic = ({
   });
 
   return (
-    <Card className="shadow-sm ">
+    <Card className="shadow-sm h-full">
       <CardHeader>
         <CardTitle>Resultados mensuales</CardTitle>
         <CardDescription>

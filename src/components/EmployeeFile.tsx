@@ -9,7 +9,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { XIcon } from "lucide-react";
-import { FaFileAlt } from "react-icons/fa";
 
 export default function EmployeeFile({
   isFileOpen,
@@ -32,11 +31,8 @@ export default function EmployeeFile({
   return (
     <Dialog open={isFileOpen} onOpenChange={setIsFileOpen}>
       <DialogTrigger onClick={() => {}} asChild>
-        <button className="group rounded-full bg-white hover:bg-primary-dark border-2 border-primary-dark p-2 transition-all ease-linear">
-          <FaFileAlt
-            className="text-primary-dark group-hover:text-white"
-            size={25}
-          />
+        <button className="group rounded-lg bg-white hover:bg-neutral-100 border  p-2 transition-all ease-linear w-full shadow-sm border-[#00000018]  flex flex-row items-center justify-center gap-2">
+          Información
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden max-h-[70vh] overflow-y-hidden  flex flex-col">

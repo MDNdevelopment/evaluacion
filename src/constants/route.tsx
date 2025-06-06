@@ -2,7 +2,7 @@ import { Login, Dashboard } from "../pages/index";
 import { AccessRoute, AuthRoute, PrivateRoute } from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
 // import Employee from "../pages/Employee"; // This page is not being used
-import Profile from "../pages/Profile";
+import Settings from "../pages/Settings";
 import PasswordReset from "../pages/PasswordReset";
 import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
@@ -65,10 +65,10 @@ export const Routes = [
     ),
   },
   {
-    path: "/perfil",
+    path: "/ajustes",
     element: (
       <PrivateRoute>
-        <Profile />
+        <Settings />
       </PrivateRoute>
     ),
   },

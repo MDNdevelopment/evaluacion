@@ -52,6 +52,7 @@ export type Employee = {
   evaluation: any;
   access_level: number;
   vacations: { status: string; end_date: Date; start_date: Date }[];
+  avatar_url: string;
 };
 
 export function EmployeesTable() {
@@ -130,6 +131,21 @@ export function EmployeesTable() {
   }, [company, isLoading]);
 
   const columns: ColumnDef<Employee>[] = [
+    {
+      header: "ID",
+      cell: ({ row }) => {
+        console.log(row.original.avatar_url);
+        return (
+          <img
+            className="rounded-full h-auto w-12"
+            src={
+              row.original.avatar_url ||
+              "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
+            }
+          />
+        );
+      },
+    },
     {
       accessorKey: "first_name",
       header: ({ column }) => {
@@ -353,7 +369,8 @@ export function EmployeesTable() {
           departments(department_name, department_id),
           positions(position_name, position_id),
          evaluation_count: evaluation_sessions!manager_id(count),
-         vacations(start_date, end_date, status)
+         vacations(start_date, end_date, status),
+         avatar_url
     `
         )
         .eq("company_id", company.id)

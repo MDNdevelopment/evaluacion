@@ -18,7 +18,6 @@ export default function dateDifference(
     months += 12;
   }
 
-  console.log(`Difference: ${years} years, ${months} months, ${days} days`);
   // Return the difference as an object
 
   return `(${years > 0 ? `${years} año${years > 1 ? "s" : ""}, ` : ""}${

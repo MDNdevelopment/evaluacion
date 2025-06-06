@@ -32,7 +32,6 @@ interface AiResponse {
 }
 
 export default function AiEvaluation({ evaluations }: any) {
-  console.log({ evaluations });
   const [aiResponse, setAiResponse] = useState<AiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const ai = new GoogleGenAI({

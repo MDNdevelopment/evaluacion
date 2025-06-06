@@ -19,7 +19,6 @@ export default function EmployeeEvaluationsList({
   employeeId,
   evaluatorId,
 }: EmployeeEvaluationsListProps) {
-  console.log({ employeeId, evaluatorId });
   const user = useUserStore((state) => state.user);
   const [userEvaluations, setUserEvaluations] = useState<any[] | null>(null);
   const { firstDay, lastDay } = getPastMonthRange();

@@ -70,7 +70,7 @@ export const AccessRoute = ({ children, access_level = 1 }: Props) => {
 export const PrivateRoute = ({ children }: Props) => {
   const location = useLocation();
   const session = useSessionStore((state) => state.session);
-  const isSettingsPage = location.pathname === "/perfil";
+  const isSettingsPage = location.pathname === "/ajustes";
 
   useEffect(() => {
     console.log("private route re rendered");
@@ -93,20 +93,7 @@ export const PrivateRoute = ({ children }: Props) => {
       </>
     );
   }
-  // if (user) {
-  //   if (!checkPermissions(user.access_level)) {
-  //     console.log("te vas pal lobby mi loco");
-  //     return (
-  //       <>
-  //         <Navbar />
-  //         <Navigate to={`/empleado/${user.id}`} />
-  //         <Outlet />
-  //         {children}
-  //       </>
-  //     );
-  //   }
-  // }
-  // If authenticated, render the Navbar and the protected content
+
   return (
     <>
       <Navbar /> {/* Render Navbar only in protected routes */}
