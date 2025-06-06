@@ -224,22 +224,25 @@ export default function EmployeeProfile() {
       <div className="flex lg:flex-row flex-col">
         <div className="w-full lg:w-2/5  lg:pr-5 flex flex-col justify-between items-center lg:items-start ">
           <div className=" w-full  flex flex-row justify-between items-center relative">
-            <div className="flex flex-row gap-5 items-center">
-              <img
-                alt=""
-                src={
-                  employeeData.avatar_url ||
-                  "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
-                }
-                className="h-28 w-28 rounded-full"
-              />
+            <div className="flex flex-row  justify-start  w-full gap-5">
+              <div className="flex-0 w-2/5 h-36 ">
+                {" "}
+                <img
+                  alt=""
+                  src={
+                    employeeData.avatar_url ||
+                    "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
+                  }
+                  className="h-36 w-36 rounded-full object-cover"
+                />
+              </div>
 
-              <div className="flex flex-col">
-                <h1 className="text-darkText text-4xl uppercase font-black">
+              <div className="flex flex-col w-3/5 ">
+                <h1 className="text-darkText text-3xl uppercase font-black">
                   {employeeData.first_name} <br /> {employeeData.last_name}
                 </h1>
 
-                <h4 className="text-gray-800">
+                <h4 className="text-gray-800 text-md">
                   {employeeData.departments.department_name} -{" "}
                   {employeeData.positions.position_name}
                 </h4>

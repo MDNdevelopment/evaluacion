@@ -137,7 +137,7 @@ export function EmployeesTable() {
         console.log(row.original.avatar_url);
         return (
           <img
-            className="rounded-full h-auto w-12"
+            className="rounded-full h-12 w-12 object-cover"
             src={
               row.original.avatar_url ||
               "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
