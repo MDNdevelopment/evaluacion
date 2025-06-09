@@ -91,7 +91,7 @@ export function EditEmployeeDialog({
     }
 
     toast.success("Empleado actualizado correctamente", {
-      position: "top-right",
+      position: "bottom-right",
       autoClose: 2000,
     });
 

@@ -70,14 +70,12 @@ export default function Navbar() {
               </DisclosureButton>
             </div>
             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-              < className="flex flex-shrink-0 items-center">
-                
-                  <img
-                    alt="Your Company"
-                    src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
-                    className="h-8 w-8 object"
-                  />
-              
+              <div className="flex flex-shrink-0 items-center">
+                <img
+                  alt="Your Company"
+                  src="https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/logo-MDN%202.webp?t=2024-09-11T16%3A18%3A41.815Z"
+                  className="h-8 w-8 object"
+                />
               </div>
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex space-x-4">
@@ -121,16 +119,15 @@ export default function Navbar() {
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
                     <div className="h-8 w-8 overflow-hidden rounded-full">
-                    <img
-                      alt=""
-                      src={
-                        user?.avatar_url ||
-                        "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
-                      }
-                      className="h-8 w-8 object-cover"
-                    />
+                      <img
+                        alt=""
+                        src={
+                          user?.avatar_url ||
+                          "https://faaqjemovtyulorpdgrd.supabase.co/storage/v1/object/public/miscellaneous/user-profile.png"
+                        }
+                        className="h-8 w-8 object-cover"
+                      />
                     </div>
-                    
                   </MenuButton>
                 </div>
                 <MenuItems

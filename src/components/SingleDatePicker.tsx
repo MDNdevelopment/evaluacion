@@ -40,11 +40,13 @@ export default function DatePicker({
   const handleMonthChange = (month: string) => {
     const newDate = setMonth(date, MONTHS.indexOf(month));
     setDate(newDate);
+    setValue(identifier, newDate);
   };
 
   const handleYearChange = (year: string) => {
     const newDate = setYear(date, parseInt(year));
     setDate(newDate);
+    setValue(identifier, newDate);
   };
 
   const handleSelect = (selectedDate: Date | undefined) => {
