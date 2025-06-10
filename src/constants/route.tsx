@@ -8,7 +8,12 @@ import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
 import PrototypeForm from "@/pages/PrototypeForm";
 import EmployeeProfile from "@/pages/EmployeeProfile";
-
+import SidebarTrigger from "@/components/Navigation/sidebar-trigger";
+import CompanyEmployees from "@/components/CompanyEmployees";
+import CompanyConfig from "@/components/CompanyConfig";
+import CompanyDepartments from "@/components/CompanyDepartments";
+import CompanyQuestions from "@/components/CompanyQuestions";
+import CompanyDownload from "@/components/CompanyDownload";
 export const Routes = [
   {
     path: "/",
@@ -89,14 +94,63 @@ export const Routes = [
     ),
   },
   {
-    path: "/company",
+    path: "/organizacion",
     element: (
       <PrivateRoute>
         <Company />
       </PrivateRoute>
     ),
   },
-
+  {
+    path: "/organizacion/empleados",
+    element: (
+      <PrivateRoute>
+        <AccessRoute access_level={2}>
+          <CompanyEmployees />
+        </AccessRoute>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/organizacion/configuracion",
+    element: (
+      <PrivateRoute>
+        <AccessRoute access_level={2}>
+          <CompanyConfig />
+        </AccessRoute>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/organizacion/departamentos",
+    element: (
+      <PrivateRoute>
+        <AccessRoute access_level={2}>
+          <CompanyDepartments />
+        </AccessRoute>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/organizacion/preguntas",
+    element: (
+      <PrivateRoute>
+        <AccessRoute access_level={2}>
+          <CompanyQuestions />
+        </AccessRoute>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/organizacion/descargas",
+    element: (
+      <PrivateRoute>
+        <AccessRoute access_level={2}>
+          <CompanyDownload />
+        </AccessRoute>
+      </PrivateRoute>
+    ),
+  },
   {
     path: "*",
     element: <p>404 Error - No conseguí esa página 🤔</p>,

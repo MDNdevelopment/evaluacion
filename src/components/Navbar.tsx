@@ -43,7 +43,7 @@ export default function Navbar() {
     },
     {
       name: "Organización",
-      href: "/company",
+      href: "/organizacion",
       current: false,
       accessLevel: 2,
       role: "admin",

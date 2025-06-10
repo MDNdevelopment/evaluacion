@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Company } from "@/types";
 import { supabase } from "@/services/supabaseClient";
 import QuestionsList from "./QuestionsList";
+import { useCompanyStore, useUserStore } from "@/stores";
 
-export default function CompanyQuestions({ company }: { company: Company }) {
+export default function CompanyQuestions() {
   const [positions, setPositions] = useState<{ [key: string]: any }>({});
+  const company = useCompanyStore((state) => state.company);
 
   const fetchPositions = async () => {
     const { data, error } = await supabase
@@ -12,7 +14,7 @@ export default function CompanyQuestions({ company }: { company: Company }) {
       .select(
         "company_id, position_id, position_name, ...departments(departmentId:department_id,departmentName:department_name)"
       )
-      .eq("company_id", company.id);
+      .eq("company_id", company?.id);
     if (error) {
       console.log(error.message);
       return;
@@ -46,7 +48,7 @@ export default function CompanyQuestions({ company }: { company: Company }) {
         Preguntas
       </h2>
 
-      <QuestionsList positions={positions} company={company} />
+      {company && <QuestionsList positions={positions} company={company} />}
     </div>
   );
 }

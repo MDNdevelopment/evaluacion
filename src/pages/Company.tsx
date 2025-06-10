@@ -26,11 +26,11 @@ export default function Company() {
         case 1:
           return <CompanyDownload />;
         case 2:
-          return <CompanyDepartments company={company} />;
+          return <CompanyDepartments />;
         case 3:
           return <CompanyEmployees />;
         case 4:
-          return <CompanyQuestions company={company} />;
+          return <CompanyQuestions />;
         default:
           return <CompanyConfig />;
       }

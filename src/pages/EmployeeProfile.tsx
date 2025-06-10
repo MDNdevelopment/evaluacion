@@ -220,7 +220,7 @@ export default function EmployeeProfile() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto p-5 lg:p-10 bg-neutral-100 lg:mt-10 shadow-md rounded-lg">
+    <div className="max-w-[1200px] mx-auto p-5 lg:p-10 lg:mt-10  rounded-lg ">
       <div className="flex lg:flex-row flex-col">
         <div className="w-full lg:w-2/5  lg:pr-5 flex flex-col justify-between items-center lg:items-start ">
           <div className=" w-full  flex flex-row justify-between items-center relative">
@@ -476,7 +476,7 @@ const Promedios = ({
   }, [historic, current]);
 
   return (
-    <Card className="mx-0 lg:mx-3 w-full lg:w-3/6 max-h-[600px] overflow-y-auto mt-10 ">
+    <Card className=" lg:mx-3 w-full lg:w-3/6 max-h-[600px] overflow-y-auto mt-10">
       <CardHeader>
         <CardTitle>
           Promedio de preguntas{" "}

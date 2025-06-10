@@ -87,7 +87,7 @@ export default function AiEvaluation({ evaluations }: any) {
   }, [evaluations]);
 
   return (
-    <div className="bg-white rounded-lg p-10 shadow-sm mt-10">
+    <div className="bg-white rounded-lg p-10 shadow-sm mt-10 border ">
       <h2 className="text-4xl font-bold mb-5">Análisis</h2>
       {isLoading ? (
         <div className="h-24 text-center">

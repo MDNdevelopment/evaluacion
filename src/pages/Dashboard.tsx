@@ -1,10 +1,25 @@
+import { Link } from "react-router-dom";
 import TopRated from "../components/TopRated";
-
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from "@/components/ui/breadcrumb";
 export default function Dashboard() {
   return (
-    <div className="max-w-[1200px] mx-auto p-10 bg-gray-100 mt-10 shadow-md rounded-lg">
-      <h1 className="text-primary text-4xl uppercase font-black">Dashboard</h1>
-      <TopRated />
+    <div className="p-10  shadow-md ">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <Link to="/dashboard">Inicio</Link>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div className="max-w-[1200px] mx-auto">
+        <TopRated />
+      </div>
     </div>
   );
 }

@@ -150,7 +150,7 @@ export default function TopRated() {
             return (
               <div
                 key={department.name}
-                className="my-2 lg:my-0 shadow-md flex flex-col items-center justify-between rounded-md flex-1 bg-white min-h-[17rem]"
+                className="border my-2 lg:my-0 shadow-md flex flex-col items-center justify-between rounded-md flex-1 bg-white min-h-[17rem]"
               >
                 <h3 className="   text-center pt-3 uppercase font-semibold text-primary-dark">
                   {department.name}

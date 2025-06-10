@@ -8,6 +8,11 @@ import Navbar from "../components/Navbar";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { useUserStore } from "@/stores/useUserStore";
 import { useEffect } from "react";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Sidebar } from "lucide-react";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import SidebarTrigger from "@/components/Navigation/sidebar-trigger";
+import PageHeader from "@/components/Navigation/page-header";
 
 //Function to check if the user is authenticated
 const isAuthenticated = () => {
@@ -62,6 +67,7 @@ export const AccessRoute = ({ children, access_level = 1 }: Props) => {
   return (
     <>
       <Outlet />
+
       {children}
     </>
   );
@@ -87,6 +93,7 @@ export const PrivateRoute = ({ children }: Props) => {
   if (isSettingsPage) {
     return (
       <>
+        <AppSidebar />
         <Navbar />
         <Outlet />
         {children}
@@ -96,9 +103,15 @@ export const PrivateRoute = ({ children }: Props) => {
 
   return (
     <>
-      <Navbar /> {/* Render Navbar only in protected routes */}
-      <Outlet /> {/* This renders the protected route content */}
-      {children} {/* Render children if provided */}
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="w-full">
+          <PageHeader />
+          {/* <Navbar /> */}
+          <Outlet /> {/* This renders the protected route content */}
+          {children} {/* Render children if provided */}
+        </main>
+      </SidebarProvider>
     </>
   );
 };

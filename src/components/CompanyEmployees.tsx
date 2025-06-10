@@ -216,7 +216,7 @@ export default function CompanyEmployees() {
     },
   ];
   return (
-    <div className="mx-auto  w-full">
+    <div className="mx-auto  max-w-[1200px] pt-10">
       <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
         Empleados
       </h2>

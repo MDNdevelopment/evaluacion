@@ -2,14 +2,16 @@ import { supabase } from "@/services/supabaseClient";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import SelectedDepartment from "./SelectedDepartment";
+import { useCompanyStore } from "@/stores";
 
 interface Department {
   id: number;
   name: string;
 }
 
-const CompanyDepartments = ({ company }: any) => {
+const CompanyDepartments = () => {
   const [departments, setDepartments] = useState<any>(null);
+  const company = useCompanyStore((state) => state.company);
 
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
@@ -18,7 +20,7 @@ const CompanyDepartments = ({ company }: any) => {
     const { data, error } = await supabase
       .from("departments")
       .select("*")
-      .eq("company_id", company.id);
+      .eq("company_id", company?.id);
 
     if (error) {
       console.log(error.message);
