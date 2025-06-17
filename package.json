@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/genai": "^0.8.0",
@@ -49,12 +50,11 @@
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^4.5.5"
   },
-  "husky":{
-    "hooks":{
+  "husky": {
+    "hooks": {
       "commit-msg": "npx --no-install commitlint --edit $1"
     }
   },
- 
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
