@@ -4,14 +4,10 @@ interface Props {
 }
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import { useSessionStore } from "@/stores/useSessionStore";
 import { useUserStore } from "@/stores/useUserStore";
-import { useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Sidebar } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import SidebarTrigger from "@/components/Navigation/sidebar-trigger";
 import PageHeader from "@/components/Navigation/page-header";
 
 //Function to check if the user is authenticated
@@ -74,13 +70,7 @@ export const AccessRoute = ({ children, access_level = 1 }: Props) => {
 };
 
 export const PrivateRoute = ({ children }: Props) => {
-  const location = useLocation();
   const session = useSessionStore((state) => state.session);
-  const isSettingsPage = location.pathname === "/ajustes";
-
-  useEffect(() => {
-    console.log("private route re rendered");
-  }, []);
 
   if (session === undefined) {
     return <p>Loading...</p>;

@@ -8,7 +8,6 @@ import Summary from "../pages/Summary";
 import Company from "@/pages/Company";
 import PrototypeForm from "@/pages/PrototypeForm";
 import EmployeeProfile from "@/pages/EmployeeProfile";
-import SidebarTrigger from "@/components/Navigation/sidebar-trigger";
 import CompanyEmployees from "@/components/CompanyEmployees";
 import CompanyConfig from "@/components/CompanyConfig";
 import CompanyDepartments from "@/components/CompanyDepartments";

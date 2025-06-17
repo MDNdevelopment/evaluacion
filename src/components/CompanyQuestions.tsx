@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Company } from "@/types";
 import { supabase } from "@/services/supabaseClient";
 import QuestionsList from "./QuestionsList";
-import { useCompanyStore, useUserStore } from "@/stores";
+import { useCompanyStore } from "@/stores";
 
 export default function CompanyQuestions() {
   const [positions, setPositions] = useState<{ [key: string]: any }>({});

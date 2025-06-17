@@ -1,18 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import ReactCrop, {
-  centerCrop,
-  makeAspectCrop,
-  Crop,
-  PixelCrop,
-  convertToPixelCrop,
-} from "react-image-crop";
+import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import { canvasPreview } from "./canvas-preview";
 import { useDebounceEffect } from "@/hooks/useDebounceEffect";
 
 import "react-image-crop/dist/ReactCrop.css";
 import { Button } from "../ui/button";
-import { set } from "date-fns";
 import Spinner from "../Spinner";
 
 // This is to demonstate how to make and center a % aspect crop
@@ -31,34 +24,13 @@ export default function ImageCrop({
 }) {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const hiddenAnchorRef = useRef<HTMLAnchorElement>(null);
   const blobUrlRef = useRef("");
 
-  function centerAspectCrop(
-    mediaWidth: number,
-    mediaHeight: number,
-    aspect: number
-  ) {
-    return centerCrop(
-      makeAspectCrop(
-        {
-          unit: "%",
-          width: 50,
-        },
-        aspect,
-        mediaWidth,
-        mediaHeight
-      ),
-      mediaWidth,
-      mediaHeight
-    );
-  }
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [scale, setScale] = useState(1);
-  const [rotate, setRotate] = useState(0);
-  const [aspect, setAspect] = useState<number | undefined>(1);
-  const [croppedImage, setCroppedImage] = useState<File | null>(null);
+  const [scale, _setScale] = useState(1);
+  const [rotate, _setRotate] = useState(0);
+  const [aspect, _setAspect] = useState<number | undefined>(1);
 
   useEffect(() => {
     console.log("imgSrc changed");
@@ -69,7 +41,7 @@ export default function ImageCrop({
     setCompletedCrop(undefined);
   }, [imgSrc]);
 
-  function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+  function onImageLoad(_e: React.SyntheticEvent<HTMLImageElement>) {
     if (aspect) {
       console.log("estoy aqui");
       setCrop({

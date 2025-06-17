@@ -1,13 +1,4 @@
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Settings,
-  Sparkles,
-  EllipsisVertical,
-} from "lucide-react";
+import { LogOut, Settings, EllipsisVertical } from "lucide-react";
 
 import { logOutUser } from "@/services/AuthService";
 

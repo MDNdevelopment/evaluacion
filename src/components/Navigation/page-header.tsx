@@ -1,8 +1,5 @@
 import SidebarTrigger from "./sidebar-trigger";
 import { useLocation } from "react-router-dom";
-interface PageHeaderProps {
-  title: string;
-}
 
 export default function PageHeader() {
   const location = useLocation();

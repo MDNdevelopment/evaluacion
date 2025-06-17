@@ -6,7 +6,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "./services/supabaseClient";
 import { useUserStore, useSessionStore, useCompanyStore } from "./stores";
-import { SidebarProvider, SidebarTrigger } from "./components/ui/sidebar";
 
 function App() {
   const setUser = useUserStore((state) => state.setUser);

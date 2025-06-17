@@ -1,30 +1,7 @@
-import {
-  Home,
-  Settings,
-  FileCheck,
-  ChartColumn,
-  User,
-  Building2,
-  ChevronUp,
-  ChevronRight,
-} from "lucide-react";
+import { Home, FileCheck, ChartColumn, User, Building2 } from "lucide-react";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { useUserStore } from "@/stores/useUserStore";
-import { Collapsible, CollapsibleTrigger } from "./ui/collapsible";
-import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { NavMain } from "./Navigation/nav-main";
 import { NavUser } from "./Navigation/nav-user";
 import { NavCompany } from "./Navigation/nav-company";

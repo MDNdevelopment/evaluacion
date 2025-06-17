@@ -69,9 +69,6 @@ export default function CompanyEmployees() {
     setCompanyDepartments(data);
   };
   const getEmployees = async () => {
-    const year = new Date().getFullYear();
-    let yearStart = `${year}-01-01`;
-    let yearEnd = `${year}-12-31`;
     if (!company) return;
     const { data, error } = await supabase
       .from("users")
