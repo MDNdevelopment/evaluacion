@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { supabase } from "../services/supabaseClient";
 
@@ -24,11 +24,14 @@ import AiEvaluation from "@/components/AiEvaluation";
 import EmployeeFile from "@/components/EmployeeFile";
 import formatDateForDisplay from "@/utils/formatDateForDisplay";
 import dateDifference from "@/utils/dateDifference";
+import translateVacationStatus from "../utils/translateVacationStatus";
 
 export default function EmployeeProfile() {
   const { id } = useParams();
   const user = useUserStore((state) => state.user);
-  const [employeeData, setEmployeeData] = useState<any>();
+
+  const navigate = useNavigate();
+  const [employeeData, setEmployeeData] = useState<any>(undefined);
   const [evaluationsData, setEvaluationsData] = useState<any>(null);
   const [pastMonthData, setPastMonthData] = useState<any>(null);
   const [evaluationsChart, setEvaluationsChart] = useState<any>([]);
@@ -36,6 +39,7 @@ export default function EmployeeProfile() {
   const [isFileOpen, setIsFileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { firstDay } = getPastMonthRange();
+  const [yearVacations, setYearVacations] = useState<any>(null);
 
   const retrieveEmployeeData = async () => {
     const { data, error } = await supabase
@@ -52,13 +56,12 @@ export default function EmployeeProfile() {
 
     if (error) {
       console.log(error.message);
+      setEmployeeData(null);
       setIsLoading(false);
       return;
     }
 
     console.log({ userData: data });
-    setEmployeeData(data);
-    setIsLoading(false);
 
     //Get the evaluations data
     const { data: evaluations, error: evaluationsError } = await supabase
@@ -202,20 +205,34 @@ export default function EmployeeProfile() {
       setPastMonthData(groupedEvaluationsByDate[firstDay]);
     }
 
-    console.log({ chartData });
     //Set the states
     setTotalAverage(totalScoreAllTime);
     setEvaluationsChart(chartData);
-    // setIsLoading(false);
+    setEmployeeData(data);
+    setYearVacations(
+      data.vacations.find((vacation: any) =>
+        vacation.start_date.includes(new Date().getFullYear().toString())
+      )
+    );
+    setIsLoading(false);
   };
 
   useEffect(() => {
+    if (id === undefined || user === null) {
+      return;
+    }
+
+    if (user.access_level < 2 && user.id !== id) {
+      navigate(`/empleado/${user.id}`);
+      console.log("mi loco te vai");
+      return;
+    }
     setEvaluationsData(null);
     setTotalAverage(null);
     retrieveEmployeeData();
   }, [id, user]);
 
-  if (isLoading) {
+  if (isLoading || employeeData === undefined) {
     return (
       <div className="flex justify-center items-center h-[10rem]">
         <Spinner />
@@ -223,7 +240,7 @@ export default function EmployeeProfile() {
     );
   }
 
-  if (!isLoading && !employeeData) {
+  if (!isLoading && employeeData === null) {
     return (
       <div className="flex justify-center items-center h-[10rem]">
         <h2 className="text-gray-500 text-lg italic">
@@ -232,7 +249,6 @@ export default function EmployeeProfile() {
       </div>
     );
   }
-
   return (
     <div className="max-w-[1200px] mx-auto p-5 lg:p-10 lg:mt-10  rounded-lg ">
       <div className="flex lg:flex-row flex-col">
@@ -240,7 +256,7 @@ export default function EmployeeProfile() {
           <div className=" w-full  flex flex-row justify-between items-center relative">
             <div className="  flex flex-col lg:flex-row  items-center  w-full gap-5">
               <div className="shrink-0 flex-2 lg:w-2/6 h-36 mt-5 lg:mt-0 object-cover aspect-square ">
-                <div className="  h-40 w-40 md:w-36 md:h-36 rounded-full overflow-hidden">
+                <div className="  h-40 w-40 md:w-32 md:h-32  lg:h-32 lg:w-32 xl:w-36 xl:h-36 rounded-full overflow-hidden mx-auto">
                   <img
                     alt=""
                     src={
@@ -252,7 +268,7 @@ export default function EmployeeProfile() {
                 </div>
               </div>
 
-              <div className=" flex flex-1 flex-col lg:items-start lg:w-4/6 pt-5 pb-5">
+              <div className=" flex flex-1 flex-col pl-0  lg:pl-5 lg:items-stretch lg:w-4/6 pt-5 pb-5 ">
                 <h1 className="text-center lg:text-left text-darkText text-3xl uppercase font-black">
                   {employeeData.first_name} <br /> {employeeData.last_name}
                 </h1>
@@ -299,6 +315,21 @@ export default function EmployeeProfile() {
                           : "N/A",
                         admin: false,
                       },
+
+                      vacations: {
+                        title: "Vacaciones",
+                        data: yearVacations
+                          ? `${formatDateForDisplay(
+                              yearVacations.start_date
+                            )} - ${formatDateForDisplay(
+                              yearVacations.end_date
+                            )}`
+                          : "",
+                        admin: false,
+                        difference: yearVacations
+                          ? translateVacationStatus(yearVacations.status)
+                          : translateVacationStatus(),
+                      },
                       hireDate: {
                         title: "Fecha de Ingreso",
                         data: employeeData.hire_date
@@ -309,11 +340,6 @@ export default function EmployeeProfile() {
                         difference: employeeData.hire_date
                           ? dateDifference(employeeData.hire_date, new Date())
                           : "",
-                      },
-                      vacations: {
-                        title: "Vacaciones",
-                        data: null,
-                        admin: false,
                       },
                     }}
                   />

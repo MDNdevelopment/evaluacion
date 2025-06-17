@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { XIcon } from "lucide-react";
 import { useUserStore } from "@/stores/useUserStore";
+import ToolTip from "./ToolTip";
 
 export default function EmployeeFile({
   isFileOpen,
@@ -22,6 +23,11 @@ export default function EmployeeFile({
 }) {
   const [copyText, setCopyText] = useState("Copiar");
   const user = useUserStore((state) => state.user);
+  const [toolTip, setToolTip] = useState({
+    show: false,
+    position: { top: 0, left: 0 },
+    text: "",
+  });
 
   function handleClickItem(data: string) {
     navigator.clipboard.writeText(data);
@@ -50,8 +56,8 @@ export default function EmployeeFile({
           <DialogTitle className="mb-2">Ficha del empleado</DialogTitle>
         </DialogHeader>
 
-        <div>
-          <ul className="flex flex-col gap-0">
+        <div className=" overflow-y-auto ">
+          <ul className="flex flex-col gap-0  ">
             {Object.entries(employeeData).map(([key, value], index) => {
               const val = value as {
                 title: string;
@@ -60,7 +66,7 @@ export default function EmployeeFile({
                 admin: boolean;
               };
 
-              if (user?.role !== "admin" && val.admin) {
+              if (user && user?.access_level < 2 && val.admin) {
                 return null;
               }
               return (
@@ -74,20 +80,53 @@ export default function EmployeeFile({
                     {val.title}:
                   </div>
                   <div className="text-right flex flex-col items-end p-1">
-                    <div className="relative flex justify-center group ">
-                      <div className="opacity-0 group-hover:opacity-100 absolute bottom-8 bg-white rounded-lg border border-neutral-200 px-2 transition-all ease-linear">
-                        <span>{copyText}</span>
-                      </div>
+                    <div className="relative flex justify-center  ">
                       <span
-                        onMouseEnter={() => {
+                        onMouseEnter={(e) => {
+                          //get the text inside the span
+                          const text = e.currentTarget.innerText;
+
+                          if (text === "") {
+                            return;
+                          }
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setToolTip({
+                            show: true,
+                            position: {
+                              top: rect.top - 28,
+                              left: rect.left + rect.width / 2,
+                            },
+                            text: val.data,
+                          });
                           setCopyText("Copiar");
+                        }}
+                        onMouseLeave={() => {
+                          setToolTip({
+                            show: false,
+                            position: { top: 0, left: 0 },
+                            text: "",
+                          });
                         }}
                         onClick={() => {
                           handleClickItem(val.data);
                         }}
-                        className=" w-fit px-2 rounded-lg border border-transparent cursor-pointer hover:border hover:border-neutral-300 text-sm"
+                        className={` w-fit px-2 rounded-lg border border-transparent  text-sm ${
+                          val.data !== "" &&
+                          "hover:border hover:border-neutral-300  cursor-pointer"
+                        }`}
                       >
                         {val.data}
+                        {/* <div className="flex justify-center items-center">
+                          <span className="opacity-0 group-hover:opacity-100 absolute bottom-8 bg-white rounded-lg border border-neutral-200 px-2 transition-all ease-linear">
+                            {copyText}
+                          </span>
+                        </div> */}
+                        <ToolTip
+                          show={toolTip.show}
+                          position={toolTip.position}
+                        >
+                          {copyText}
+                        </ToolTip>
                       </span>
                     </div>
 
