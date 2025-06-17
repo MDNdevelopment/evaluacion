@@ -26,9 +26,13 @@ import { useUserStore } from "@/stores/useUserStore";
 import { Collapsible, CollapsibleTrigger } from "./ui/collapsible";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import { NavMain } from "./Navigation/nav-main";
+import { NavUser } from "./Navigation/nav-user";
+import { NavCompany } from "./Navigation/nav-company";
+import { useCompanyStore } from "@/stores";
 
 export function AppSidebar() {
   const user = useUserStore((state) => state.user);
+  const company = useCompanyStore((state) => state.company);
 
   // Menu items.
   const navMain = [
@@ -37,31 +41,36 @@ export function AppSidebar() {
       url: "/empleado/" + user?.id,
       icon: User,
       role: "employee",
+      access_level: 1,
     },
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: Home,
       role: "employee",
+      access_level: 2,
     },
     {
       title: "Evaluar",
       url: "/empleados",
       icon: FileCheck,
-      role: "admin",
+      role: "employee",
+      access_level: 2,
     },
     {
       title: "Resumen",
       url: "/resumen",
       icon: ChartColumn,
-      role: "admin",
+      role: "employee",
+      access_level: 2,
     },
 
     {
       title: "Mi organización",
       url: "/organizacion",
       icon: Building2,
-      admin: false,
+      role: "employee",
+      access_level: 1,
       items: [
         {
           title: "Configuración",
@@ -95,8 +104,27 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarContent className="gap-0">
-        <NavMain items={navMain} />
+      <SidebarContent className="gap-0 flex flex-col justify-between p-3">
+        <div>
+          <NavCompany
+            teams={[
+              {
+                name: company?.name || "Cargando...",
+                logo: company?.logo_url || "",
+              },
+            ]}
+          />
+          <NavMain items={navMain} />
+        </div>
+        <NavUser
+          user={{
+            name: user?.full_name || "Usuario",
+            email: user?.email || "",
+            avatar: user?.avatar_url || "",
+            position: user?.position_name || "",
+            department: user?.department_name || "",
+          }}
+        />
       </SidebarContent>
     </Sidebar>
   );

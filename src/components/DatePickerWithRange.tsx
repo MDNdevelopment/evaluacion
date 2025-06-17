@@ -16,16 +16,23 @@ export function DatePickerWithRange({
   className,
   vacationsRange,
   setVacationsRange,
+  disabled,
+  startYear,
+  endYear,
 }: {
   className?: React.HTMLAttributes<HTMLDivElement>;
   vacationsRange: {
     startDate: Date | undefined;
     endDate: Date | undefined;
+    status?: string | undefined;
   };
   setVacationsRange: (range: {
     startDate: Date | undefined;
     endDate: Date | undefined;
   }) => void;
+  disabled?: boolean;
+  startYear: number;
+  endYear: number;
 }) {
   const [date, setDate] = useState<DateRange | undefined>({
     from: vacationsRange.startDate,
@@ -44,6 +51,7 @@ export function DatePickerWithRange({
       <Popover modal>
         <PopoverTrigger asChild>
           <Button
+            disabled={disabled}
             id="date"
             variant={"outline"}
             className={cn(
@@ -88,6 +96,8 @@ export function DatePickerWithRange({
             }}
             numberOfMonths={2}
             locale={es}
+            fromYear={startYear}
+            toYear={endYear}
           />
         </PopoverContent>
       </Popover>

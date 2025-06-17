@@ -24,6 +24,7 @@ interface Employee {
   user_id: string;
   first_name: string;
   last_name: string;
+  vacations: { status: string; start_date: string; end_date: string }[];
 }
 
 export default function CompanyEmployees() {
@@ -75,11 +76,9 @@ export default function CompanyEmployees() {
     const { data, error } = await supabase
       .from("users")
       .select(
-        "*, ...departments(department_name, department_id), ...positions(position_name, position_id), vacations(status, start_date, end_date)"
+        "*, ...departments(department_name, department_id), ...positions(position_name, position_id), vacations(status, start_date, end_date, id)"
       )
-      .eq("company_id", company.id)
-      .lte("vacations.start_date", yearEnd)
-      .gte("vacations.end_date", yearStart);
+      .eq("company_id", company.id);
 
     if (error) {
       console.log(error.message);
@@ -88,14 +87,18 @@ export default function CompanyEmployees() {
     }
     setFetchingEmployees(false);
 
+    console.log({ data });
+
     setEmployees(data);
   };
 
   const setUserDataFromTable = (row: any) => {
+    console.log({ row });
     setSelectedEmployeeData({
       user_id: row.original.user_id,
       first_name: row.original.first_name,
       last_name: row.original.last_name,
+      vacations: row.original.vacations,
     });
   };
 
@@ -151,11 +154,15 @@ export default function CompanyEmployees() {
     {
       header: "Vacaciones",
       cell: ({ row }) => {
+        const yearVacation = row.original.vacations?.find((vacation: any) =>
+          vacation.start_date.includes(new Date().getFullYear())
+        );
+
         return (
           <VacationsBadge
-            vacationStatus={row.original.vacations?.[0]?.status}
-            vacationStartDate={row.original.vacations?.[0]?.start_date}
-            vacationEndDate={row.original.vacations?.[0]?.end_date}
+            vacationStatus={yearVacation?.status}
+            vacationStartDate={yearVacation?.start_date}
+            vacationEndDate={yearVacation?.end_date}
           />
         );
       },
@@ -225,10 +232,12 @@ export default function CompanyEmployees() {
         <DataTable columns={columns} data={employees} />
       </div>
       <AssignVacationsDialog
+        setSelectedEmployeeData={setSelectedEmployeeData}
         isVacationsDialogOpen={isVacationsDialogOpen}
         setIsVacationsDialogOpen={setIsVacationsDialogOpen}
         employeeId={selectedEmployeeData ? selectedEmployeeData.user_id : null}
         setFetchingEmployees={setFetchingEmployees}
+        selectedEmployeeData={selectedEmployeeData}
       />
       <EditEmployeeDialog
         employeeId={selectedEmployeeData ? selectedEmployeeData.user_id : null}

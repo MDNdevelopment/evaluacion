@@ -14,95 +14,92 @@ import { Button } from "./ui/button";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 import Spinner from "./Spinner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import translateVacationStatus from "@/utils/translateVacationStatus";
 export default function AssignVacationsDialog({
   employeeId,
   isVacationsDialogOpen,
   setIsVacationsDialogOpen,
   setFetchingEmployees,
+  selectedEmployeeData,
+  setSelectedEmployeeData,
 }: {
   employeeId: string | null;
   isVacationsDialogOpen: boolean;
   setIsVacationsDialogOpen: (val: boolean) => void;
   setFetchingEmployees: (val: boolean) => void;
+  selectedEmployeeData: any;
+  setSelectedEmployeeData: (val: any) => void;
 }) {
   const [vacationsRange, setVacationsRange] = useState<{
     startDate: Date | undefined;
     endDate: Date | undefined;
+    status?: string;
   }>({
     startDate: undefined,
     endDate: undefined,
+    status: undefined,
   });
-  const [isVacationSet, setIsVacationSet] = useState<boolean>(false);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [uploadingData, setUploadingData] = useState<boolean>(false);
-  const [sendingData, setSendingData] = useState<boolean>(false);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [isInserting, setIsInserting] = useState<boolean>(false);
   const [foundVacationId, setFoundVacationId] = useState<number | null>(null);
+
+  const [selectedYear, setSelectedYear] = useState<string>(
+    new Date().getFullYear().toString()
+  );
+
+  const startYear = new Date().getFullYear() - 15;
+  const endYear = startYear + 17; // Assuming you want to show the next year as well
+  const years = Array.from(
+    { length: endYear - startYear + 1 },
+    (_, i) => endYear - i
+  );
 
   const parseLocalDate = (str: string) => {
     const [year, month, day] = str.split("-");
     return new Date(Number(year), Number(month) - 1, Number(day));
   };
 
-  const getEmployeeVacations = async (employeeId: string | null) => {
-    const year = new Date().getFullYear();
-    let yearStart = `${year}-01-01`;
-    let yearEnd = `${year}-12-31`;
-    if (!employeeId) return;
-    const { data, error } = await supabase
-      .from("vacations")
-      .select("*")
-      .eq("user_id", employeeId)
-      .lte("start_date", yearEnd)
-      .gte("end_date", yearStart)
-      .single();
-
-    if (error) {
-      setVacationsRange({
-        startDate: undefined,
-        endDate: undefined,
-      });
-      setIsVacationSet(false);
-      setIsLoading(false);
-      return null;
-    }
-
-    setFoundVacationId(data.id);
-    setIsVacationSet(true);
-    setVacationsRange({
-      startDate: parseLocalDate(data?.start_date),
-      endDate: parseLocalDate(data?.end_date),
-    });
-
-    setIsLoading(false);
-    return data;
-  };
-
-  const setVacationStatus = (_startDate: Date, endDate: Date) => {
+  const setVacationStatus = (startDate: Date, endDate: Date) => {
     const today = Date.now();
 
     if (today > endDate.valueOf()) {
       return "fulfilled";
     }
 
-    ("aun no han terminado");
+    if (startDate.valueOf() <= today && endDate.valueOf() >= today) {
+      return "ongoing";
+    }
+
     return "programmed";
   };
 
   useEffect(() => {
     setIsLoading(true);
+
+    setSelectedYear(new Date().getFullYear().toString());
     if (!employeeId) return;
-    if (isVacationsDialogOpen) {
-      getEmployeeVacations(employeeId);
-    }
-  }, [employeeId, isVacationsDialogOpen]);
+    handleYearChange(new Date().getFullYear().toString());
+    setIsLoading(false);
+  }, [employeeId, isVacationsDialogOpen, selectedEmployeeData]);
 
   const handleSubmit = async (e: any) => {
-    setUploadingData(true);
+    setIsInserting(true);
+    setIsLoading(true);
     e.preventDefault();
     if (!employeeId) return;
     if (!vacationsRange.startDate || !vacationsRange.endDate) {
       alert("Please select a valid date range.");
+      setIsInserting(false);
+      setIsLoading(false);
       return;
     }
 
@@ -111,8 +108,8 @@ export default function AssignVacationsDialog({
       vacationsRange.endDate
     );
 
-    if (!isVacationSet) {
-      setSendingData(true);
+    if (!foundVacationId) {
+      setIsLoading(true);
       const { error } = await supabase.from("vacations").insert([
         {
           user_id: employeeId,
@@ -125,8 +122,9 @@ export default function AssignVacationsDialog({
       if (error) {
         console.error("Error assigning vacations:", error.message);
         alert("Error assigning vacations. Please try again.");
-        setSendingData(false);
-        setUploadingData(false);
+        setIsLoading(false);
+        setIsInserting(false);
+
         return;
       }
     } else {
@@ -141,8 +139,10 @@ export default function AssignVacationsDialog({
       if (error) {
         console.error("Error updating vacations:", error.message);
         alert("Error updating vacations. Please try again.");
-        setSendingData(false);
-        setUploadingData(false);
+
+        setIsLoading(false);
+        setIsInserting(false);
+
         return;
       }
     }
@@ -152,18 +152,23 @@ export default function AssignVacationsDialog({
     });
     setIsVacationsDialogOpen(false);
     setVacationsRange({ startDate: undefined, endDate: undefined });
-    setSendingData(false);
     setFetchingEmployees(true);
-    setUploadingData(false);
+    setIsLoading(false);
+    setIsInserting(false);
   };
 
   const handleResetVacations = async (
     e: any,
     foundVacationId: number | null
   ) => {
+    setIsResetting(true);
     e.preventDefault();
-    console.log(e);
-    if (!employeeId) return;
+    setIsLoading(true);
+    if (!employeeId) {
+      setIsLoading(false);
+      setIsResetting(false);
+      return;
+    }
     const response = await supabase
       .from("vacations")
       .delete()
@@ -175,12 +180,48 @@ export default function AssignVacationsDialog({
         position: "bottom-right",
         autoClose: 2000,
       });
+      setIsResetting(false);
+      setIsLoading(false);
       return;
     }
 
+    toast.success("Vacaciones restablecidas con éxito", {
+      position: "bottom-right",
+      autoClose: 4000,
+    });
+    setSelectedEmployeeData({
+      ...selectedEmployeeData,
+      vacations: selectedEmployeeData.vacations?.filter(
+        (vacation: any) => vacation.id !== foundVacationId
+      ),
+    });
     setVacationsRange({ startDate: undefined, endDate: undefined });
-    setIsVacationSet(false);
     setFetchingEmployees(true);
+    setIsLoading(false);
+    setIsResetting(false);
+  };
+
+  const handleYearChange = (year: string) => {
+    const vacation = selectedEmployeeData.vacations?.find((vacation: any) =>
+      vacation.start_date.includes(year)
+    );
+
+    if (vacation) {
+      console.log({ vacation });
+      setVacationsRange({
+        startDate: parseLocalDate(vacation.start_date),
+        endDate: parseLocalDate(vacation.end_date),
+        status: vacation.status,
+      });
+      setFoundVacationId(vacation.id);
+    } else {
+      setFoundVacationId(null);
+      setVacationsRange({
+        startDate: undefined,
+        endDate: undefined,
+        status: undefined,
+      });
+    }
   };
   return (
     <>
@@ -198,27 +239,54 @@ export default function AssignVacationsDialog({
             </DialogDescription>
 
             <form className="flex flex-col pt-10">
+              <div className="flex flex-row items-center gap-4 mb-5">
+                <Label htmlFor="username" className="text-right w-2/5">
+                  Año:
+                </Label>
+                <Select
+                  onValueChange={(e) => {
+                    setSelectedYear(e);
+                    handleYearChange(e);
+                  }}
+                  value={selectedYear}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="w-[90px] focus:ring-none ">
+                    <SelectValue placeholder="Año" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((years) => (
+                      <SelectItem
+                        className="cursor-pointer hover:bg-neutral-100"
+                        key={years}
+                        value={years.toString()}
+                      >
+                        {years}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex flex-row items-center gap-4">
                 <Label htmlFor="username" className="text-right w-2/5">
-                  Próximas vacaciones:
+                  Vacaciones:
                 </Label>
-                {isLoading ? (
-                  <div>
-                    <Spinner />
-                  </div>
-                ) : (
-                  <div className="w-3/5">
-                    <DatePickerWithRange
-                      vacationsRange={vacationsRange}
-                      setVacationsRange={setVacationsRange}
-                    />
-                    {isVacationSet ? (
-                      <p className=" text-xs text-green-700">Programadas</p>
-                    ) : (
-                      <p className=" text-xs text-red-700">Aún sin programar</p>
-                    )}
-                  </div>
-                )}
+
+                <div className="w-3/5">
+                  <DatePickerWithRange
+                    startYear={parseInt(selectedYear)}
+                    endYear={parseInt(selectedYear) + 1}
+                    disabled={
+                      selectedYear < new Date().getFullYear().toString() ||
+                      vacationsRange.status === "fulfilled" ||
+                      isLoading
+                    }
+                    vacationsRange={vacationsRange}
+                    setVacationsRange={setVacationsRange}
+                  />
+
+                  {translateVacationStatus(vacationsRange.status)}
+                </div>
               </div>
 
               <DialogFooter className="pt-10">
@@ -232,22 +300,28 @@ export default function AssignVacationsDialog({
                   Cerrar
                 </Button>
                 <Button
-                  disabled={!isVacationSet}
+                  disabled={
+                    !foundVacationId ||
+                    vacationsRange.status === "fulfilled" ||
+                    isLoading
+                  }
                   onClick={(e) => handleResetVacations(e, foundVacationId)}
                   variant={"outline"}
                 >
                   Restablecer
+                  {isResetting && <Spinner />}
                 </Button>
+
                 <Button
                   disabled={
                     !vacationsRange.startDate ||
                     !vacationsRange.endDate ||
-                    sendingData ||
-                    uploadingData
+                    isLoading
                   }
                   onClick={(e) => handleSubmit(e)}
                 >
                   Asignar
+                  {isInserting && <Spinner />}
                 </Button>
               </DialogFooter>
             </form>

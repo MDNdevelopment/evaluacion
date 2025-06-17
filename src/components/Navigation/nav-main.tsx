@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import { useUserStore } from "@/stores";
 
 export function NavMain({
   items,
@@ -26,25 +27,23 @@ export function NavMain({
     title: string;
     url: string;
     icon?: LucideIcon;
-    isActive?: boolean;
+    role: string;
+    access_level: number;
     items?: {
       title: string;
       url: string;
+      role: string;
     }[];
   }[];
 }) {
+  const user = useUserStore((state) => state.user);
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Menú</SidebarGroupLabel>
       <SidebarMenu className="gap-3">
         {items.map((item) =>
           item.items && item.items.length > 0 ? (
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive}
-              className="group/collapsible"
-            >
+            <Collapsible key={item.title} asChild className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -55,28 +54,40 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub className="gap-2">
-                    {item.items.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link to={subItem.url}>
-                            <span className="text-base">{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.items.map(
+                      (subItem) =>
+                        user &&
+                        (user?.role === subItem.role ||
+                          user?.role === "admin") && (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <Link to={subItem.url}>
+                                <span className="text-base">
+                                  {subItem.title}
+                                </span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        )
+                    )}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title} asChild>
-                <Link to={item.url} className="flex items-center gap-2">
-                  {item.icon && <item.icon />}
-                  <span className="text-lg">{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            user &&
+            ((user?.role === item.role &&
+              user?.access_level >= item.access_level) ||
+              user?.role === "admin") && (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton tooltip={item.title} asChild>
+                  <Link to={item.url} className="flex items-center gap-2">
+                    {item.icon && <item.icon />}
+                    <span className="text-lg">{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
           )
         )}
       </SidebarMenu>

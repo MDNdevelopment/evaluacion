@@ -4,15 +4,19 @@ import { Button } from "./ui/button";
 import { useUserStore } from "@/stores";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
+import ImageCrop from "./Image crop/image-crop";
 
 export default function UploadProfilePic() {
+  const setNewAvatar = useUserStore((state) => state.setNewAvatar);
   const inputFile = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState<boolean>(false);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const handleFileChange = (e: any) => {
     setFileError(null); // Reset error state
-
+    console.log("archivo seleccionado");
     if (!e.target.files || e.target.files.length === 0) {
       setFileError("No se seleccionó ningún archivo.");
       return;
@@ -23,6 +27,7 @@ export default function UploadProfilePic() {
       file.type !== "image/png" &&
       file.type !== "image/webp"
     ) {
+      console.log("formato de archivo no permitido", file.type);
       setFileError(
         "Formato de archivo no permitido. Formatos válidos: JPG, PNG y WEBP"
       );
@@ -30,69 +35,97 @@ export default function UploadProfilePic() {
     }
     if (file.size > 2 * 1024 * 1024) {
       // 2MB
+      console.log("archivo demasiado grande", file.size);
       setFileError("El archivo es demasiado grande. Tamaño máximo: 2MB.");
       return;
     }
 
     console.log(file);
     setSelectedFile(file);
+    setObjectUrl(URL.createObjectURL(file)); // Create a URL for the selected file
     setFileError(null); // Clear any previous error
   };
   const user = useUserStore((state) => state.user);
 
-  const handleUploadFile = async () => {
+  const handleUploadFile = async (croppedFile: File | undefined) => {
+    setUploadingAvatar(true);
     setFileError(null);
     if (!user) {
       setFileError("Usuario no encontrado. Por favor, inicia sesión.");
       return;
     }
-    if (!selectedFile) {
+    if (!croppedFile) {
       setFileError("Por favor, selecciona un archivo antes de subir.");
       return;
     }
 
     const userId = user.id;
-    const fileType = selectedFile.type.split("/")[1]; // Get file type (e.g., jpg, png, webp)
-    const fileName = `avatar_${userId}.${fileType}`; // Create a unique file name
 
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .upload(fileName, selectedFile, { cacheControl: "3600", upsert: true });
+    //get the cloudinary signature
+    const { data: signatureData, error: signatureError } =
+      await supabase.functions.invoke("express", {
+        body: { publicId: userId, uploadPreset: "evaluacion" },
+      });
 
-    if (error) {
-      console.error("Error uploading file:", error);
-      setFileError("Error al subir el archivo. Inténtalo de nuevo.");
+    if (signatureError) {
+      console.error("Error getting signature:", signatureError);
+      setFileError("Error al obtener la firma de Cloudinary.");
+      setUploadingAvatar(false);
       return;
     }
-    if (data) {
-      console.log("File uploaded successfully:", data);
-      // Update user profile with the new avatar URL
-      if (data) {
-        // Get the public URL
-        const { data: publicUrlData } = await supabase.storage
-          .from("avatars")
-          .getPublicUrl(fileName);
 
-        const publicUrl = publicUrlData.publicUrl;
-        console.log("Public URL:", publicUrl);
+    console.log(signatureData);
 
-        const { error: updateError } = await supabase
-          .from("users")
-          .update({ avatar_url: publicUrl })
-          .eq("user_id", userId);
-        if (updateError) {
-          console.error("Error updating user profile:", updateError);
-          setFileError("Error al actualizar el perfil del usuario.");
-          return;
-        }
-        toast.success("Foto de perfil actualizada con éxito", {
-          position: "bottom-right",
-          autoClose: 2000,
-        });
-        setOpen(false);
-        setSelectedFile(null);
-      }
+    const { signature, timestamp } = signatureData;
+    const url = "https://api.cloudinary.com/v1_1/mdnclientes/image/upload/";
+    const data = new FormData();
+    data.append("file", croppedFile);
+    data.append("upload_preset", "evaluacion");
+    data.append("signature", signature);
+    data.append("timestamp", timestamp);
+    data.append("public_id", userId); // Use user ID as public ID
+    data.append("api_key", import.meta.env.VITE_CLOUDINARY_API_KEY);
+    const res = await fetch(url, {
+      method: "POST",
+      body: data,
+    });
+
+    const parsedRes = await res.json();
+    if (!res.ok) {
+      console.error("Error uploading file:", parsedRes);
+      setFileError("Error al subir el archivo. Inténtalo de nuevo.");
+      setUploadingAvatar(false);
+      return;
     }
+    console.log("File uploaded successfully:", parsedRes);
+    // Update user profile with the new avatar URL
+
+    if (res.ok) {
+      const publicUrl = parsedRes.secure_url;
+      console.log("Public URL:", publicUrl);
+
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ avatar_url: publicUrl })
+        .eq("user_id", userId);
+      if (updateError) {
+        console.error("Error updating user profile:", updateError);
+        setFileError("Error al actualizar el perfil del usuario.");
+        setUploadingAvatar(false);
+        return;
+      }
+      toast.success("Foto de perfil actualizada con éxito", {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+      setNewAvatar(publicUrl);
+      setOpen(false);
+      setSelectedFile(null);
+      setFileError(null); // Clear any previous error
+      setUploadingAvatar(false);
+      inputFile.current!.value = ""; // Reset the file input
+    }
+    setUploadingAvatar(false);
   };
   return (
     <>
@@ -105,7 +138,7 @@ export default function UploadProfilePic() {
         Cambiar foto de perfil
       </Button>
       {open && (
-        <div className="sm:max-w-full max-h-[70vh] overflow-y-hidden flex flex-col ">
+        <div className="sm:max-w-full  overflow-y-hidden flex flex-col ">
           <div className="flex flex-col items-center justify-center gap-4  w-full ">
             <p className="text-sm text-neutral-600">
               Tamaño máximo de imagen: 2MB. Formatos permitidos: JPG, PNG y WEBP
@@ -127,21 +160,18 @@ export default function UploadProfilePic() {
                 <p className="text-green-600">
                   Archivo seleccionado: {selectedFile.name}
                 </p>
-                <img
+                {/* <img
                   src={URL.createObjectURL(selectedFile)}
                   alt="Preview"
                   className="w-44 h-auto object-cover rounded-md"
+                /> */}
+
+                <ImageCrop
+                  handleUploadFile={handleUploadFile}
+                  imgSrc={objectUrl}
+                  userId={user?.id}
+                  uploadingAvatar={uploadingAvatar}
                 />
-                <Button
-                  onClick={() => {
-                    // Handle file upload logic here
-                    handleUploadFile();
-                  }}
-                  className=""
-                  variant={"outline"}
-                >
-                  Confirmar
-                </Button>
               </>
             )}
           </div>

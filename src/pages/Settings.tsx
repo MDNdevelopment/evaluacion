@@ -14,8 +14,7 @@ export default function Settings() {
     );
   }
   return (
-    <div className="lg:max-w-[1200px] mx-auto p-10 ">
-      <h1 className="text-slate-900 text-4xl uppercase font-black">Ajustes</h1>
+    <div className="  p-10 ">
       <p className="text-neutral-600">
         Gestiona la configuración de tu perfil{" "}
       </p>

@@ -82,7 +82,7 @@ export default function DatePicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-2" align="start">
         <div className="w-full flex justify-between">
           <Select
             onValueChange={handleMonthChange}

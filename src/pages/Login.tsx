@@ -4,6 +4,8 @@ import { useUserStore } from "../stores/useUserStore";
 import { loginUser } from "../services/AuthService";
 import { useCompanyStore } from "@/stores/useCompanyStore";
 import { useSessionStore } from "@/stores/useSessionStore";
+import Spinner from "@/components/Spinner";
+import { Button } from "@/components/ui/button";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -13,8 +15,11 @@ export default function Login() {
   const setUser = useUserStore((state) => state.setUser);
   const setCompany = useCompanyStore((state) => state.setCompany);
   const setSession = useSessionStore((state) => state.setSession);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsLoading(true);
+    setError(null); // Reset error state
     e.preventDefault();
     const { ok } = await loginUser({
       email,
@@ -26,10 +31,12 @@ export default function Login() {
     });
     if (!ok) {
       console.log("Error login");
+      setIsLoading(false);
       return;
     }
     // Set cookie with session token
     navigate("/dashboard"); // Redirect to dashboard
+    setIsLoading(false);
   };
 
   //   Check if the user is already authenticated and has the auth-token cookie
@@ -99,12 +106,14 @@ export default function Login() {
             </div>
 
             <div>
-              <button
+              <Button
+                disabled={isLoading}
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
+                {isLoading && <Spinner />}
                 Entrar
-              </button>
+              </Button>
             </div>
           </form>
 

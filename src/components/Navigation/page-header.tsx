@@ -12,6 +12,7 @@ export default function PageHeader() {
     "/empleados": "Evaluar",
     "/resumen": "Resumen",
     "/empleado/": "Perfil del Empleado",
+    "/ajustes": "Ajustes",
     "/Organización": "Mi Organización",
     "/organizacion/configuracion": "Configuración de la Organización",
     "/organizacion/empleados": "Empleados de la Organización",
@@ -26,7 +27,7 @@ export default function PageHeader() {
     <div className="p-2 bg-neutral-100 shadow-sm flex flex-row items-center justify-start border-b-2 border-neutral-200">
       <SidebarTrigger />
       <div className="max-w-[1200px] ">
-        <h1 className=" text-lg  font-bold text-neutral-800">{pageName}</h1>
+        <h1 className=" text-lg  font-medium text-neutral-800">{pageName}</h1>
       </div>
     </div>
   );

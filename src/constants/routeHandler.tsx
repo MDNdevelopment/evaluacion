@@ -60,7 +60,7 @@ export const AccessRoute = ({ children, access_level = 1 }: Props) => {
   if (!user) {
     return <>Cargando...</>;
   }
-  if (user && user.access_level < access_level) {
+  if (user && user.access_level < access_level && user.role !== "admin") {
     return <Navigate to={`/empleado/${user.id}`} replace />;
   }
 
@@ -90,16 +90,16 @@ export const PrivateRoute = ({ children }: Props) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (isSettingsPage) {
-    return (
-      <>
-        <AppSidebar />
-        <Navbar />
-        <Outlet />
-        {children}
-      </>
-    );
-  }
+  // if (isSettingsPage) {
+  //   return (
+  //     <>
+  //       <AppSidebar />
+  //       <Navbar />
+  //       <Outlet />
+  //       {children}
+  //     </>
+  //   );
+  // }
 
   return (
     <>

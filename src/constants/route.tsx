@@ -89,7 +89,9 @@ export const Routes = [
     path: "/resumen",
     element: (
       <PrivateRoute>
-        <Summary />
+        <AccessRoute access_level={2}>
+          <Summary />
+        </AccessRoute>
       </PrivateRoute>
     ),
   },
@@ -145,9 +147,7 @@ export const Routes = [
     path: "/organizacion/descargas",
     element: (
       <PrivateRoute>
-        <AccessRoute access_level={2}>
-          <CompanyDownload />
-        </AccessRoute>
+        <CompanyDownload />
       </PrivateRoute>
     ),
   },

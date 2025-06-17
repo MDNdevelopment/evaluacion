@@ -139,7 +139,7 @@ export default function TopRated() {
   }
   return (
     <div className="mt-5">
-      <h2 className="text-gray-800 font-black text-2xl">
+      <h2 className="text-gray-800  text-2xl font-light">
         Mejores promedios del período actual
       </h2>
       <div className="lg:grid lg:grid-cols-3 lg:gap-4 mt-2 flex flex-col mx-auto">
@@ -187,7 +187,7 @@ export default function TopRated() {
                   </div>
                 ) : (
                   <div className="flex justify-center  flex-1 items-center pt-5 flex-col">
-                    <h2 className="text-gray-400 font-bold text-3xl text-center">
+                    <h2 className="text-gray-400 font-light text-2xl text-center">
                       Aún no hay evaluaciones...
                     </h2>
                   </div>

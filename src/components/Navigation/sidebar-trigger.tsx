@@ -1,4 +1,3 @@
-import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
 import { Menu } from "lucide-react";
 

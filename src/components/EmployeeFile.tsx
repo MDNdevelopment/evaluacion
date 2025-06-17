@@ -9,6 +9,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { XIcon } from "lucide-react";
+import { useUserStore } from "@/stores/useUserStore";
 
 export default function EmployeeFile({
   isFileOpen,
@@ -20,6 +21,7 @@ export default function EmployeeFile({
   employeeData: any;
 }) {
   const [copyText, setCopyText] = useState("Copiar");
+  const user = useUserStore((state) => state.user);
 
   function handleClickItem(data: string) {
     navigator.clipboard.writeText(data);
@@ -30,12 +32,12 @@ export default function EmployeeFile({
   }
   return (
     <Dialog open={isFileOpen} onOpenChange={setIsFileOpen}>
-      <DialogTrigger onClick={() => {}} asChild>
-        <button className="group rounded-lg bg-white hover:bg-neutral-100 border  p-2 transition-all ease-linear w-3/5 mx-auto lg:w-full shadow-sm border-[#00000018]  flex flex-row items-center justify-center gap-2">
+      <DialogTrigger className="bg-green-600 w-full" onClick={() => {}} asChild>
+        <button className="group rounded-lg bg-white hover:bg-neutral-100 border  p-2 transition-all ease-linear w-fit px-5 mx-auto  shadow-sm border-[#00000018]  flex flex-row items-center justify-center gap-2">
           Información
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] [&>button]:hidden max-h-[70vh] overflow-y-hidden  flex flex-col">
+      <DialogContent className="sm:max-w-[425px] [&>button]:hidden max-h-[70vh] overflow-y-hidden  flex flex-col  w-90 rounded-lg">
         <DialogHeader>
           <DialogClose asChild={true}>
             <XIcon
@@ -55,7 +57,12 @@ export default function EmployeeFile({
                 title: string;
                 data: string;
                 difference?: string;
+                admin: boolean;
               };
+
+              if (user?.role !== "admin" && val.admin) {
+                return null;
+              }
               return (
                 <li
                   key={key}
@@ -63,9 +70,11 @@ export default function EmployeeFile({
                     index % 2 === 0 ? "bg-white" : "bg-neutral-100"
                   }  py-3 px-5 justify-between `}
                 >
-                  <div className="font-medium">{val.title}:</div>
+                  <div className="font-medium flex items-center justify-center">
+                    {val.title}:
+                  </div>
                   <div className="text-right flex flex-col items-end p-1">
-                    <div className="relative flex justify-center group">
+                    <div className="relative flex justify-center group ">
                       <div className="opacity-0 group-hover:opacity-100 absolute bottom-8 bg-white rounded-lg border border-neutral-200 px-2 transition-all ease-linear">
                         <span>{copyText}</span>
                       </div>
@@ -76,7 +85,7 @@ export default function EmployeeFile({
                         onClick={() => {
                           handleClickItem(val.data);
                         }}
-                        className=" w-fit px-2 rounded-lg border border-transparent cursor-pointer hover:border hover:border-neutral-300"
+                        className=" w-fit px-2 rounded-lg border border-transparent cursor-pointer hover:border hover:border-neutral-300 text-sm"
                       >
                         {val.data}
                       </span>
