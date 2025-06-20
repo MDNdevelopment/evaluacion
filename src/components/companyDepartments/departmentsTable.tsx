@@ -30,8 +30,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { supabase } from "@/services/supabaseClient";
-import { useUserStore } from "@/stores";
 
 interface Department {
   department_id: number;
@@ -55,9 +53,12 @@ export default function DepartmentsTable({
   departments: Department[];
   departmentAvg: any;
 }) {
+  const safeDepartments = departments ?? [];
   //Table states
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(
+    {}
+  );
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
 
@@ -100,6 +101,7 @@ export default function DepartmentsTable({
       header: ({ column }) => {
         return (
           <Button
+            disabled={departments.length === 0 || !column.getCanSort()}
             variant="ghost"
             onClick={() => {
               toggleHandler(column);
@@ -120,6 +122,7 @@ export default function DepartmentsTable({
       header: ({ column }) => {
         return (
           <Button
+            disabled={departments.length === 0 || !column.getCanSort()}
             variant="ghost"
             onClick={() => {
               toggleHandler(column);
@@ -144,6 +147,7 @@ export default function DepartmentsTable({
       header: ({ column }) => {
         return (
           <Button
+            disabled={departments.length === 0 || !column.getCanSort()}
             variant="ghost"
             onClick={() => {
               toggleHandler(column);
@@ -167,6 +171,7 @@ export default function DepartmentsTable({
       header: ({ column }) => {
         return (
           <Button
+            disabled={departments.length === 0 || !column.getCanSort()}
             variant="ghost"
             onClick={() => {
               toggleHandler(column);
@@ -253,7 +258,7 @@ export default function DepartmentsTable({
       pagination,
     },
     onPaginationChange: setPagination,
-    globalFilterFn: (row, _columnId, filterValue) => {
+    globalFilterFn: (_row, _columnId, _filterValue) => {
       return true;
     },
   });
@@ -281,7 +286,7 @@ export default function DepartmentsTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {departments.length && table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   className={`${
@@ -290,7 +295,7 @@ export default function DepartmentsTable({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell, index) => (
+                  {row.getVisibleCells().map((cell) => (
                     <TableCell className={`text-center `} key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -301,10 +306,10 @@ export default function DepartmentsTable({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="hover:bg-white">
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center "
                 >
                   No hay departamentos disponibles.
                 </TableCell>
@@ -313,36 +318,38 @@ export default function DepartmentsTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4 px-5">
-        <div className="flex items-center justify-between mt-4 gap-2">
-          <span className="text-sm text-neutral-600">
-            Página {pagination.pageIndex + 1} de{" "}
-            {Math.ceil(departments.length / pagination.pageSize)}
-            {"."}
-          </span>
-          <span className="text-sm text-neutral-600">
-            Departamentos: {departments.length}
-          </span>
+      {departments.length > 0 && (
+        <div className="flex items-center justify-between space-x-2 py-4 px-5">
+          <div className="flex items-center justify-between mt-4 gap-2">
+            <span className="text-sm text-neutral-600">
+              Página {pagination.pageIndex + 1} de{" "}
+              {Math.ceil(departments.length / pagination.pageSize)}
+              {"."}
+            </span>
+            <span className="text-sm text-neutral-600">
+              Departamentos: {departments.length}
+            </span>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Siguiente
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </Button>
-        </div>
-      </div>
+      )}
     </>
   );
 }
