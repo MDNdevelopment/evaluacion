@@ -75,6 +75,11 @@ export function AppSidebar() {
           url: "/organizacion/descargas",
           role: "employee",
         },
+        {
+          title: "Agregar empleado",
+          url: "/dashboard/nuevo",
+          role: "admin",
+        },
       ],
     },
   ];
