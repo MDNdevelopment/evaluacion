@@ -11,51 +11,39 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/services/supabaseClient";
 import { XIcon } from "lucide-react";
+import { c } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export function DeletePosition({
   positionName,
   positionId,
-  setIsLoading,
-  setSelectedDepartment,
-  department,
+  setLoading,
 }: {
   positionName: string | undefined;
   positionId: number | undefined;
-  company: any;
-  setIsLoading: any;
-  setSelectedDepartment: any;
-  department: any;
+  setLoading: any;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleSubmit = async () => {
-    // Delete the position
-    const responsePosition = await supabase
-      .from("positions")
-      .delete()
-      .eq("position_id", positionId);
+    //Check if there are employees in this position
 
-    if (responsePosition.error) {
-      console.log(responsePosition.error.message);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
+    toast.success("Cargo eliminado con éxito", {
+      position: "bottom-right",
+      autoClose: 2000,
+    });
+    setLoading(true);
     setIsOpen(false);
-    setSelectedDepartment(department);
-
-    console.log("Position and unused categories deleted successfully.");
   };
   return (
     <Dialog open={isOpen}>
       <DialogTrigger className="mr-3" asChild>
         <Button
-          className="text-sm font-light py-1 px-2 bg-red-700 hover:bg-red-800 text-white hover:text-white mt-3"
+          className="text-red-600 hover:text-red-600"
           onClick={() => setIsOpen(true)}
-          variant="outline"
+          variant="ghost"
         >
-          Eliminar cargo
+          Eliminar
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] [&>button]:hidden ">
@@ -70,7 +58,7 @@ export function DeletePosition({
           </DialogHeader>
           <DialogClose asChild={true}>
             <XIcon
-              className="flex flex-row justify-self-end cursor-pointer text-sm"
+              className="flex flex-row justify-self-end cursor-pointer text-sm absolute top-0 right-0 mt-2 mr-2"
               onClick={() => setIsOpen(false)}
             />
           </DialogClose>

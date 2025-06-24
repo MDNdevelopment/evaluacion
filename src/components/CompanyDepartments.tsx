@@ -5,6 +5,7 @@ import DepartmentsTable from "./companyDepartments/departmentsTable";
 import { Separator } from "./ui/separator";
 import DepartmentsInfo from "./companyDepartments/departmentsInfo";
 import DepartmentsBest from "./companyDepartments/DepartmentsBest";
+import DepartmentDialog from "./companyDepartments/departmentDialog";
 
 interface CompanyInfo {
   departments: number;
@@ -20,7 +21,11 @@ const CompanyDepartments = () => {
   const [companyInfo, setCompanyInfo] = useState<
     CompanyInfo | null | undefined
   >(undefined);
-
+  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] =
+    useState<boolean>(false);
+  const [departmentDialogMode, setDepartmentDialogMode] = useState<
+    "edit" | "employees" | "positions"
+  >("edit");
   const getDepartments = async () => {
     const { data, error } = await supabase
       .from("departments")
@@ -105,7 +110,7 @@ const CompanyDepartments = () => {
       id: bestDept.id,
       name:
         departments.find((dept: any) => dept.department_id === bestDept.id)
-          ?.department_name || "N/A",
+          ?.department_name || "",
       avg_score: bestDept.avg_score,
       user_count: bestDept.user_count,
     });
@@ -133,6 +138,8 @@ const CompanyDepartments = () => {
       <DepartmentsTable
         departmentAvg={departmentAvg}
         departments={departments}
+        setIsDepartmentDialogOpen={setIsDepartmentDialogOpen}
+        setDepartmentDialogMode={setDepartmentDialogMode}
       />
     </div>
   );

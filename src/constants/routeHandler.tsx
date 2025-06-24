@@ -48,6 +48,26 @@ export const AuthRoute = ({ children }: Props) => {
   return children;
 };
 
+export const AdminRoute = ({ children }: Props) => {
+  const user = useUserStore((state) => state.user);
+
+  if (!user) {
+    return <>Cargando...</>;
+  }
+
+  // If the user is not an admin, redirect to their profile
+  if (user.role !== "admin") {
+    return <Navigate to={`/empleado/${user.id}`} replace />;
+  }
+
+  return (
+    <>
+      <Outlet />
+      {children}
+    </>
+  );
+};
+
 export const AccessRoute = ({ children, access_level = 1 }: Props) => {
   const user = useUserStore((state) => state.user);
 

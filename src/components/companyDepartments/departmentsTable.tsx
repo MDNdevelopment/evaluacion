@@ -49,9 +49,13 @@ interface Department {
 export default function DepartmentsTable({
   departments,
   departmentAvg,
+  setIsDepartmentDialogOpen,
+  setDepartmentDialogMode,
 }: {
   departments: Department[];
   departmentAvg: any;
+  setIsDepartmentDialogOpen: (isOpen: boolean) => void;
+  setDepartmentDialogMode: (mode: "edit" | "employees" | "positions") => void;
 }) {
   const safeDepartments = departments ?? [];
   //Table states
@@ -214,7 +218,10 @@ export default function DepartmentsTable({
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => {
-                  navigate(`/departments/${row.original.department_id}`);
+                  navigate(
+                    `/organizacion/departamentos/${row.original.department_id}`,
+                    { state: row.original }
+                  );
                 }}
               >
                 Editar departamento
