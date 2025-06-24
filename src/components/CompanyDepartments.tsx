@@ -5,7 +5,8 @@ import DepartmentsTable from "./companyDepartments/departmentsTable";
 import { Separator } from "./ui/separator";
 import DepartmentsInfo from "./companyDepartments/departmentsInfo";
 import DepartmentsBest from "./companyDepartments/DepartmentsBest";
-import DepartmentDialog from "./companyDepartments/departmentDialog";
+import DepartmentDialog from "./companyDepartments/DepartmentDialog";
+import { Input } from "./ui/input";
 
 interface CompanyInfo {
   departments: number;
@@ -18,14 +19,12 @@ const CompanyDepartments = () => {
   const company = useCompanyStore((state) => state.company);
   const [departmentAvg, setDepartmentAvg] = useState<any>({});
   const [bestDepartment, setBestDepartment] = useState<any>(undefined);
+  const [fetchDepartments, setFetchDepartments] = useState<boolean>(true);
   const [companyInfo, setCompanyInfo] = useState<
     CompanyInfo | null | undefined
   >(undefined);
-  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] =
-    useState<boolean>(false);
-  const [departmentDialogMode, setDepartmentDialogMode] = useState<
-    "edit" | "employees" | "positions"
-  >("edit");
+  useState<boolean>(false);
+
   const getDepartments = async () => {
     const { data, error } = await supabase
       .from("departments")
@@ -117,8 +116,10 @@ const CompanyDepartments = () => {
   };
 
   useEffect(() => {
-    getDepartments();
-  }, [company]);
+    if (fetchDepartments) {
+      getDepartments();
+    }
+  }, [company, fetchDepartments]);
 
   return (
     <div className=" w-full max-w-[1200px] mx-auto  px-4 py-8">
@@ -134,12 +135,18 @@ const CompanyDepartments = () => {
         <DepartmentsInfo companyInfo={companyInfo} />
         <DepartmentsBest bestDepartment={bestDepartment} />
       </div>
+      <div className="flex flex-row justify-between items-center mb-5">
+        <Input className="w-1/4" />
+        <DepartmentDialog
+          mode="create"
+          company={{ id: company?.id, name: company?.name }}
+          setFetchDepartments={setFetchDepartments}
+        />
+      </div>
 
       <DepartmentsTable
         departmentAvg={departmentAvg}
         departments={departments}
-        setIsDepartmentDialogOpen={setIsDepartmentDialogOpen}
-        setDepartmentDialogMode={setDepartmentDialogMode}
       />
     </div>
   );

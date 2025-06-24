@@ -36,7 +36,10 @@ export default function TopRated() {
 
   const getDepartments = async () => {
     let fetchedDepartments: Department[] = [];
-    const { data, error } = await supabase.from("departments").select("*");
+    const { data, error } = await supabase
+      .from("departments")
+      .select("*")
+      .eq("dashboard_visible", true);
 
     if (error) {
       console.log(error.message);

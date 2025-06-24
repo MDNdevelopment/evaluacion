@@ -49,15 +49,10 @@ interface Department {
 export default function DepartmentsTable({
   departments,
   departmentAvg,
-  setIsDepartmentDialogOpen,
-  setDepartmentDialogMode,
 }: {
   departments: Department[];
   departmentAvg: any;
-  setIsDepartmentDialogOpen: (isOpen: boolean) => void;
-  setDepartmentDialogMode: (mode: "edit" | "employees" | "positions") => void;
 }) {
-  const safeDepartments = departments ?? [];
   //Table states
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(
@@ -226,16 +221,15 @@ export default function DepartmentsTable({
               >
                 Editar departamento
               </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => {
-                  navigate(`/departments/${row.original.department_id}`);
-                }}
-              >
-                Editar cargos
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  navigate(`/departments/${row.original.department_id}`);
+                  navigate(
+                    `/organizacion/departamentos/${row.original.department_id}`,
+                    {
+                      state: { targetId: "employees" },
+                    }
+                  );
                 }}
               >
                 Ver empleados
