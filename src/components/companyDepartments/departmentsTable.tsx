@@ -31,7 +31,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { Input } from "../ui/input";
-import DepartmentDialog from "./DepartmentDialog";
+import DepartmentDialog from "./departmentDialog";
 
 interface Department {
   department_id: number;

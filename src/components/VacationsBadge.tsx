@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import dateBetweenRange from "@/utils/dateBetweenRange";
 
 export default function VacationsBadge({
