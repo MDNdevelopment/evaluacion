@@ -50,7 +50,7 @@ export default function DepartmentsBest({
           </div>
         </div>
 
-        <div className="flex-1 flex flex-row  lg:justify-between justify-center w-full lg:gap-0 gap-5">
+        <div className="flex-1 flex flex-row  lg:justify-between justify-center w-full  gap-5">
           <div className="flex flex-col justify-center items-center   ">
             <span className="text-base font-light">Empleados:</span>
             <span className="font-black text-5xl text-neutral-700 self-end pr-5">
