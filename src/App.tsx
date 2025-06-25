@@ -30,7 +30,6 @@ function App() {
       .single();
 
     if (error) {
-      console.log("hola");
       console.error(error.message);
     }
     if (employeeData) {
@@ -59,7 +58,6 @@ function App() {
   };
   const checkSession = () => {
     supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event);
       if (session) {
         useSessionStore.getState().setSession(session);
         getUserData(session.user.id);
@@ -71,7 +69,6 @@ function App() {
 
   useEffect(() => {
     checkSession();
-    console.log("APP RE RENDERED");
   }, []);
   return (
     <>

@@ -9,7 +9,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepare": "husky",
-    "release": "release-it",
     "commitlint": "commitlint --edit"
   },
   "dependencies": {
@@ -29,6 +28,7 @@
     "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@release-it/conventional-changelog": "^10.0.1",
     "@supabase/supabase-js": "^2.45.3",
@@ -74,7 +74,6 @@
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "postcss": "^8.4.45",
-    "release-it": "^19.0.3",
     "tailwindcss": "^3.4.10",
     "ts-jest": "^29.2.5",
     "typescript": "^5.5.3",

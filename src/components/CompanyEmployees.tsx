@@ -84,13 +84,10 @@ export default function CompanyEmployees() {
     }
     setFetchingEmployees(false);
 
-    console.log({ data });
-
     setEmployees(data);
   };
 
   const setUserDataFromTable = (row: any) => {
-    console.log({ row });
     setSelectedEmployeeData({
       user_id: row.original.user_id,
       first_name: row.original.first_name,

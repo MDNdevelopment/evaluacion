@@ -69,7 +69,6 @@ export function EmployeesTable() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const loggedUser = employees.find((e) => e.user_id === user?.id);
-  console.log({ userVAcations: loggedUser?.vacations });
 
   const checkVacationOngoing = (vacations: any) => {
     let vacationOngoing = false;
@@ -102,7 +101,6 @@ export function EmployeesTable() {
 
   const toggleHandler = (column: any) => {
     const columnName = column.id;
-    console.log({ columnName });
     const isSortedAsc = column.getIsSorted() === "asc";
     // Create a new URLSearchParams object
     const newSearchParams = new URLSearchParams(searchParams);
@@ -120,7 +118,6 @@ export function EmployeesTable() {
   useEffect(() => {
     getEmployees();
     setEvaluation(null);
-    console.log("EmployeesTable Rendered");
 
     const columnName = searchParams.get("column");
     const order = searchParams.get("order");
@@ -133,7 +130,6 @@ export function EmployeesTable() {
     {
       header: "ID",
       cell: ({ row }) => {
-        console.log(row.original.avatar_url);
         return (
           <div className="h-12 w-12 overflow-hidden">
             <img
@@ -377,9 +373,8 @@ export function EmployeesTable() {
         .eq("company_id", company.id)
         .eq("evaluation_sessions.period", firstDay);
 
-      console.log({ data });
       if (error) {
-        console.log(error.message);
+        console.error(error.message);
         return;
       }
 
@@ -391,7 +386,7 @@ export function EmployeesTable() {
         .eq("period", firstDay);
 
       if (errorEvaluations) {
-        console.log(errorEvaluations.message);
+        console.error(errorEvaluations.message);
         return;
       }
 
@@ -425,7 +420,7 @@ export function EmployeesTable() {
       setEmployees(employeesList);
       setIsLoading(false);
     } else {
-      console.log("no company");
+      console.error("no company");
     }
   };
 
