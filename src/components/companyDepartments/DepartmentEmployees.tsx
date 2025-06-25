@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function DepartmentEmployees({ users }: { users: any }) {
   return (
     <>
-      <ul className="grid grid-cols-3 gap-3 ">
+      <ul className="grid grid-cols-2 lg:grid-cols-3 gap-3 ">
         {users && users.length > 0 ? (
           users
             .sort(
@@ -26,7 +26,7 @@ export default function DepartmentEmployees({ users }: { users: any }) {
                   />
                 </div>
                 <span className="text-center my-2 text-xl font-light">{`${user.first_name} ${user.last_name}`}</span>
-                <div className="bg-neutral-800 px-3 py-4 rounded-b-md text-neutral-50 flex-1 flex-grow-1">
+                <div className="bg-neutral-800 px-3 py-4 rounded-b-md text-neutral-50 flex flex-col justify-between flex-1 flex-grow-1">
                   <div className="flex gap-2">
                     <span className="font-light text-xs">Cargo:</span>
                     <span className="font-bold text-xs ">{`${user.position.position_name}`}</span>
