@@ -33,9 +33,9 @@ export default function DepartmentsBest({
     );
   }
   return (
-    <div className="h-36 w-full border border-neutral-200 rounded-md px-5 py-3 flex flex-col">
-      <div className="flex flex-row gap-4 w-full items-center h-full px-3 py-2 ">
-        <div className="flex flex-col justify-center  ">
+    <div className="lg:h-36 w-full border border-neutral-200 rounded-md px-5 py-3 flex flex-col">
+      <div className="flex lg:flex-row flex-col gap-4 w-full items-center h-full px-3 py-2 ">
+        <div className="flex flex-col justify-center  w-full ">
           <span className="font-black uppercase text-3xl text-neutral-700 flex-1">
             {bestDepartment.name}
           </span>
@@ -50,7 +50,7 @@ export default function DepartmentsBest({
           </div>
         </div>
 
-        <div className="flex-1 flex flex-row  justify-between">
+        <div className="flex-1 flex flex-row  lg:justify-between justify-center w-full lg:gap-0 gap-5">
           <div className="flex flex-col justify-center items-center   ">
             <span className="text-base font-light">Empleados:</span>
             <span className="font-black text-5xl text-neutral-700 self-end pr-5">
