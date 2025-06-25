@@ -276,7 +276,7 @@ export default function DepartmentsTable({
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-10 mb-5 lg:flex-row lg:justify-between lg:items-center">
+      <div className="flex flex-col gap-4 lg:px-0 px-10 mb-5 lg:flex-row lg:justify-between lg:items-center">
         <div className="lg:w-1/4">
           <span className="text-neutral-800 text-sm font-light">
             Buscar departamento

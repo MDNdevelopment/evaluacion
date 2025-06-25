@@ -20,7 +20,7 @@ export function PositionDialog({
   departmentId,
   departmentName,
   company,
-  setFetchDepartmentInfo,
+  refetch,
   mode = "create",
   positionId,
   positionName,
@@ -28,7 +28,7 @@ export function PositionDialog({
   departmentId?: string;
   departmentName?: string;
   company?: any;
-  setFetchDepartmentInfo: (value: boolean) => void;
+  refetch: () => void;
   mode?: "edit" | "create" | "delete";
   positionId?: number;
   positionName?: string;
@@ -127,8 +127,7 @@ export function PositionDialog({
         autoClose: 2000,
       }
     );
-    setFetchDepartmentInfo(true);
-    console.log("im here");
+    refetch();
 
     setIsOpen(false);
   };
