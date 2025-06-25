@@ -20,7 +20,7 @@ export default function DepartmentGeneralSettings({
           Aquí puedes administrar los cargos del departamento
         </p>
 
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-end mt-5">
           <PositionDialog
             departmentId={id}
             departmentName={department?.department_name}
