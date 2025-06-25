@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
-import DepartmentDialog from "./DepartmentDialog";
+import DepartmentDialog from "./departmentDialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { supabase } from "@/services/supabaseClient";
@@ -62,7 +62,7 @@ export default function DepartmentGeneralSettings({
           </div>
           <div>
             <div className="flex flex-row items-center mt-5 px-1 gap-3">
-              <div className="flex flex-col g:w-2/6 w-4/6 lg:text-base text-sm">
+              <div className="flex flex-col lg:w-2/6 w-4/6 lg:text-base text-sm">
                 <label className="">Visible en el dashboard: </label>
                 <span className="text-xs text-neutral-500 italic font-light">
                   Elige si quieres que el departamento sea visible en el
