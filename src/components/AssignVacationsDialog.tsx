@@ -207,7 +207,6 @@ export default function AssignVacationsDialog({
     );
 
     if (vacation) {
-      console.log({ vacation });
       setVacationsRange({
         startDate: parseLocalDate(vacation.start_date),
         endDate: parseLocalDate(vacation.end_date),

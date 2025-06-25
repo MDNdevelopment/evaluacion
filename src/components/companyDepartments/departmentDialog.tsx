@@ -22,7 +22,7 @@ export default function DepartmentDialog({
   departmentName,
   company,
   mode = "create",
-  setFetchDepartments,
+  refetch,
 }: {
   departmentId?: number;
   departmentName?: string;
@@ -31,7 +31,7 @@ export default function DepartmentDialog({
     name?: string;
   };
   mode?: "create" | "delete";
-  setFetchDepartments?: (value: boolean) => void;
+  refetch?: () => void;
 }) {
   const [newDepartment, setNewDepartment] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -41,7 +41,7 @@ export default function DepartmentDialog({
     console.log("submitting");
     setLoading(true);
     if (mode === "create") {
-      const { data: newDepData, error: newDepError } = await supabase
+      const { data: _newDepData, error: newDepError } = await supabase
         .from("departments")
         .insert({
           department_name: newDepartment,
@@ -118,17 +118,18 @@ export default function DepartmentDialog({
         autoClose: 2000,
       }
     );
-    setFetchDepartments?.(true);
-
+    console.log("setting fetch departments to true");
     setLoading(false);
     if (mode === "delete") {
       navigate("/organizacion/departamentos", {
         replace: true,
       });
     } else {
+      // Refresh the departments list
+
+      refetch?.();
       setNewDepartment("");
       setIsOpen(false);
-      // Refresh the departments list
       return;
     }
   };
@@ -189,7 +190,8 @@ export default function DepartmentDialog({
               Eliminar departamento: {departmentName}
             </DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que deseas eliminar este departamento?
+              ¿Estás seguro de que deseas eliminar este departamento y todos sus
+              cargos?
             </DialogDescription>
           </DialogHeader>
 

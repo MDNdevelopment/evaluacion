@@ -1,4 +1,4 @@
-import DepartmentDialog from "@/components/companyDepartments/departmentDialog";
+import DepartmentDialog from "@/components/companyDepartments/DepartmentDialog";
 import DepartmentEmployees from "@/components/companyDepartments/DepartmentEmployees";
 import { PositionDialog } from "@/components/PositionDialog";
 import Spinner from "@/components/Spinner";

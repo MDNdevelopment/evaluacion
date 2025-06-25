@@ -30,6 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Input } from "../ui/input";
+import DepartmentDialog from "./DepartmentDialog";
 
 interface Department {
   department_id: number;
@@ -49,15 +51,20 @@ interface Department {
 export default function DepartmentsTable({
   departments,
   departmentAvg,
+  refetch,
+  company,
 }: {
   departments: Department[];
   departmentAvg: any;
+  refetch: () => void;
+  company: any;
 }) {
   //Table states
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(
     {}
   );
+  const [searchDepartment, setSearchDepartment] = useState<string>("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
 
@@ -257,15 +264,35 @@ export default function DepartmentsTable({
       columnVisibility,
       rowSelection,
       pagination,
+      globalFilter: searchDepartment,
     },
     onPaginationChange: setPagination,
-    globalFilterFn: (_row, _columnId, _filterValue) => {
-      return true;
+    globalFilterFn: (row, _columnId, filterValue) => {
+      return row.original.department_name
+        .toLowerCase()
+        .includes(filterValue.toLowerCase());
     },
   });
 
   return (
     <>
+      <div className="flex flex-row justify-between items-center mb-5">
+        <div className="w-1/4">
+          <span className="text-neutral-800 text-sm font-light">
+            Buscar departamento
+          </span>
+          <Input
+            value={searchDepartment}
+            onChange={(e) => setSearchDepartment(e.target.value)}
+          />
+        </div>
+
+        <DepartmentDialog
+          mode="create"
+          company={{ id: company?.id, name: company?.name }}
+          refetch={refetch}
+        />
+      </div>
       <div className="rounded-md border  overflow-x-auto ">
         <Table>
           <TableHeader>
@@ -312,7 +339,9 @@ export default function DepartmentsTable({
                   colSpan={columns.length}
                   className="h-24 text-center "
                 >
-                  No hay departamentos disponibles.
+                  {searchDepartment
+                    ? "No se encontraron departamentos que coincidan con la búsqueda"
+                    : "No hay departamentos disponibles."}
                 </TableCell>
               </TableRow>
             )}

@@ -40,7 +40,6 @@ export const AuthRoute = ({ children }: Props) => {
 
   // Otherwise, if authenticated, redirect to dashboard
   if (isAuthenticated()) {
-    console.log({ path: loc.pathname });
     return <Navigate to={loc.pathname} replace />;
   }
 
@@ -70,8 +69,6 @@ export const AdminRoute = ({ children }: Props) => {
 
 export const AccessRoute = ({ children, access_level = 1 }: Props) => {
   const user = useUserStore((state) => state.user);
-
-  console.log({ user });
 
   if (!user) {
     return <>Cargando...</>;

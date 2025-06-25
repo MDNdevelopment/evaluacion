@@ -148,7 +148,6 @@ export default function TopRated() {
       <div className="lg:grid lg:grid-cols-3 lg:gap-4 mt-2 flex flex-col mx-auto">
         {departments &&
           departments.map((department) => {
-            console.log({ department });
             if (department.id === 5 || department.id === 6) return;
             return (
               <div

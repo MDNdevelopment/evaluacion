@@ -10,10 +10,6 @@ export default function VacationsBadge({
   vacationStartDate: string;
   vacationEndDate: string;
 }) {
-  useEffect(() => {
-    console.log("MOUNTING BADGE");
-  });
-
   const ongoing = dateBetweenRange(
     new Date(vacationStartDate),
     new Date(vacationEndDate)

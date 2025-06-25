@@ -61,8 +61,6 @@ export default function EmployeeProfile() {
       return;
     }
 
-    console.log({ userData: data });
-
     //Get the evaluations data
     const { data: evaluations, error: evaluationsError } = await supabase
       .from("evaluation_sessions")
@@ -224,7 +222,6 @@ export default function EmployeeProfile() {
 
     if (user.access_level < 2 && user.id !== id) {
       navigate(`/empleado/${user.id}`);
-      console.log("mi loco te vai");
       return;
     }
     setEvaluationsData(null);
