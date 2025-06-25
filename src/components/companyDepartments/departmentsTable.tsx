@@ -276,8 +276,8 @@ export default function DepartmentsTable({
 
   return (
     <>
-      <div className="flex flex-row justify-between items-center mb-5">
-        <div className="w-1/4">
+      <div className="flex flex-col gap-4 px-10 mb-5 lg:flex-row lg:justify-between lg:items-center">
+        <div className="lg:w-1/4">
           <span className="text-neutral-800 text-sm font-light">
             Buscar departamento
           </span>
@@ -349,7 +349,7 @@ export default function DepartmentsTable({
         </Table>
       </div>
       {departments.length > 0 && (
-        <div className="flex items-center justify-between space-x-2 py-4 px-5">
+        <div className="flex lg:flex-row flex-col gap-4 lg:gap-0 items-center justify-between space-x-2 py-4 px-5">
           <div className="flex items-center justify-between mt-4 gap-2">
             <span className="text-sm text-neutral-600">
               Página {pagination.pageIndex + 1} de{" "}

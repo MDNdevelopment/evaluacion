@@ -231,7 +231,7 @@ export default function DepartmentDialog({
           variant={`${mode === "delete" ? "ghost" : "outline"}`}
           disabled={mode === "create" && !company}
         >
-          {mode === "create" && "Agregar departamento"}
+          {mode === "create" && "Nuevo departamento"}
           {mode === "delete" && "Eliminar"}
         </Button>
       </DialogTrigger>
