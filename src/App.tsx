@@ -57,7 +57,7 @@ function App() {
     }
   };
   const checkSession = () => {
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         useSessionStore.getState().setSession(session);
         getUserData(session.user.id);

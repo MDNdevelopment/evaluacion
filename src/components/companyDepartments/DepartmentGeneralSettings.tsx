@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
-import DepartmentDialog from "./DepartmentDialog";
+import DepartmentDialog from "./departmentDialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { supabase } from "@/services/supabaseClient";
