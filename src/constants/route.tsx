@@ -1,5 +1,10 @@
 import { Login, Dashboard } from "../pages/index";
-import { AccessRoute, AuthRoute, PrivateRoute } from "./routeHandler";
+import {
+  AccessRoute,
+  AdminRoute,
+  AuthRoute,
+  PrivateRoute,
+} from "./routeHandler";
 import NewEmployee from "../pages/NewEmployee";
 // import Employee from "../pages/Employee"; // This page is not being used
 import Settings from "../pages/Settings";
@@ -13,6 +18,7 @@ import CompanyConfig from "@/components/CompanyConfig";
 import CompanyDepartments from "@/components/CompanyDepartments";
 import CompanyQuestions from "@/components/CompanyQuestions";
 import CompanyDownload from "@/components/CompanyDownload";
+import DepartmentEdit from "@/pages/DeparmentEdit";
 export const Routes = [
   {
     path: "/",
@@ -106,9 +112,9 @@ export const Routes = [
     path: "/organizacion/empleados",
     element: (
       <PrivateRoute>
-        <AccessRoute access_level={2}>
+        <AdminRoute>
           <CompanyEmployees />
-        </AccessRoute>
+        </AdminRoute>
       </PrivateRoute>
     ),
   },
@@ -116,9 +122,9 @@ export const Routes = [
     path: "/organizacion/configuracion",
     element: (
       <PrivateRoute>
-        <AccessRoute access_level={2}>
+        <AdminRoute>
           <CompanyConfig />
-        </AccessRoute>
+        </AdminRoute>
       </PrivateRoute>
     ),
   },
@@ -126,9 +132,19 @@ export const Routes = [
     path: "/organizacion/departamentos",
     element: (
       <PrivateRoute>
-        <AccessRoute access_level={2}>
+        <AdminRoute>
           <CompanyDepartments />
-        </AccessRoute>
+        </AdminRoute>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/organizacion/departamentos/:id",
+    element: (
+      <PrivateRoute>
+        <AdminRoute>
+          <DepartmentEdit />
+        </AdminRoute>
       </PrivateRoute>
     ),
   },
@@ -136,9 +152,9 @@ export const Routes = [
     path: "/organizacion/preguntas",
     element: (
       <PrivateRoute>
-        <AccessRoute access_level={2}>
+        <AdminRoute>
           <CompanyQuestions />
-        </AccessRoute>
+        </AdminRoute>
       </PrivateRoute>
     ),
   },

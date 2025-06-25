@@ -1,0 +1,13 @@
+name: Release Please
+on:
+  push:
+    branches: [main] # or "development"
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: "node" # For npm projects
+          package-name: "your-package" # Optional
+          token: ${{ secrets.GITHUB_TOKEN }}

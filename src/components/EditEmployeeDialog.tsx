@@ -65,8 +65,6 @@ export function EditEmployeeDialog({
 
   const onSubmit = handleSubmit(async (data: any) => {
     setSendingData(true);
-    console.log(employeeId);
-    console.log(data);
     const { data: _updateData, error } = await supabase
       .from("users")
       .update({
@@ -109,7 +107,6 @@ export function EditEmployeeDialog({
       return;
     }
     if (data) {
-      console.log(data);
       setValue("first_name", data.first_name);
       setValue("last_name", data.last_name);
       setValue("email", data.email);
@@ -127,7 +124,6 @@ export function EditEmployeeDialog({
         department_name: data.name,
       });
       setValue("position_id", data.position_id);
-      console.log({ dbb: data.department_id });
       setSelectedPositions(
         positions.filter(
           (position) => position.department_id === data.department_id

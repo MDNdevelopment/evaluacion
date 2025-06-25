@@ -1,82 +1,39 @@
-import { supabase } from "@/services/supabaseClient";
-import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
-import SelectedDepartment from "./SelectedDepartment";
-import { useCompanyStore } from "@/stores";
-
-interface Department {
-  id: number;
-  name: string;
-}
+import DepartmentsTable from "./companyDepartments/departmentsTable";
+import { Separator } from "./ui/separator";
+import DepartmentsInfo from "./companyDepartments/departmentsInfo";
+import DepartmentsBest from "./companyDepartments/DepartmentsBest";
+import useFetchDepartments from "@/hooks/useFetchDepartments";
 
 const CompanyDepartments = () => {
-  const [departments, setDepartments] = useState<any>(null);
-  const company = useCompanyStore((state) => state.company);
-
-  const [selectedDepartment, setSelectedDepartment] =
-    useState<Department | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const getDepartments = async () => {
-    const { data, error } = await supabase
-      .from("departments")
-      .select("*")
-      .eq("company_id", company?.id);
-
-    if (error) {
-      console.log(error.message);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(false);
-    setDepartments(data);
-  };
-  useEffect(() => {
-    getDepartments();
-  }, [company]);
-
+  const {
+    departments,
+    departmentAvg,
+    bestDepartment,
+    companyTotals,
+    company,
+    refetch,
+  } = useFetchDepartments();
   return (
-    <div className="mx-auto  w-full">
-      <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-        Departamentos
-      </h2>
-      <div className="flex flex-col lg:flex-row flex-wrap">
-        {!isLoading && departments ? (
-          departments.map((department: any) => {
-            return (
-              <div
-                key={department.department_id}
-                onClick={() =>
-                  setSelectedDepartment({
-                    id: department.department_id,
-                    name: department.department_name,
-                  })
-                }
-                className=" pl-3 mx-2 my-2 min-h-20 lg:w-1/6 border border-gray-200 hover:bg-gray-100  shadow-sm rounded-md flex flex-col justify-start py-2 cursor-pointer"
-              >
-                <h3 className="text-md font-semibold">
-                  {department.department_name}
-                </h3>
-              </div>
-            );
-          })
-        ) : (
-          <p>Loading...</p>
-        )}
-        {!isLoading && (
-          <div
-            key={"new-dep"}
-            className="relative pl-3 mx-2 my-2 min-h-20 lg:w-1/6 border border-gray-200 bg-darkText shadow-sm rounded-md flex flex-col justify-start py-2 hover:bg-darkText-darker cursor-pointer"
-          >
-            {" "}
-            <h3 className="text- font-semibold text-white">
-              {"Agregar departamento"}
-            </h3>
-            <FaPlus className="text-white absolute right-2" />
-          </div>
-        )}
+    <div className=" w-full max-w-[1200px] mx-auto  px-4 py-8">
+      <p className="text-neutral-700 font-base italic">
+        Gestiona los departamentos de tu organización
+      </p>
+      <p className="text-neutral-600 font-light text-sm">
+        Aquí podrás agregar/modificar/eliminar departamentos y sus cargos,
+        además de ver su lista de empleados.
+      </p>
+      <Separator className="my-3 mb-5" />
+      <div className="flex flex-col xl:flex-row gap-5 mb-5">
+        <DepartmentsInfo companyTotals={companyTotals} />
+        <DepartmentsBest bestDepartment={bestDepartment} />
       </div>
-      <SelectedDepartment department={selectedDepartment} />
+
+      <DepartmentsTable
+        departmentAvg={departmentAvg}
+        departments={departments}
+        company={company}
+        refetch={refetch}
+      />
     </div>
   );
 };
