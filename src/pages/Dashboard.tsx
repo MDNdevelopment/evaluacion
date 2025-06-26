@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/breadcrumb";
 export default function Dashboard() {
   return (
-    <div className="p-10  shadow-md ">
+    <div className="p-10  ">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
