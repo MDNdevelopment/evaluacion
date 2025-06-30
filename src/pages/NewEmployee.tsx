@@ -13,7 +13,7 @@ type Inputs = {
   position: string;
   department: number;
   access_level: number;
-  role: string;
+  admin: boolean;
 };
 
 export default function NewEmployee() {
@@ -65,7 +65,7 @@ export default function NewEmployee() {
           last_name: watch("lastName"),
           position_id: watch("position"),
           access_level: watch("access_level"),
-          role: watch("role"),
+          admin: watch("admin"),
           company_id: company.id,
         });
 
@@ -430,12 +430,12 @@ export default function NewEmployee() {
                   </div>
                   <div className="">
                     <select
-                      id="role"
-                      {...register("role")}
+                      id="admin"
+                      {...register("admin")}
                       className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
                     >
-                      <option value={"admin"}>Admin</option>
-                      <option selected value={"employee"}>
+                      <option value="true">Admin</option>
+                      <option selected value="false">
                         Empleado
                       </option>
                     </select>

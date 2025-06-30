@@ -421,7 +421,7 @@ export default function EmployeeProfile() {
         </div>
       )}
 
-      {user && user.role === "admin" && (
+      {user && user.admin && (
         <div className="mt-10">
           <h2 className="text-darkText text-xl  font-black mb-3">
             Evaluaciones hechas por{" "}
@@ -429,7 +429,7 @@ export default function EmployeeProfile() {
           </h2>
           {user &&
           employeeData &&
-          user.role === "admin" &&
+          user.admin &&
           employeeData.access_level > 1 ? (
             <EmployeeEvaluationsList evaluatorId={employeeData.user_id} />
           ) : null}

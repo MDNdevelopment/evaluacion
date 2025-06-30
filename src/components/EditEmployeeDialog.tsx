@@ -45,6 +45,7 @@ export function EditEmployeeDialog({
   const [birthDate, setBirthDate] = useState<null | Date>(null);
   const [sendingData, setSendingData] = useState<boolean>(false);
   const [hireDate, setHireDate] = useState<null | Date>(null);
+  const [employeePosition, setEmployeePosition] = useState<number | null>(null);
   const { register, setValue, handleSubmit } = useForm({
     defaultValues: {
       first_name: "",
@@ -123,12 +124,13 @@ export function EditEmployeeDialog({
         department_id: data.department_id,
         department_name: data.name,
       });
-      setValue("position_id", data.position_id);
       setSelectedPositions(
         positions.filter(
           (position) => position.department_id === data.department_id
         )
       );
+      setValue("position_id", data.position_id);
+      setEmployeePosition(data.position_id);
     }
   };
 
@@ -154,6 +156,10 @@ export function EditEmployeeDialog({
       getEmployeeData(employeeId);
     }
   }, [employeeId, isEditEmployeeDialogOpen]);
+
+  useEffect(() => {
+    setValue("position_id", employeePosition || 0);
+  }, [employeePosition]);
 
   return (
     <Dialog
@@ -280,18 +286,23 @@ export function EditEmployeeDialog({
             </select>
           </div>
           <div className="flex flex-row items-center gap-4">
-            <Label htmlFor="username" className="text-right w-2/4">
+            <Label htmlFor="position" className="text-right w-2/4">
               Cargo
             </Label>
             <select
               {...register("position_id")}
               className="border p-1 rounded-md shadow-sm w-full "
             >
-              {selectedPositions.map((position) => (
-                <option key={position.position_id} value={position.position_id}>
-                  {position.position_name}
-                </option>
-              ))}
+              {employeePosition &&
+                selectedPositions &&
+                selectedPositions.map((currPosition) => (
+                  <option
+                    key={currPosition.position_id}
+                    value={currPosition.position_id}
+                  >
+                    {currPosition.position_name}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-row items-center gap-4">
