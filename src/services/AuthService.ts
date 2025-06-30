@@ -63,7 +63,7 @@ export const loginUser = async ({
         position_name: employeeData.positions.position_name,
         access_level: employeeData.access_level,
         company_id: employeeData.company_id,
-        role: employeeData.role,
+        admin: employeeData.admin,
       });
 
       setCompany({

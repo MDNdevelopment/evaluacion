@@ -55,7 +55,7 @@ export const AdminRoute = ({ children }: Props) => {
   }
 
   // If the user is not an admin, redirect to their profile
-  if (user.role !== "admin") {
+  if (!user.admin) {
     return <Navigate to={`/empleado/${user.id}`} replace />;
   }
 
@@ -73,7 +73,7 @@ export const AccessRoute = ({ children, access_level = 1 }: Props) => {
   if (!user) {
     return <>Cargando...</>;
   }
-  if (user && user.access_level < access_level && user.role !== "admin") {
+  if (user && user.access_level < access_level && !user.admin) {
     return <Navigate to={`/empleado/${user.id}`} replace />;
   }
 

@@ -32,21 +32,21 @@ export default function Navbar() {
       href: "/dashboard/nuevo",
       current: false,
       accessLevel: 2,
-      role: "admin",
+      admin: true,
     },
     {
       name: "Mi perfil",
       href: `/empleado/${user?.id}`,
       current: false,
       accessLevel: 1,
-      role: "employee",
+      admin: false,
     },
     {
       name: "Organización",
       href: "/organizacion",
       current: false,
       accessLevel: 2,
-      role: "admin",
+      admin: true,
     },
   ];
   return (
@@ -83,8 +83,8 @@ export default function Navbar() {
                     navigation.map((item) => {
                       if (
                         (user.access_level >= item.accessLevel &&
-                          user.role === (item?.role ?? "employee")) ||
-                        user.role === "admin"
+                          user.admin === (item?.admin ?? false)) ||
+                        user.admin
                       ) {
                         return (
                           <Link
@@ -167,8 +167,8 @@ export default function Navbar() {
                 navigation.map((item) => {
                   if (
                     (user.access_level >= item.accessLevel &&
-                      user.role === (item?.role ?? "employee")) ||
-                    user.role === "admin"
+                      user.admin === (item?.admin ?? false)) ||
+                    user.admin
                   ) {
                     return (
                       <Link

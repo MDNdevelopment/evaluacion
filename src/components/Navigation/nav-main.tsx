@@ -27,12 +27,12 @@ export function NavMain({
     title: string;
     url: string;
     icon?: LucideIcon;
-    role: string;
+    admin: boolean;
     access_level: number;
     items?: {
       title: string;
       url: string;
-      role: string;
+      admin: boolean;
     }[];
   }[];
 }) {
@@ -57,8 +57,7 @@ export function NavMain({
                     {item.items.map(
                       (subItem) =>
                         user &&
-                        (user?.role === subItem.role ||
-                          user?.role === "admin") && (
+                        (user?.admin === subItem.admin || user?.admin) && (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild>
                               <Link to={subItem.url}>
@@ -76,9 +75,9 @@ export function NavMain({
             </Collapsible>
           ) : (
             user &&
-            ((user?.role === item.role &&
+            ((user?.admin === item.admin &&
               user?.access_level >= item.access_level) ||
-              user?.role === "admin") && (
+              user?.admin) && (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton tooltip={item.title} asChild>
                   <Link to={item.url} className="flex items-center gap-2">

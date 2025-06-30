@@ -9,7 +9,7 @@ export function CompanyOptions({ setSelectedOption }: any) {
   return (
     <div className="flex flex-col items-start mt-5">
       {COMPANY_OPTIONS.map((option, index) => {
-        if (user.role === option.role || option.role === "employee") {
+        if (user.admin === option.admin || !option.admin) {
           return (
             <Button
               key={option.option}
