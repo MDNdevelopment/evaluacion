@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
 import SingleDatePicker from "./SingleDatePicker";
+import parseLocalDate from "@/utils/parseLocalDate";
 
 interface Department {
   department_name: string;
@@ -336,10 +337,4 @@ export function EditEmployeeDialog({
       </DialogContent>
     </Dialog>
   );
-}
-
-function parseLocalDate(str: string) {
-  if (!str) return undefined;
-  const [year, month, day] = str.split("-");
-  return new Date(Number(year), Number(month) - 1, Number(day));
 }
