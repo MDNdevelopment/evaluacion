@@ -363,16 +363,16 @@ export default function NewEmployee() {
                 {errors.phone.message}
               </p>
             )}
-            <div className="flex flex-row items-center mt-5 px-1">
+            <div className="flex flex-row items-center mt-5 px-1 ">
               <label className="lg:w-2/6 w-4/6 lg:text-base text-sm">
                 Contraseña:{" "}
               </label>
-              <div className="relative w-full flex">
+              <div className="relative h-fit w-full flex items-center mb-2">
                 <input
                   id="password"
                   type={showPassword1 ? "text" : "password"}
                   autoComplete="current-password"
-                  className={`block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6  ${
+                  className={`block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm    sm:leading-6  ${
                     errors.password && "ring-red-500 focus:outline-red-500"
                   }`}
                   {...register("password", {
@@ -489,7 +489,7 @@ export default function NewEmployee() {
               <select
                 id="access_level"
                 {...register("access_level")}
-                className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
+                className="block relative bg-white w-full rounded-md border-0 py-2 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
               >
                 <option value={1}>1</option>
                 <option value={2}>2 </option>
@@ -505,7 +505,7 @@ export default function NewEmployee() {
               <select
                 id="admin"
                 {...register("admin")}
-                className="block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
+                className="block relative bg-white w-full rounded-md border-0 py-2 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6"
               >
                 <option value="true">Admin</option>
                 <option selected value="false">
