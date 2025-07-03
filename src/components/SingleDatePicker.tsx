@@ -20,7 +20,7 @@ interface SingleDatePickerProps {
   endYear?: number;
   identifier: string;
   setValue: any;
-  date: Date;
+  date?: Date;
   setDate: (val: Date) => void;
 }
 
@@ -38,13 +38,13 @@ export default function DatePicker({
   );
 
   const handleMonthChange = (month: string) => {
-    const newDate = setMonth(date, MONTHS.indexOf(month));
+    const newDate = setMonth(date ?? new Date(), MONTHS.indexOf(month));
     setDate(newDate);
     setValue(identifier, newDate);
   };
 
   const handleYearChange = (year: string) => {
-    const newDate = setYear(date, parseInt(year));
+    const newDate = setYear(date ?? new Date(), parseInt(year));
     setDate(newDate);
     setValue(identifier, newDate);
   };
@@ -60,8 +60,6 @@ export default function DatePicker({
       setDate(date);
       return;
     }
-
-    setDate(new Date());
   }, []);
 
   return (
@@ -86,7 +84,7 @@ export default function DatePicker({
         <div className="w-full flex justify-between">
           <Select
             onValueChange={handleMonthChange}
-            value={MONTHS[getMonth(date)]}
+            value={MONTHS[getMonth(date ?? new Date())]}
           >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Mes" />
@@ -101,7 +99,7 @@ export default function DatePicker({
           </Select>
           <Select
             onValueChange={handleYearChange}
-            value={getYear(date).toString()}
+            value={getYear(date ?? new Date()).toString()}
           >
             <SelectTrigger className="w-[90px]">
               <SelectValue placeholder="Año" />
