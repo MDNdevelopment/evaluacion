@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "prepare": "husky",
     "commitlint": "commitlint --edit",
-    "test": "vitest"
+    "test": "vitest",
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "@google/genai": "^0.8.0",
