@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ShowPasswordButton from "../ShowPasswordButton";
 import SingleDatePicker from "../SingleDatePicker";
-import parseLocalDate from "@/utils/parseLocalDate";
 
 export default function PersonalData({
   errors,
@@ -65,7 +64,7 @@ export default function PersonalData({
             <input
               id="lastName"
               type="text"
-              autoComplete="given-name"
+              autoComplete="new-password"
               className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6 ${
                 errors.lastName && "ring-red-500 focus:outline-red-500"
               }`}
@@ -100,7 +99,7 @@ export default function PersonalData({
             <input
               id="email"
               type="email"
-              autoComplete="email"
+              autoComplete="new-password"
               className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6  ${
                 errors.email && "ring-red-500 focus:outline-red-500"
               }`}
@@ -134,7 +133,7 @@ export default function PersonalData({
             <input
               id="phone"
               type="phone"
-              autoComplete="phone"
+              autoComplete="new-password"
               className={`block bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm  mb-2  sm:leading-6  ${
                 errors.phone && "ring-red-500 focus:outline-red-500"
               }`}
@@ -165,7 +164,7 @@ export default function PersonalData({
               <input
                 id="password"
                 type={showPassword1 ? "text" : "password"}
-                autoComplete="current-password"
+                autoComplete="new-password"
                 className={`block relative bg-white w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset  sm:text-sm    sm:leading-6  ${
                   errors.password && "ring-red-500 focus:outline-red-500"
                 }`}
@@ -197,32 +196,45 @@ export default function PersonalData({
             <label className="lg:w-2/6 w-4/6 lg:text-base text-sm">
               Fecha de nacimiento:{" "}
             </label>
-            <SingleDatePicker
-              identifier="birth_date"
-              setValue={setValue}
-              date={
-                typeof birthDate === "string"
-                  ? parseLocalDate(birthDate) ?? new Date()
-                  : birthDate || new Date()
-              }
-              setDate={setBirthDate}
-            />
+            <div className="flex flex-col w-full">
+              <div className="mb-2">
+                <SingleDatePicker
+                  identifier="birth_date"
+                  setValue={setValue}
+                  date={birthDate ?? undefined}
+                  setDate={setBirthDate}
+                />
+              </div>
+
+              {errors && errors.birth_date && (
+                <p className="text-sm text-red-500  text-right">
+                  {errors.birth_date.message ||
+                    "La fecha de nacimiento es obligatoria"}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-row items-center mt-5 px-1">
             <label className="lg:w-2/6 w-4/6 lg:text-base text-sm">
               Fecha de ingreso:{" "}
             </label>
-            <SingleDatePicker
-              identifier="hire_date"
-              setValue={setValue}
-              date={
-                typeof hireDate === "string"
-                  ? parseLocalDate(hireDate) ?? new Date()
-                  : hireDate || new Date()
-              }
-              setDate={setHireDate}
-            />
+            <div className="flex flex-col w-full">
+              <div className="mb-2">
+                <SingleDatePicker
+                  identifier="hire_date"
+                  setValue={setValue}
+                  date={hireDate ?? undefined}
+                  setDate={setHireDate}
+                />
+              </div>
+              {errors && errors.hire_date && (
+                <p className="text-sm text-red-500  text-right">
+                  {errors.hire_date.message ||
+                    "La fecha de ingreso es obligatoria"}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex justify-end"></div>
         </div>

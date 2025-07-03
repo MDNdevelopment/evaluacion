@@ -9,9 +9,13 @@ export default function JobData({
   setSelectedDepartment,
 }: any) {
   useEffect(() => {
-    if (!selectedDepartment || !positions) return;
+    if (!selectedDepartment || !positions) {
+      console.log({ selectedDepartment, positions });
+      return;
+    }
+    console.log("setting position");
     setValue("position", positions[selectedDepartment][0].position_id);
-  }, [selectedDepartment]);
+  }, [selectedDepartment, positions]);
 
   useEffect(() => {
     if (!departments) return;

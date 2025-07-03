@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
 import { toast } from "react-toastify";
@@ -40,6 +40,8 @@ export default function NewEmployee() {
     watch,
     reset,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
@@ -47,7 +49,7 @@ export default function NewEmployee() {
       lastName: "",
       email: "",
       password: "",
-      position: "",
+      position: undefined,
       department: undefined,
       access_level: 1,
       admin: false,
@@ -57,12 +59,10 @@ export default function NewEmployee() {
     },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = async () => {
-    if (!watch("hire_date") || !watch("birth_date")) {
-      return;
-    }
-
+  const onSubmit: SubmitHandler<Inputs> = async (e) => {
+    console.log(e);
     setIsLoading(true);
+
     //Get user authentication
     const {
       data: { session },
@@ -75,15 +75,15 @@ export default function NewEmployee() {
 
     const { error } = await supabase.functions.invoke("bright-task", {
       body: {
-        firstName: watch("firstName"),
-        lastName: watch("lastName"),
+        first_name: watch("firstName"),
+        last_name: watch("lastName"),
         email: watch("email"),
         password: watch("password"),
-        position: watch("position"),
-        department: watch("department"),
+        position_id: watch("position"),
+        department_id: watch("department"),
         access_level: watch("access_level"),
         admin: watch("admin"),
-        phone: watch("phone"),
+        phone_number: watch("phone"),
         birth_date: watch("birth_date"),
         hire_date: watch("hire_date"),
         companyId: company?.id,
@@ -116,8 +116,36 @@ export default function NewEmployee() {
     setIsLoading(false);
   };
 
+  const customChecker = (e: any) => {
+    e.preventDefault();
+    if (!watch("hire_date")) {
+      setError("hire_date", {
+        type: "manual",
+        message: "La fecha de ingreso es obligatoria",
+      });
+    }
+    if (!watch("birth_date")) {
+      setError("birth_date", {
+        type: "manual",
+        message: "La fecha de nacimiento es obligatoria",
+      });
+    }
+
+    handleSubmit(onSubmit)();
+  };
+
+  useEffect(() => {
+    if (birthDate) {
+      clearErrors("birth_date");
+    }
+
+    if (hireDate) {
+      clearErrors("hire_date");
+    }
+  }, [birthDate, hireDate]);
   return (
     <div className="  p-10 ">
+      {JSON.stringify(Object.keys(errors))}
       <p className="text-neutral-800 text-xl">
         Agrega un nuevo empleado a tu organización
       </p>
@@ -126,7 +154,7 @@ export default function NewEmployee() {
 
       <form
         className=" w-full md:w-5/6 lg:w-4/6 xl:4/6 flex flex-col items-end "
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={customChecker}
       >
         <PersonalData
           setValue={setValue}
