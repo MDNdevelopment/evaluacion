@@ -1,3 +1,5 @@
+//TODO: Creo que este componente no se usa mas
+
 import { FormProvider, useForm } from "react-hook-form";
 import SurveyQuestion from "./SurveyQuestion";
 import { CATEGORIES } from "../constants/evaluationCategories";

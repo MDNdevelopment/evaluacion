@@ -75,7 +75,10 @@ export default function EvaluationForm({
     const { data, error } = await supabase
       .from("question_positions")
       .select("id:question_id, position_id, ...questions(text)")
-      .eq("position_id", employeePosition);
+      .eq("position_id", employeePosition)
+      .eq("questions.removed", false);
+
+    //i need to fetch the questions that has the value 'removed' as false
 
     if (error) {
       console.log(error);
@@ -83,7 +86,7 @@ export default function EvaluationForm({
     }
     if (data) {
       console.log(data);
-      setQuestions(data);
+      setQuestions(data.filter((q) => q.text !== null));
     }
     setIsLoading(false);
   };

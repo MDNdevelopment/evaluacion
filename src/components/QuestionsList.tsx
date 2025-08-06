@@ -125,7 +125,6 @@ export default function QuestionsList({
   };
 
   useEffect(() => {
-    console.log("MOUNTING QUESTION LIST");
     if (fetchingQuestions) {
       fetchQuestions();
       setFetchingQuestions(false);
