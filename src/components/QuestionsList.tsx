@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, ListPlus, Trash } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -29,9 +29,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@headlessui/react";
 import { FaLeftLong, FaRightLong } from "react-icons/fa6";
 import { QuestionDialog } from "./QuestionDialog";
-import { FaTrash } from "react-icons/fa";
 import { ConfirmationDialog } from "./ConfirmationDialog";
 import { QuestionsFilter } from "./QuestionsFilter";
+import { DialogDescription, DialogTitle } from "./ui/dialog";
 
 export default function QuestionsList({
   company,
@@ -53,6 +53,33 @@ export default function QuestionsList({
 
   const [fetchingQuestions, setFetchingQuestions] = useState(true);
   const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
+
+  const filterQuestions = (positions: any) => {
+    console.log("filtering questions");
+    const filteredQuestions = questions.reduce((acc: any, curr: any) => {
+      curr.positions.map((position: any) => {
+        if (positions.includes(position.position_id)) {
+          if (!acc.includes(curr)) {
+            acc.push(curr);
+          }
+        }
+      });
+      return acc;
+    }, []);
+
+    if (filteredQuestions.length === 0) {
+      setValidQuestions(questions);
+      setTotalPages(Math.ceil(questions.length / 10));
+      setCurrentPage(0);
+      setDisplayedQuestions(questions.slice(0, 10));
+      return;
+    }
+
+    setValidQuestions(filteredQuestions);
+    setTotalPages(Math.ceil(filteredQuestions.length / 10));
+    setCurrentPage(0);
+    setDisplayedQuestions(filteredQuestions.slice(0, 10));
+  };
 
   const fetchQuestions = async () => {
     console.log("fetching questions");
@@ -94,38 +121,12 @@ export default function QuestionsList({
       newPositions = [...selectedPositions, positionId];
     }
 
-    const filteredQuestions = questions.reduce((acc: any, curr: any) => {
-      curr.positions.map((position: any) => {
-        if (newPositions.includes(position.position_id)) {
-          if (!acc.includes(curr)) {
-            acc.push(curr);
-          }
-        }
-      });
-      return acc;
-    }, []);
-
-    console.log({ filteredQuestions });
     setSelectedPositions(newPositions);
 
-    if (filteredQuestions.length === 0) {
-      setValidQuestions(questions);
-      setTotalPages(Math.ceil(questions.length / 10));
-      setCurrentPage(0);
-      setDisplayedQuestions(questions.slice(0, 10));
-      return;
-    }
-
-    console.log({ filteredQuestions });
-    console.log({ sliced: filteredQuestions.slice(0, 10) });
-    setValidQuestions(filteredQuestions);
-    setTotalPages(Math.ceil(filteredQuestions.length / 10));
-    setCurrentPage(0);
-    setDisplayedQuestions(filteredQuestions.slice(0, 10));
+    filterQuestions(newPositions);
   };
 
   useEffect(() => {
-    console.log("MOUNTING QUESTION LIST");
     if (fetchingQuestions) {
       fetchQuestions();
       setFetchingQuestions(false);
@@ -175,16 +176,25 @@ export default function QuestionsList({
         );
       },
       cell: ({ row }) => (
-        <div className=" pl-3 w-full flex flex-col items-start">
-          {row.original.text}
-          <div className="mt-4">
-            <div className="flex flex-row fles-wrap">
-              {(row.original.tags ?? []).length > 0 &&
-                (row.original.tags ?? []).map((tag) => {
+        <div className=" pl-3 w-full flex flex-col items-start justify-center ">
+          <div className="flex flex-row flex-start gap-x-3 items-center ">
+            {row.original.removed && (
+              <div className="bg-red-700 text-white px-1 py-1 text-xs rounded-sm font-bold">
+                Desactivada
+              </div>
+            )}
+            {row.original.text}
+          </div>
+
+          {(row.original.tags ?? []).length > 0 && (
+            <div className="mt-4">
+              <div className="flex flex-row fles-wrap">
+                {(row.original.tags ?? []).map((tag) => {
                   return <Tag key={tag.id} text={tag.tag} />;
                 })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ),
     },
@@ -224,16 +234,37 @@ export default function QuestionsList({
             />
 
             <ConfirmationDialog
-              title="Eliminar pregunta"
-              description="¿Seguro que deseas eliminar la pregunta?"
-              confirmText="Eliminar"
+              confirmText={row.original.removed ? "Agregar" : "Eliminar"}
+              mode={row.original.removed ? "add" : "delete"}
               handleSubmit={() => {
-                handleDeleteQuestion(row.original.id, () => {
-                  setFetchingQuestions(true);
-                });
+                //TODO: add a flow to re-add a removed question
+                if (row.original.removed) {
+                  handleAddQuestion(row.original.id, () => {
+                    // setFetchingQuestions(true);
+                    filterQuestions(selectedPositions);
+                  });
+                  row.original.removed = false;
+                } else {
+                  handleDeleteQuestion(row.original.id, () => {
+                    // setFetchingQuestions(true);
+                    filterQuestions(selectedPositions);
+                  });
+                  row.original.removed = true;
+                }
               }}
-              triggerText={<FaTrash />}
-            />
+              triggerText={row.original.removed ? <ListPlus /> : <Trash />}
+            >
+              <DialogTitle className="mt-1">
+                {row.original.removed
+                  ? "Agergar pregunta"
+                  : "Eliminar pregunta"}
+              </DialogTitle>
+              <DialogDescription>
+                {row.original.removed
+                  ? "La pregunta se encuentra desactivada. ¿Deseas activarla de nuevo?"
+                  : "Si la pregunta ha sido respondida en alguna evaluación, será desactivada, de lo contrario será eliminada."}
+              </DialogDescription>
+            </ConfirmationDialog>
           </div>
         );
       },
@@ -397,7 +428,28 @@ function Tag({ text }: { text: string }) {
     </div>
   );
 }
+async function handleAddQuestion(questionId: number, callback: () => void) {
+  const { error } = await supabase
+    .from("questions")
+    .update({ removed: false })
+    .eq("id", questionId);
 
+  if (error) {
+    console.log(error.message);
+    toast.error("Error al agregar la pregunta", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
+    return;
+  }
+
+  toast.success("Pregunta agregada con éxito", {
+    position: "bottom-right",
+    autoClose: 1000,
+  });
+
+  callback();
+}
 async function handleDeleteQuestion(questionId: number, callback: () => void) {
   //Check if the question has been used in any evaluation
   const { data, error: errorFetchQuestion } = await supabase
@@ -428,22 +480,10 @@ async function handleDeleteQuestion(questionId: number, callback: () => void) {
       return;
     }
 
-    //Add a "deactivated" tag to the question
-    const { error: errorTag } = await supabase.from("question_tags").insert({
-      question_id: questionId,
-      tag: "desactivada",
+    toast.success("Pregunta desactivada correctamente", {
+      position: "bottom-right",
+      autoClose: 1000,
     });
-
-    if (errorTag) {
-      console.log(errorTag.message);
-      toast.error("Error al elminar la pregunta EL03", {
-        position: "bottom-right",
-        autoClose: 1000,
-      });
-      return;
-    }
-
-    //TODO: if this fails, the question should be re added to the database
   } else {
     // delete question from the database
     const response = await supabase
@@ -459,13 +499,11 @@ async function handleDeleteQuestion(questionId: number, callback: () => void) {
       return;
     }
 
-    console.log(response);
+    toast.success("Pregunta eliminada correctamente", {
+      position: "bottom-right",
+      autoClose: 1000,
+    });
   }
-
-  toast.success("Pregunta eliminada correctamente", {
-    position: "bottom-right",
-    autoClose: 1000,
-  });
 
   callback();
 

@@ -11,7 +11,6 @@ export const QuestionsFilter = ({
   handlePositionClick: (positionId: number) => void;
   selectedPositions: number[];
 }) => {
-  console.log({ departments });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleOpenerClick = () => {
@@ -36,7 +35,6 @@ export const QuestionsFilter = ({
   positionsList = positionsList.sort((a: any, b: any) =>
     a.name.localeCompare(b.name)
   );
-  console.log({ positionsList });
   return (
     <div>
       <Button

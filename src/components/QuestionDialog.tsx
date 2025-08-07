@@ -13,12 +13,11 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { PositionSelector } from "./PositionSelector";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { XIcon } from "lucide-react";
+import { SquarePen, XIcon } from "lucide-react";
 import { Company, Position } from "@/types";
 import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "@/services/supabaseClient";
 import { toast } from "react-toastify";
-import { FaPencilAlt } from "react-icons/fa";
 
 export function QuestionDialog({
   company,
@@ -309,7 +308,7 @@ export function QuestionDialog({
             onClick={() => setIsOpen(true)}
             variant="outline"
           >
-            {<FaPencilAlt />}
+            {<SquarePen />}
           </Button>
         )}
       </DialogTrigger>
