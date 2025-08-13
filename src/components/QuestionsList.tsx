@@ -28,7 +28,6 @@ import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@headlessui/react";
-import { FaLeftLong, FaRightLong } from "react-icons/fa6";
 import { QuestionDialog } from "./QuestionDialog";
 import { ConfirmationDialog } from "./ConfirmationDialog";
 import { QuestionsFilter } from "./QuestionsFilter";
