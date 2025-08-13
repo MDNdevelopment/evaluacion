@@ -5,6 +5,7 @@ import { Company, Position, Question } from "@/types";
 import {
   ColumnDef,
   ColumnFiltersState,
+  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -45,14 +46,16 @@ export default function QuestionsList({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [_itemsPerPage, _setItemsPerPage] = useState<number>(10);
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [validQuestions, setValidQuestions] = useState<Question[]>([]);
-  const [totalPages, setTotalPages] = useState<number>(0);
 
   const [fetchingQuestions, setFetchingQuestions] = useState(true);
   const [selectedPositions, setSelectedPositions] = useState<number[]>([]);
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const filterQuestions = (positions: any) => {
     console.log("filtering questions");
@@ -69,16 +72,10 @@ export default function QuestionsList({
 
     if (filteredQuestions.length === 0) {
       setValidQuestions(questions);
-      setTotalPages(Math.ceil(questions.length / 10));
-      setCurrentPage(0);
-      setDisplayedQuestions(questions.slice(0, 10));
       return;
     }
 
     setValidQuestions(filteredQuestions);
-    setTotalPages(Math.ceil(filteredQuestions.length / 10));
-    setCurrentPage(0);
-    setDisplayedQuestions(filteredQuestions.slice(0, 10));
   };
 
   const fetchQuestions = async () => {
@@ -105,12 +102,9 @@ export default function QuestionsList({
       console.log(sortedQuestions);
       setQuestions(sortedQuestions);
       setValidQuestions(sortedQuestions);
-      setTotalPages(Math.ceil(sortedQuestions.length / 10));
-      setDisplayedQuestions(sortedQuestions.slice(0, 10));
       return;
     }
     setQuestions([]);
-    setDisplayedQuestions([]);
   };
 
   const handlePositionClick = (positionId: number) => {
@@ -130,35 +124,8 @@ export default function QuestionsList({
     if (fetchingQuestions) {
       fetchQuestions();
       setFetchingQuestions(false);
-      setCurrentPage(0);
     }
   }, [company, fetchingQuestions]);
-
-  const handlePageDown = () => {
-    if (currentPage === 0) {
-      return;
-    }
-    const newPage = currentPage - 1;
-    const start = newPage * 10;
-    const end = start + 9;
-    console.log({ start, end });
-    setDisplayedQuestions(validQuestions.slice(start, end));
-    console.log(questions.slice(start, end));
-    setCurrentPage(newPage);
-  };
-
-  const handlePageUp = () => {
-    if (currentPage === totalPages - 1) {
-      return;
-    }
-    const newPage = currentPage + 1;
-    const start = newPage * 10;
-    const end = start + 9;
-    console.log({ start, end });
-    setDisplayedQuestions(validQuestions.slice(start, end));
-    console.log(questions.slice(start, end));
-    setCurrentPage(newPage);
-  };
 
   const columns: ColumnDef<Question>[] = [
     {
@@ -237,19 +204,19 @@ export default function QuestionsList({
               confirmText={row.original.removed ? "Agregar" : "Eliminar"}
               mode={row.original.removed ? "add" : "delete"}
               handleSubmit={() => {
-                //TODO: add a flow to re-add a removed question
+                //TODO: Que no se vaya a la pagina 0 al hacer fetch de preguntas
+
                 if (row.original.removed) {
                   handleAddQuestion(row.original.id, () => {
-                    // setFetchingQuestions(true);
+                    setFetchingQuestions(true);
                     filterQuestions(selectedPositions);
                   });
                   row.original.removed = false;
                 } else {
                   handleDeleteQuestion(row.original.id, () => {
-                    // setFetchingQuestions(true);
+                    setFetchingQuestions(true);
                     filterQuestions(selectedPositions);
                   });
-                  row.original.removed = true;
                 }
               }}
               triggerText={row.original.removed ? <ListPlus /> : <Trash />}
@@ -272,7 +239,7 @@ export default function QuestionsList({
   ];
 
   const table = useReactTable({
-    data: displayedQuestions,
+    data: validQuestions,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -282,13 +249,15 @@ export default function QuestionsList({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    manualPagination: true,
+
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
+    onPaginationChange: setPagination,
     globalFilterFn: (row, _columnId, filterValue) => {
       const question = row.original.text.toLowerCase();
       const searchValue = filterValue.toLowerCase();
@@ -299,6 +268,8 @@ export default function QuestionsList({
 
   return (
     <div className="flex flex-col">
+      {JSON.stringify(table.getState().pagination)}
+      {JSON.stringify(table.getCanNextPage())}
       <QuestionDialog
         company={company}
         setFetchingQuestions={setFetchingQuestions}
@@ -316,45 +287,46 @@ export default function QuestionsList({
             placeholder="Buscar..."
             onChange={(event) => {
               if (event.target.value === "") {
-                setDisplayedQuestions(validQuestions.slice(0, 10));
-                setTotalPages(Math.ceil(validQuestions.length / 10));
-                setCurrentPage(0);
                 return table.setGlobalFilter(event.target.value);
               }
-              const searchedQuestions = validQuestions.filter((question) =>
-                question.text
-                  .toLowerCase()
-                  .includes(event.target.value.toLowerCase())
-              );
-              setDisplayedQuestions(searchedQuestions);
-              setTotalPages(Math.ceil(searchedQuestions.length / 10));
-              setCurrentPage(0);
+
               return table.setGlobalFilter(event.target.value);
             }}
             className="max-w-sm border border-gray-300 rounded-md px-2 py-1"
           />
-          <div className=" text-center">
-            <Button
-              onClick={() => {
-                handlePageDown();
-              }}
-              variant="outline"
-              className="ml-2"
-            >
-              <FaLeftLong />
-            </Button>
-            <Button
-              onClick={() => {
-                handlePageUp();
-              }}
-              variant="outline"
-              className="ml-2"
-            >
-              <FaRightLong />
-            </Button>
-            <p>
-              Página {currentPage + 1} de {totalPages}
-            </p>
+          <div className=" text-center flex flex-col ">
+            {validQuestions.length > 0 && (
+              <div className="flex  flex-col gap-4 lg:gap-0 items-center justify-between space-x-2 py-4 px-5">
+                <div className="flex items-center justify-between mt-4 mb-2 gap-2">
+                  <span className="text-sm text-neutral-600">
+                    Página {pagination.pageIndex + 1} de{" "}
+                    {Math.ceil(validQuestions.length / pagination.pageSize)}
+                    {"."}
+                  </span>
+                  <span className="text-sm text-neutral-600">
+                    Preguntas: {validQuestions.length}
+                  </span>
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    Anterior
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -492,7 +464,7 @@ async function handleDeleteQuestion(questionId: number, callback: () => void) {
       .eq("id", questionId);
     if (response.error) {
       console.log(response.error.message);
-      toast.error("Error al elminar la pregunta EL03", {
+      toast.error("Error al eliminar la pregunta EL03", {
         position: "bottom-right",
         autoClose: 1000,
       });
