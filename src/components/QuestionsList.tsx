@@ -266,9 +266,11 @@ export default function QuestionsList({
   });
 
   return (
-    <div className="flex flex-col">
-      {JSON.stringify(table.getState().pagination)}
-      {JSON.stringify(table.getCanNextPage())}
+    <div className="flex flex-col max-w-[1200px] mx-auto w-full pt-10">
+      <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+        Preguntas
+      </h2>
+
       <QuestionDialog
         company={company}
         setFetchingQuestions={setFetchingQuestions}
@@ -280,8 +282,8 @@ export default function QuestionsList({
         handlePositionClick={handlePositionClick}
         selectedPositions={selectedPositions}
       />
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="flex flex-row justify-between items-end py-4 ">
+      <div>
+        <div className="flex flex-row  justify-between items-end py-1 ">
           <Input
             placeholder="Buscar..."
             onChange={(event) => {
@@ -291,7 +293,7 @@ export default function QuestionsList({
 
               return table.setGlobalFilter(event.target.value);
             }}
-            className="max-w-sm border border-gray-300 rounded-md px-2 py-1"
+            className="max-w-sm border border-gray-300 rounded-md px-2 mb-5 py-1"
           />
           <div className=" text-center flex flex-col ">
             {validQuestions.length > 0 && (
