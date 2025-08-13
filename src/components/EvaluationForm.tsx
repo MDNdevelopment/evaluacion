@@ -78,7 +78,6 @@ export default function EvaluationForm({
       .eq("position_id", employeePosition)
       .eq("questions.removed", false);
 
-    //i need to fetch the questions that has the value 'removed' as false
 
     if (error) {
       console.log(error);

@@ -26,4 +26,5 @@ export interface Question {
     tag: string;
     id: number;
   }[];
+  removed?: boolean;
 }
