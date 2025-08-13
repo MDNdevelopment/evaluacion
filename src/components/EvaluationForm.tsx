@@ -78,6 +78,7 @@ export default function EvaluationForm({
       .eq("position_id", employeePosition)
       .eq("questions.removed", false);
 
+
     if (error) {
       console.log(error);
       return;
