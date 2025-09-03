@@ -63,8 +63,6 @@ export default function EvaluationForm({
           ...methods.getValues("responses"),
           [answer.question_id]: answer.response,
         });
-
-        console.log(methods.watch("responses"));
       }
     );
     setDisabledForm(true);
@@ -83,7 +81,6 @@ export default function EvaluationForm({
       return;
     }
     if (data) {
-      console.log(data);
       setQuestions(data.filter((q) => q.text !== null));
     }
     setIsLoading(false);
@@ -103,8 +100,6 @@ export default function EvaluationForm({
       console.log(error);
       return;
     }
-    console.log({ data });
-    console.log("setting answers");
     setAnswers(data.evaluation_responses);
 
     setEvaluationData({
@@ -126,6 +121,7 @@ export default function EvaluationForm({
   }, [isOpen]);
 
   const handleSubmit = async (data: any) => {
+    console.log("submitting");
     setIsLoading(true);
     if (userAccessLevel === 1) {
       toast.error("No tienes permisos para evaluar.", {
@@ -251,88 +247,87 @@ export default function EvaluationForm({
               </h3>
             )}
           </DialogHeader>
-
-          <div className="overflow-y-auto touch-auto max-h-[100%]">
-            {questions.length > 0 ? (
-              <FormProvider {...methods}>
-                <form
-                  aria-disabled={disabledForm}
-                  className="max-w-full w-full"
-                  onSubmit={methods.handleSubmit(handleSubmit)}
-                >
+          <FormProvider {...methods}>
+            <form
+              aria-disabled={disabledForm}
+              className="max-w-full w-full"
+              onSubmit={methods.handleSubmit(handleSubmit)}
+            >
+              <div className="overflow-y-auto touch-auto max-h-[100%]">
+                {questions.length > 0 ? (
                   <EvaluationList
                     evaluationId={evaluationId}
                     questions={questions}
                   />
-                </form>
-              </FormProvider>
-            ) : isLoading ? (
-              <div className="flex justify-center items-center">
-                <Spinner />
+                ) : isLoading ? (
+                  <div className="flex justify-center items-center">
+                    <Spinner />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center p-10 bg-gray-100 rounded-md">
+                    <h3 className="scroll-m-20 text-md font-semibold text-gray-600">
+                      No hay preguntas para este cargo.
+                    </h3>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center justify-center p-10 bg-gray-100 rounded-md">
-                <h3 className="scroll-m-20 text-md font-semibold text-gray-600">
-                  No hay preguntas para este cargo.
-                </h3>
+              <div>
+                <div className="flex flex-row items-center justify-start pt-5 ">
+                  <h3 className="font-bold mb-1">Comentario</h3>
+                  {!evaluationId && (
+                    <span
+                      className={`${
+                        commentCharacters > 80
+                          ? "text-neutral-400"
+                          : commentCharacters > 20
+                          ? "text-yellow-500"
+                          : commentCharacters > 0
+                          ? "text-red-500"
+                          : "text-red-700"
+                      } ml-2`}
+                    >
+                      {commentCharacters}/400
+                    </span>
+                  )}
+                </div>
+                <textarea
+                  maxLength={400}
+                  className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-auto"
+                  placeholder="Escribe un comentario..."
+                  disabled={!!evaluationId}
+                  {...methods.register("comment", { maxLength: 400 })}
+                />
               </div>
-            )}
-          </div>
-          <div>
-            <div className="flex flex-row items-center justify-start pt-5 ">
-              <h3 className="font-bold mb-1">Comentario</h3>
-              {!evaluationId && (
-                <span
-                  className={`${
-                    commentCharacters > 80
-                      ? "text-neutral-400"
-                      : commentCharacters > 20
-                      ? "text-yellow-500"
-                      : commentCharacters > 0
-                      ? "text-red-500"
-                      : "text-red-700"
-                  } ml-2`}
-                >
-                  {commentCharacters}/400
-                </span>
-              )}
-            </div>
-            <textarea
-              maxLength={400}
-              className="w-full h-24 border border-gray-300 rounded-md p-2 overflow-y-auto"
-              placeholder="Escribe un comentario..."
-              disabled={!!evaluationId}
-              {...methods.register("comment", { maxLength: 400 })}
-            />
-          </div>
-          <DialogFooter className="pt-2">
-            {!!evaluationId ? (
-              <Button
-                onClick={() => {
-                  handleDelete();
-                }}
-                variant={"destructive"}
-                type="button"
-              >
-                Eliminar evaluación
-              </Button>
-            ) : (
-              <Button
-                disabled={
-                  Object.keys(methods.watch("responses")).length !==
-                    questions?.length ||
-                  !!evaluationId ||
-                  questions.length === 0 ||
-                  isLoading
-                }
-                className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
-                variant={"outline"}
-                type="submit"
-              >
-                Enviar
-              </Button>
-            )}
-          </DialogFooter>
+              <DialogFooter className="pt-2">
+                {!!evaluationId ? (
+                  <Button
+                    onClick={() => {
+                      handleDelete();
+                    }}
+                    variant={"destructive"}
+                    type="button"
+                  >
+                    Eliminar evaluación
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={
+                      Object.keys(methods.watch("responses")).length !==
+                        questions?.length ||
+                      !!evaluationId ||
+                      questions.length === 0 ||
+                      isLoading
+                    }
+                    className="bg-green-600 text-white disabled:bg-gray-300 disabled:text-gray-700"
+                    variant={"outline"}
+                    type="submit"
+                  >
+                    Enviar
+                  </Button>
+                )}
+              </DialogFooter>
+            </form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
     </>
@@ -350,15 +345,12 @@ const EvaluationList = ({
   const { setValue, getValues, watch } = useFormContext();
 
   const handleChange = (questionId: number, value: number) => {
-    console.log({ questionId, value });
     setValue("responses", { ...getValues("responses"), [questionId]: value });
-    console.log(watch("responses"));
   };
   return (
     <div className=" md:max-h-[200px] lg:max-h-[300px] xl:max-h-[350px] xxl:max-h-[900px]">
       {questions &&
         questions.map((question) => {
-          console.log(question);
           return (
             <div
               className="border p-2 text-center my-2 rounded-md hover:bg-gray-100"
