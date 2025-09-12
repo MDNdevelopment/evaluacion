@@ -94,7 +94,10 @@ export default function EmployeeProfile() {
         agg[curr.period].totalScore += curr.total_score;
 
         //If the comment exists, add it to that period
-        if (curr.evaluation_comments[0].comment.length > 0) {
+        if (
+          curr.evaluation_comments.length > 0 &&
+          curr.evaluation_comments[0].comment.length > 0
+        ) {
           agg[curr.period].comments.push(curr.evaluation_comments[0].comment);
         }
 
