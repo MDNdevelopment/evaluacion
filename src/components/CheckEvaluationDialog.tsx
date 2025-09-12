@@ -141,14 +141,15 @@ export const CheckEvaluationDialog = ({
                   );
                 })}
 
-                {retrievedAnswers.evaluation_comments[0]?.comment !== "" && (
-                  <div className="bg-gray-100 min-h-[6.5rem] p-4">
-                    <h3 className="font-bold">Comentarios adicionales:</h3>
-                    <p className="mt-1 rounded-r-lg text-left w-full">
-                      {retrievedAnswers.evaluation_comments[0].comment}
-                    </p>
-                  </div>
-                )}
+                {retrievedAnswers.evaluation_comments[0]?.comment !== "" &&
+                  retrievedAnswers.evaluation_comments.length > 0 && (
+                    <div className="bg-gray-100 min-h-[6.5rem] p-4">
+                      <h3 className="font-bold">Comentarios adicionales:</h3>
+                      <p className="mt-1 rounded-r-lg text-left w-full">
+                        {retrievedAnswers.evaluation_comments[0].comment}
+                      </p>
+                    </div>
+                  )}
               </>
             ) : (
               <div className="flex justify-center items-center w-full h-24">
