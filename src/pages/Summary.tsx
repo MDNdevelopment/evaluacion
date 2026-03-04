@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "../services/supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -14,46 +14,79 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { useUserStore } from "@/stores";
+import EvaluationsMadeDialog from "../components/EvaluationsMadeDialog";
 
 export default function Summary() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<any>(null);
+  const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
+  const [selectedManager, setSelectedManager] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { register, handleSubmit, watch } = useForm();
 
-  const columns: ColumnDef<any>[] = [
-    {
-      accessorKey: "first_name",
-      header: "Nombre",
-      enableSorting: true,
-    },
-    {
-      accessorKey: "last_name",
-      header: "Apellido",
-      enableSorting: true,
-    },
-    {
-      accessorKey: "position_name",
-      header: "Cargo",
-      enableSorting: true,
-    },
-    {
-      accessorKey: "department_name",
-      header: "Departamento",
-      enableSorting: true,
-    },
-    {
-      accessorKey: "total_score",
-      header: "Total",
-      enableSorting: true,
-    },
-    {
-      accessorKey: "evaluation_count",
-      header: "Evaluaciones",
-      enableSorting: true,
-    },
-    {
+  const month = watch("month");
+  const year = watch("year");
+  const periodDate = `${year}-${String(month).padStart(2, "0")}-01`;
+
+  const columns: ColumnDef<any>[] = useMemo(() => {
+    const base: ColumnDef<any>[] = [
+      {
+        accessorKey: "first_name",
+        header: "Nombre",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "last_name",
+        header: "Apellido",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "position_name",
+        header: "Cargo",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "department_name",
+        header: "Dept.",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "total_score",
+        header: "Puntaje Total",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "evaluation_count",
+        header: `Eval. recibidas`,
+        enableSorting: true,
+      },
+    ];
+
+    // only show evaluated_others_count for admins
+    if (user?.admin) {
+      base.push({
+        accessorKey: "evaluated_others_count",
+        header: "Eval. hechas",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <Button
+            className="underline "
+            variant="ghost"
+            onClick={() => {
+              setSelectedManager(row.original.user_id);
+              setIsDialogOpen(true);
+            }}
+          >
+            {row.original.evaluated_others_count}
+          </Button>
+        ),
+      });
+    }
+
+    base.push({
       id: "actions",
       header: "Acciones",
       cell: ({ row }) => {
@@ -83,8 +116,10 @@ export default function Summary() {
           </DropdownMenu>
         );
       },
-    },
-  ];
+    });
+
+    return base;
+  }, [user, navigate]);
 
   const onSubmit = handleSubmit(async (data: any) => {
     setIsLoading(true);
@@ -150,108 +185,6 @@ export default function Summary() {
         </select>
       </form>
 
-      {/* <div className="overflow-x-auto">
-        <table className="overflow-x-auto mt-5 w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr className="">
-              <th scope="col" className="px-6 py-3 text-center">
-                Nombre y apellido
-              </th>
-              <th
-                onClick={() => sortDepartments()}
-                scope="col"
-                className="px-6 py-3 text-center cursor-pointer"
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <p>Departamento</p>{" "}
-                  <FaAngleDown
-                    className={`d-block
-                        ${departmentsDirection ? " " : " rotate-180"}
-                      `}
-                  />
-                </div>
-              </th>
-              <th scope="col" className="px-6 py-3 text-center">
-                Rol
-              </th>
-              <th
-                onClick={() => sortEvaluations()}
-                scope="col"
-                className="px-6 py-3 text-center cursor-pointer  "
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <p>Evaluaciones</p>{" "}
-                  <FaAngleDown
-                    className={`d-block
-                        ${evaluationsDirection ? " " : " rotate-180"}
-                      `}
-                  />
-                </div>
-              </th>
-              <th
-                onClick={() => sortAverages()}
-                scope="col"
-                className="px-6 py-3 text-center cursor-pointer"
-              >
-                <div className="flex flex-row items-center justify-between">
-                  <p>Promedio</p>{" "}
-                  <FaAngleDown
-                    className={`d-block
-                        ${averagesDirection ? " " : " rotate-180"}
-                      `}
-                  />
-                </div>
-              </th>
-
-              <th>Acción</th>
-            </tr>
-          </thead>
-
-          {!isLoading && data && data.length > 0 && (
-            <tbody className="relative">
-              {data.map((employee: any) => {
-                console.log(employee);
-                return (
-                  <tr
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                    key={employee.user_id}
-                  >
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                    >
-                      {`${employee.first_name} ${employee.last_name}`}
-                    </th>
-                    <td className="px-6 py-4">{employee.department_name}</td>
-
-                    <td className="px-6 py-4">{employee.position_name}</td>
-                    <td className="px-6 py-4 text-center">
-                      {employee.evaluation_count}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      {employee.average_total_rate.toFixed(2)}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="flex flex-row  ">
-                        <FaUser
-                          color="#222222"
-                          size={22}
-                          className="mx-2 cursor-pointer"
-                          onClick={() => {
-                            navigate(`/empleado/${employee.target_employee}`);
-                          }}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          )}
-        </table>
-      </div> */}
-
       {isLoading ? (
         <div>
           <div className="bg-white flex justify-center items-center w-full py-5 mt-2">
@@ -263,6 +196,12 @@ export default function Summary() {
           <DataTable columns={columns} data={data} />
         </div>
       )}
+      <EvaluationsMadeDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        managerId={selectedManager || ""}
+        period={periodDate}
+      />
     </div>
   );
 }
